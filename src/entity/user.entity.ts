@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   PrimaryColumn,
   UpdateDateColumn,
@@ -19,6 +20,10 @@ export class User {
   @ApiProperty({ description: '사용자 정보 수정일' })
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @ApiProperty({ description: '사용자 계정 삭제일' })
+  @DeleteDateColumn()
+  deletedAt: Date;
 
   @ApiProperty({ description: '이름' })
   @Column()
