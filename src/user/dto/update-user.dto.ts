@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString } from 'class-validator';
+import { IsEmail, IsOptional, IsPhoneNumber, IsString } from 'class-validator';
 
 export class UpdateUserDto {
   @IsString()
@@ -10,7 +10,7 @@ export class UpdateUserDto {
   })
   name?: string;
 
-  @IsString()
+  @IsPhoneNumber('KR')
   @IsOptional()
   @ApiProperty({
     description: '휴대폰번호',
@@ -18,7 +18,7 @@ export class UpdateUserDto {
   })
   phone?: string;
 
-  @IsString()
+  @IsEmail()
   @IsOptional()
   @ApiProperty({
     description: '이메일주소',

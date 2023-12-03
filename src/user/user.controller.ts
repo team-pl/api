@@ -10,8 +10,8 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ApiTags } from '@nestjs/swagger';
-import { CreateUserDto } from 'src/dto/create-user.dto';
-import { UpdateUserDto } from 'src/dto/update-user.dto';
+import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { UpdateUserDto } from 'src/user/dto/update-user.dto';
 
 @Controller('user')
 @ApiTags('User')
@@ -30,9 +30,11 @@ export class UserController {
   }
 
   @Post()
-  createUser(@Body(new ValidationPipe()) data: CreateUserDto) {
-    return this.service.createUser(data);
+  signUp(@Body(new ValidationPipe()) data: CreateUserDto) {
+    return this.service.signUp(data);
   }
+
+  login() {}
 
   @Put(':id')
   updateUser(

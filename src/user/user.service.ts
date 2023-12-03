@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreateUserDto } from 'src/dto/create-user.dto';
-import { UpdateUserDto } from 'src/dto/update-user.dto';
+import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { UpdateUserDto } from 'src/user/dto/update-user.dto';
 import { User } from 'src/entity/user.entity';
 import { IsNull, Repository } from 'typeorm';
 import { v4 as uuid } from 'uuid';
@@ -30,7 +30,7 @@ export class UserService {
     return this.getUserById(id);
   }
 
-  async createUser(data: CreateUserDto) {
+  async signUp(data: CreateUserDto) {
     const id = uuid();
     const user = await this.userRepository.create({ id, ...data });
     return await this.userRepository.save(user);
