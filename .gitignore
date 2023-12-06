@@ -40,6 +40,5 @@ lerna-debug.log*
 .env.development
 
 # 도커
-dockerfile
 .dockerignore
 docker-compose.yml
