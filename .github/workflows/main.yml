@@ -38,7 +38,7 @@ jobs:
         with:
           builder: ${{ steps.buildx.outputs.name }}
           push: true
-          tags: ${{ github.actor }}
+          tags: ${{ env.DOCKER_IMAGE }}
           context: .
           build-args: |
             "STAGE=${{ secrets.STAGE }}"
