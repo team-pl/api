@@ -1,7 +1,13 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import {
+  DocumentBuilder,
+  SwaggerCustomOptions,
+  SwaggerModule,
+} from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+import * as basicAuth from 'express-basic-auth';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -13,8 +19,29 @@ async function bootstrap() {
     .addTag('')
     .build();
 
+  const configService = app.get(ConfigService);
+
+  // Swagger
+
+  app.use(
+    ['/docs', '/docs-json'],
+    basicAuth({
+      challenge: true,
+      users: {
+        [configService.get('swagger.user')]:
+          configService.get('swagger.password'),
+      },
+    }),
+  );
+
+  const SwaggerCustomOption: SwaggerCustomOptions = {
+    swaggerOptions: {
+      persistAuthorization: true,
+    },
+  };
+
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('docs', app, document, SwaggerCustomOption);
 
   app.useGlobalPipes(new ValidationPipe());
 

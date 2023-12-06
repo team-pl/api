@@ -9,11 +9,17 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiExtraModels, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { UpdateUserDto } from 'src/user/dto/update-user.dto';
+import { GetUserResDto, PostUserResDto } from './dto/response.dto';
+import {
+  SwaggerGetResponse,
+  SwaggerPostResponse,
+} from 'src/decorator/swagger.decorator';
 
 @Controller('user')
+@ApiExtraModels(GetUserResDto, PostUserResDto)
 @ApiTags('User')
 export class UserController {
   constructor(private readonly service: UserService) {}
@@ -24,11 +30,13 @@ export class UserController {
     return this.service.getAllUser();
   }
 
+  @SwaggerGetResponse(GetUserResDto)
   @Get(':id')
   getOneUser(@Param('id') id: string) {
     return this.service.getUser(id);
   }
 
+  @SwaggerPostResponse(PostUserResDto)
   @Post()
   signUp(@Body(new ValidationPipe()) data: CreateUserDto) {
     return this.service.signUp(data);
