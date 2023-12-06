@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 env:
-  DOCKER_IMAGE: ghcr.io/jihyeonlim/team-pl
+  DOCKER_IMAGE: ghcr.io/team-pl/team-pl
   VERSION: ${{ github.sha }}
   NAME: cicd
 
@@ -30,7 +30,7 @@ jobs:
         uses: docker/login-action@v1
         with:
           registry: ghcr.io
-          username: jihyeonlim
+          username: ${{ github.actor }}
           password: ${{ secrets.GHCR_TOKEN }}
       - name: Build and push
         id: docker_build
@@ -38,7 +38,7 @@ jobs:
         with:
           builder: ${{ steps.buildx.outputs.name }}
           push: true
-          tags: ${{ env.DOCKER_IMAGE }}:latest
+          tags: ${{ steps.docker_meta.outputs.tags }}
           context: .
           build-args: |
             "STAGE=${{ secrets.STAGE }}"
@@ -54,7 +54,7 @@ jobs:
         uses: docker/login-action@v1
         with:
           registry: ghcr.io
-          username: jihyeonlim
+          username: ${{ github.actor }}
           password: ${{ secrets.GHCR_TOKEN }}
       - name: Docker run
         run: |
