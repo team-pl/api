@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 env:
-  DOCKER_IMAGE: ghcr.io/${{ github.actor }}/team-pl
+  DOCKER_IMAGE: ghcr.io/jihyeonlim/team-pl
   VERSION: ${{ github.sha }}
   NAME: cicd
 
@@ -30,7 +30,7 @@ jobs:
         uses: docker/login-action@v1
         with:
           registry: ghcr.io
-          username: ${{ github.actor }}
+          username: jihyeonlim
           password: ${{ secrets.GHCR_TOKEN }}
       - name: Build and push
         id: docker_build
@@ -54,7 +54,7 @@ jobs:
         uses: docker/login-action@v1
         with:
           registry: ghcr.io
-          username: ${{ github.actor }}
+          username: jihyeonlim
           password: ${{ secrets.GHCR_TOKEN }}
       - name: Docker run
         run: |
