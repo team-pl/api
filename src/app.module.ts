@@ -11,7 +11,7 @@ import swaggerConfig from './config/swagger.config';
     ConfigModule.forRoot({
       isGlobal: true,
       load: [swaggerConfig],
-      envFilePath: `.env.${process.env.NODE_ENV}`,
+      // envFilePath: '.',
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
