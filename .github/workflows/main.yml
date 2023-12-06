@@ -7,7 +7,7 @@ on:
 env:
   DOCKER_IMAGE: ghcr.io/team-pl/team-pl
   VERSION: ${{ github.sha }}
-  NAME: cicd
+  NAME: team-pl
 
 jobs:
   build:
