@@ -39,6 +39,6 @@ lerna-debug.log*
 .env.production
 .env.development
 
-# 도커
-.dockerignore
-docker-compose.yml
+# # 도커
+# .dockerignore
+# docker-compose.yml
