@@ -59,4 +59,16 @@ export class UserService {
       deletedAt: IsNull(),
     });
   }
+
+  async findUser(name: string, phone: string) {
+    const user = await this.userRepository.findOneBy({
+      name,
+      phone,
+      deletedAt: IsNull(),
+    });
+
+    if (!user) throw new HttpException('NotFound', HttpStatus.NOT_FOUND);
+
+    return user;
+  }
 }

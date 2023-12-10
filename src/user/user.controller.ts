@@ -14,6 +14,7 @@ import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { UpdateUserDto } from 'src/user/dto/update-user.dto';
 import { GetUserResDto, PostUserResDto } from './dto/response.dto';
 import {
+  SwaggerGetListResponse,
   SwaggerGetResponse,
   SwaggerPostResponse,
 } from 'src/decorator/swagger.decorator';
@@ -24,6 +25,7 @@ import {
 export class UserController {
   constructor(private readonly service: UserService) {}
 
+  @SwaggerGetListResponse(GetUserResDto)
   @Get()
   getAllUsers() {
     console.log('/GET API ');
@@ -41,8 +43,6 @@ export class UserController {
   signUp(@Body(new ValidationPipe()) data: CreateUserDto) {
     return this.service.signUp(data);
   }
-
-  login() {}
 
   @Put(':id')
   updateUser(

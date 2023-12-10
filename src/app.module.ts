@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
+import { AuthModule } from './auth/auth.module';
 import swaggerConfig from './config/swagger.config';
 
 @Module({
@@ -11,7 +12,6 @@ import swaggerConfig from './config/swagger.config';
     ConfigModule.forRoot({
       isGlobal: true,
       load: [swaggerConfig],
-      // envFilePath: '.',
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -25,6 +25,7 @@ import swaggerConfig from './config/swagger.config';
       logging: true,
     }),
     UserModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
