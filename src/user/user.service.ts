@@ -36,6 +36,24 @@ export class UserService {
     return await this.userRepository.save(user);
   }
 
+  async kakaoSignUp(
+    kakaoId: string,
+    name: string,
+    email: string,
+    profile: string,
+  ) {
+    const id = uuid();
+    const user = await this.userRepository.create({
+      id,
+      kakaoId,
+      name,
+      phone: '',
+      email,
+      profile,
+    });
+    return await this.userRepository.save(user);
+  }
+
   async updateUser(id: string, data: UpdateUserDto) {
     const user = await this.getUserById(id);
 
@@ -70,5 +88,16 @@ export class UserService {
     if (!user) throw new HttpException('NotFound', HttpStatus.NOT_FOUND);
 
     return user;
+  }
+
+  async getUserByKakaoId(id: string) {
+    return await this.userRepository.findOneBy({
+      kakaoId: id,
+      deletedAt: IsNull(),
+    });
+  }
+
+  async setRefreshToken(id: string, token: string) {
+    this.userRepository.update(id, { refreshToken: token });
   }
 }

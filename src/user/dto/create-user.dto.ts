@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEmail, IsNotEmpty, IsPhoneNumber, IsString } from 'class-validator';
 
 export class CreateUserDto {
@@ -25,4 +25,10 @@ export class CreateUserDto {
     example: 'aa@gamil.com',
   })
   email: string;
+
+  @ApiPropertyOptional({
+    description: '카카오 ID',
+    example: '12345678',
+  })
+  kakaoId: string;
 }

@@ -9,6 +9,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { config } from 'dotenv';
 import { JwtStrategy } from './jwt.strategy';
 import { AuthController } from './auth.controller';
+import { KakaoStrategy } from './kakao.strategy';
 
 config();
 
@@ -24,7 +25,7 @@ config();
     }),
     TypeOrmModule.forFeature([User]),
   ],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy, KakaoStrategy],
   exports: [AuthService],
   controllers: [AuthController],
 })
