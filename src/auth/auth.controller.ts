@@ -18,6 +18,7 @@ import {
 import { JwtAuthGuard } from './jwtAuth.guard';
 import { GetUserResDto } from 'src/user/dto/response.dto';
 import { KakaoAuthGuard } from './kakaoAuth.guard';
+import { NaverAuthGuard } from './naver.guard';
 
 @Controller('auth')
 @ApiExtraModels(LoginResDto)
@@ -51,7 +52,6 @@ export class AuthController {
   @UseGuards(KakaoAuthGuard)
   @Get('kakao')
   async getKakaoInfo(@Query() code: string, @Request() req, @Res() res) {
-    console.log('user : ', req.user);
     const { name, email, profile } = req.user;
     const { accessToken, refreshToken, user } = await this.service.getJWT(
       req.user.kakaoId,
@@ -70,5 +70,17 @@ export class AuthController {
   async getMyInfo(@Request() req) {
     const { name, phone } = req.user.name;
     return await this.service.userValidation(name, phone);
+  }
+
+  @UseGuards(NaverAuthGuard)
+  @Get('login-naver')
+  async loginNaver(@Request() req, @Res() res) {
+    console.log('naver 로그인 시도');
+  }
+
+  @UseGuards(NaverAuthGuard)
+  @Get('naver')
+  async getNaverInfo(@Request() req, @Res() res) {
+    console.log('req.user:', req.user);
   }
 }

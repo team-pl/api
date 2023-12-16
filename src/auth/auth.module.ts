@@ -10,6 +10,7 @@ import { config } from 'dotenv';
 import { JwtStrategy } from './jwt.strategy';
 import { AuthController } from './auth.controller';
 import { KakaoStrategy } from './kakao.strategy';
+import { NaverStrategy } from './naver.strategy';
 
 config();
 
@@ -25,7 +26,13 @@ config();
     }),
     TypeOrmModule.forFeature([User]),
   ],
-  providers: [AuthService, LocalStrategy, JwtStrategy, KakaoStrategy],
+  providers: [
+    AuthService,
+    LocalStrategy,
+    JwtStrategy,
+    KakaoStrategy,
+    NaverStrategy,
+  ],
   exports: [AuthService],
   controllers: [AuthController],
 })
