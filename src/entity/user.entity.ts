@@ -51,6 +51,19 @@ export class User {
   kakaoId: string | null;
 
   @ApiProperty({
+    nullable: true,
+    description:
+      '네이버 ID(네이버에서 제공해주며, 네이버 소셜 로그인으로 가입한 사용자는 고유 ID를 가짐)',
+  })
+  @Column({
+    nullable: true,
+    comment:
+      '네이버 ID(네이버에서 제공해주며, 네이버 소셜 로그인으로 가입한 사용자는 고유 ID를 가짐)',
+    default: null,
+  })
+  naverId: string | null;
+
+  @ApiProperty({
     description: 'Refresh Token',
     nullable: true,
   })
