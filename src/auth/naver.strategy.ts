@@ -21,7 +21,7 @@ export class NaverStrategy extends PassportStrategy(Strategy) {
     return {
       name: profile.displayName,
       email: profile._json.email,
-      kakaoId: profile._json.id,
+      naverId: profile.id,
       profile: profile._json.profile_image,
       accessToken,
       refreshToken,
