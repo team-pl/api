@@ -87,6 +87,26 @@ export class AuthService {
     return user;
   }
 
+  async naverValidateUser(
+    naverId: string,
+    name: string,
+    email: string,
+    profile: string,
+    phone: string = '',
+  ): Promise<User> {
+    let user = await this.userService.getUserByNaverId(naverId);
+    if (!user) {
+      user = await this.userService.naverSignUp(
+        naverId,
+        name,
+        email,
+        profile,
+        phone,
+      );
+    }
+    return user;
+  }
+
   async generateRefreshToken(user: User) {
     const jwtPayload = {
       id: user.id,
@@ -105,8 +125,32 @@ export class AuthService {
     return refreshToken;
   }
 
-  async getJWT(kakaoId: string, name: string, email: string, profile: string) {
+  async getKakaoJWT(
+    kakaoId: string,
+    name: string,
+    email: string,
+    profile: string,
+  ) {
     const user = await this.kakaoValidateUser(kakaoId, name, email, profile);
+    const accessToken = await this.generateAccessToken(user);
+    const refreshToken = await this.generateRefreshToken(user); // refreshToken 생성
+    return { accessToken, refreshToken, user };
+  }
+
+  async getNaverJWT(
+    kakaoId: string,
+    name: string,
+    email: string,
+    profile: string,
+    phone: string,
+  ) {
+    const user = await this.naverValidateUser(
+      kakaoId,
+      name,
+      email,
+      profile,
+      phone,
+    );
     const accessToken = await this.generateAccessToken(user);
     const refreshToken = await this.generateRefreshToken(user); // refreshToken 생성
     return { accessToken, refreshToken, user };
