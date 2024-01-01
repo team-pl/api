@@ -18,6 +18,7 @@ import {
   SwaggerGetResponse,
   SwaggerPostResponse,
 } from 'src/decorator/swagger.decorator';
+import { SignupKakaoUserDto } from './dto/signup-user.dto';
 
 @Controller('user')
 @ApiExtraModels(GetUserResDto, PostUserResDto)
@@ -50,6 +51,15 @@ export class UserController {
     @Body(new ValidationPipe()) data: UpdateUserDto,
   ) {
     return this.service.updateUser(id, data);
+  }
+
+  @Put('signup/:id')
+  signUpKakaoUser(
+    @Param('id') id: string,
+    @Body(new ValidationPipe()) data: SignupKakaoUserDto,
+  ) {
+    const { phone, name } = data;
+    return this.service.kakaoNextSignUp(id, phone, name);
   }
 
   @Delete(':id')
