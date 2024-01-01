@@ -1,7 +1,6 @@
 import {
   Controller,
   Get,
-  Post,
   Query,
   Request,
   Res,
@@ -10,15 +9,14 @@ import {
 import { ApiExtraModels, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginResDto } from './dto/response.dto';
-import { LocalAuthGuard } from './localAuth.guard';
-import {
-  SwaggerGetResponse,
-  SwaggerPostResponse,
-} from 'src/decorator/swagger.decorator';
+import { SwaggerGetResponse } from 'src/decorator/swagger.decorator';
 import { JwtAuthGuard } from './jwtAuth.guard';
 import { GetUserResDto } from 'src/user/dto/response.dto';
 import { KakaoAuthGuard } from './kakaoAuth.guard';
 import { NaverAuthGuard } from './naver.guard';
+import { config } from 'dotenv';
+
+config();
 
 @Controller('auth')
 @ApiExtraModels(LoginResDto)
@@ -44,16 +42,16 @@ export class AuthController {
 
   @UseGuards(KakaoAuthGuard)
   @Get('login-kakao')
-  async loginKakao(@Request() req, @Res() res) {
+  async loginKakao(@Res() res) {
     const url = this.service.kakaoRedirect();
     return res.redirect(url);
   }
 
   @UseGuards(KakaoAuthGuard)
   @Get('kakao')
-  async getKakaoInfo(@Query() code: string, @Request() req, @Res() res) {
+  async getKakaoInfo(@Request() req, @Res() res) {
     const { name, email, profile } = req.user;
-    const { accessToken, refreshToken, user } = await this.service.getJWT(
+    const { accessToken, refreshToken, user } = await this.service.getKakaoJWT(
       req.user.kakaoId,
       name,
       email,
@@ -61,6 +59,7 @@ export class AuthController {
     );
     res.cookie('accessToken', accessToken, { httpOnly: true });
     res.cookie('refreshToken', refreshToken, { httpOnly: true });
+    res.redirect(process.env.SIGNUP_KAKAO_REDIRECT_URL);
     return user;
   }
 
@@ -75,12 +74,33 @@ export class AuthController {
   @UseGuards(NaverAuthGuard)
   @Get('login-naver')
   async loginNaver(@Request() req, @Res() res) {
-    console.log('naver 로그인 시도');
+    const api_url =
+      'https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=' +
+      process.env.NAVER_CLIENT_ID +
+      '&redirect_uri=' +
+      process.env.NAVER_CALLBACK_URL;
+    res.writeHead(200, { 'Content-Type': 'text/html;charset=utf-8' });
+    res.end(
+      "<a href='" +
+        api_url +
+        "'><img height='50' src='http://static.nid.naver.com/oauth/small_g_in.PNG'/></a>",
+    );
   }
 
   @UseGuards(NaverAuthGuard)
   @Get('naver')
   async getNaverInfo(@Request() req, @Res() res) {
-    console.log('req.user:', req.user);
+    const { name, email, profile, phone } = req.user;
+    const { accessToken, refreshToken, user } = await this.service.getNaverJWT(
+      req.user.naverId,
+      name,
+      email,
+      profile,
+      phone,
+    );
+    res.cookie('accessToken', accessToken, { httpOnly: true });
+    res.cookie('refreshToken', refreshToken, { httpOnly: true });
+    res.redirect(process.env.SIGNUP_REDIRECT_URL);
+    return user;
   }
 }
