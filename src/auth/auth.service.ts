@@ -79,12 +79,17 @@ export class AuthService {
     name: string,
     email: string,
     profile: string,
-  ): Promise<User> {
+  ): Promise<{ user: User; isNewUser: boolean }> {
+    let isNewUser = false;
     let user = await this.userService.getUserByKakaoId(kakaoId);
     if (!user) {
+      isNewUser = true;
       user = await this.userService.kakaoSignUp(kakaoId, name, email, profile);
     }
-    return user;
+    return {
+      user,
+      isNewUser,
+    };
   }
 
   async naverValidateUser(
@@ -131,10 +136,15 @@ export class AuthService {
     email: string,
     profile: string,
   ) {
-    const user = await this.kakaoValidateUser(kakaoId, name, email, profile);
+    const { user, isNewUser } = await this.kakaoValidateUser(
+      kakaoId,
+      name,
+      email,
+      profile,
+    );
     const accessToken = await this.generateAccessToken(user);
     const refreshToken = await this.generateRefreshToken(user); // refreshToken 생성
-    return { accessToken, refreshToken, user };
+    return { accessToken, refreshToken, user, isNewUser };
   }
 
   async getNaverJWT(
