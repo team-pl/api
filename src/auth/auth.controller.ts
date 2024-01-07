@@ -15,6 +15,8 @@ import { GetUserResDto } from 'src/user/dto/response.dto';
 import { KakaoAuthGuard } from './kakaoAuth.guard';
 import { NaverAuthGuard } from './naver.guard';
 import { config } from 'dotenv';
+import { cookieOption } from 'src/lib/cookie';
+// import * as session from 'express-session';
 
 config();
 
@@ -53,9 +55,10 @@ export class AuthController {
     const { name, email, profile } = req.user;
     const { accessToken, refreshToken, user, isNewUser } =
       await this.service.getKakaoJWT(req.user.kakaoId, name, email, profile);
-    res.cookie('accessToken', accessToken);
-    res.cookie('refreshToken', refreshToken);
-    res.cookie('id', user.id);
+
+    res.cookie('accessToken', accessToken, cookieOption);
+    res.cookie('refreshToken', refreshToken, cookieOption);
+
     if (isNewUser) {
       res.redirect(process.env.SIGNUP_KAKAO_REDIRECT_URL);
     } else {
