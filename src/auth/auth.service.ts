@@ -14,8 +14,8 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async userValidation(name: string, phone: string) {
-    const user = await this.userService.findUser(name, phone);
+  async userValidation(name: string, id: string) {
+    const user = await this.userService.findUser(name, id);
 
     if (user) return user;
 
@@ -83,8 +83,10 @@ export class AuthService {
     let isNewUser = false;
     let user = await this.userService.getUserByKakaoId(kakaoId);
     if (!user) {
-      isNewUser = true;
       user = await this.userService.kakaoSignUp(kakaoId, name, email, profile);
+    }
+    if (!user.phone) {
+      isNewUser = true;
     }
     return {
       user,
