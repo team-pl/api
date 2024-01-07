@@ -8,6 +8,10 @@ import {
 import { ValidationPipe } from '@nestjs/common';
 import * as basicAuth from 'express-basic-auth';
 import { ConfigService } from '@nestjs/config';
+import * as cookieParser from 'cookie-parser';
+import { config } from 'dotenv';
+
+config();
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -20,6 +24,8 @@ async function bootstrap() {
     .build();
 
   const configService = app.get(ConfigService);
+
+  app.use(cookieParser(process.env.COOKIE_SECRET));
 
   // Swagger
 
@@ -46,11 +52,15 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
 
   app.enableCors({
-    origin: ['http://localhost:3001'],
+    origin: [
+      process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3000'
+        : 'https://teampl-plus.com',
+    ],
     credentials: true,
     exposedHeaders: ['Access-Control-Allow-Origin'],
   });
 
-  await app.listen(3000);
+  await app.listen(process.env.NODE_ENV === 'development' ? 3001 : 3000);
 }
 bootstrap();
