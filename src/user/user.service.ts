@@ -97,10 +97,10 @@ export class UserService {
     });
   }
 
-  async findUser(name: string, phone: string) {
+  async findUser(name: string, id: string) {
     const user = await this.userRepository.findOneBy({
       name,
-      phone,
+      id,
       deletedAt: IsNull(),
     });
 
@@ -115,6 +115,7 @@ export class UserService {
       deletedAt: IsNull(),
     });
   }
+
   async getUserByNaverId(id: string) {
     return await this.userRepository.findOneBy({
       naverId: id,
