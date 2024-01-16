@@ -42,3 +42,6 @@ lerna-debug.log*
 # # 도커
 # .dockerignore
 # docker-compose.yml
+
+# 마이그레이션 폴더
+/src/database/migrations
