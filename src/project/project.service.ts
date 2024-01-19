@@ -12,7 +12,7 @@ export class ProjectService {
     private projectRepository: Repository<Project>,
   ) {}
 
-  async create(data: CreateProjectDto) {
+  async create(data: CreateProjectDto, userId: string) {
     const id = uuid();
 
     const { recruitExpiredAt, content, ...rest } = data;
@@ -27,6 +27,7 @@ export class ProjectService {
       id,
       recruitExpiredAt: expiredAt,
       content: bufferContent,
+      userId,
       ...rest,
     });
 

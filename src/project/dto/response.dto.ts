@@ -36,6 +36,9 @@ export class PostProjectResDto {
   @ApiProperty({ description: '프로젝트 모집자의 대표프로필' })
   profile: string;
 
+  @ApiProperty({ description: '프로젝트 모집자의 ID (user_entity.id)' })
+  userId: string;
+
   @ApiProperty({
     description: '프로젝트 카테고리1의 카테고리1',
     default: ECategory1.DEVELOPER,

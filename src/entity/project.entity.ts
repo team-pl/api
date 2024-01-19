@@ -54,6 +54,10 @@ export class Project {
   @Column({ comment: '프로젝트 모집자의 대표프로필', default: '' })
   profile: string;
 
+  @ApiProperty({ description: '프로젝트 모집자의 ID (user_entity.id)' })
+  @Column({ comment: '프로젝트 모집자의 ID (user_entity.id)', default: '' })
+  userId: string;
+
   @ApiProperty({
     description: '프로젝트 카테고리1의 카테고리1',
     default: ECategory1.DEVELOPER,
