@@ -12,7 +12,7 @@ export class ProjectService {
     private projectRepository: Repository<Project>,
   ) {}
 
-  async create(data: CreateProjectDto, userId: string) {
+  async create(data: CreateProjectDto, userId: string, fileUrl: string | null) {
     const id = uuid();
 
     const { recruitExpiredAt, content, ...rest } = data;
@@ -28,18 +28,10 @@ export class ProjectService {
       recruitExpiredAt: expiredAt,
       content: bufferContent,
       userId,
+      file: fileUrl,
       ...rest,
     });
 
     return await this.projectRepository.save(project);
   }
-
-  // async getAllUser() {
-  //   return await this.userRepository.find({
-  //     where: {
-  //       deletedAt: IsNull(),
-  //     },
-  //     order: { createdAt: 'DESC' },
-  //   });
-  // }
 }
