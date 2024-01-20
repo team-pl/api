@@ -41,8 +41,6 @@ export class CreateProjectDto {
   })
   url: string;
 
-  // file 업로드할때 어떤 형식으로 할지 추가하거나 정리하기
-
   @IsNumber()
   @ApiProperty({
     description: '프로젝트 총 모집인원',
