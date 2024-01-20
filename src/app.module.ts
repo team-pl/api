@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { ProjectModule } from './project/project.module';
+import { FileModule } from './file/file.module';
 import swaggerConfig from './config/swagger.config';
 
 @Module({
@@ -28,6 +29,7 @@ import swaggerConfig from './config/swagger.config';
     UserModule,
     AuthModule,
     ProjectModule,
+    FileModule,
   ],
   controllers: [AppController],
   providers: [AppService],
