@@ -40,7 +40,7 @@ export class UserService {
     kakaoId: string,
     name: string,
     email: string,
-    profile: string,
+    profileImageUrl: string,
   ) {
     const id = uuid();
     const user = await this.userRepository.create({
@@ -49,7 +49,7 @@ export class UserService {
       name,
       phone: '',
       email,
-      profile,
+      profileImageUrl,
     });
     return await this.userRepository.save(user);
   }
@@ -58,7 +58,7 @@ export class UserService {
     naverId: string,
     name: string,
     email: string,
-    profile: string,
+    profileImageUrl: string,
     phone: string = '',
   ) {
     const id = uuid();
@@ -68,7 +68,7 @@ export class UserService {
       name,
       phone,
       email,
-      profile,
+      profileImageUrl,
     });
     return await this.userRepository.save(user);
   }
