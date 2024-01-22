@@ -4,9 +4,11 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  OneToMany,
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Profile } from './profile.entity';
 
 @Entity({ name: 'user' })
 export class User {
@@ -75,5 +77,9 @@ export class User {
     nullable: true,
   })
   @Column({ comment: '프로필사진 url', default: null, nullable: true })
-  profile: string | null;
+  profileImageUrl: string | null;
+
+  @ApiProperty({ description: '사용자의 프로필 정보' })
+  @OneToMany(() => Profile, (profile) => profile.user)
+  profile: Profile[];
 }
