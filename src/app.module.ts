@@ -7,6 +7,7 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { ProjectModule } from './project/project.module';
 import { FileModule } from './file/file.module';
+import { ProfileModule } from './profile/profile.module';
 import swaggerConfig from './config/swagger.config';
 
 @Module({
@@ -30,6 +31,7 @@ import swaggerConfig from './config/swagger.config';
     AuthModule,
     ProjectModule,
     FileModule,
+    ProfileModule,
   ],
   controllers: [AppController],
   providers: [AppService],
