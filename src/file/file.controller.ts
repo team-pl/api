@@ -11,6 +11,7 @@ import {
 import { FileService } from './file.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from 'src/auth/jwtAuth.guard';
+import { EFileUsage } from 'src/type/file.type';
 
 @Controller('file')
 export class FileController {
@@ -26,6 +27,6 @@ export class FileController {
       throw new HttpException('NotFound', HttpStatus.NOT_FOUND);
     }
 
-    return this.service.uploadFile(file, id);
+    return this.service.uploadFile(file, id, EFileUsage.DEFAULT);
   }
 }

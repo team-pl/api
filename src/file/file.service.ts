@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import * as AWS from 'aws-sdk';
 import { config } from 'dotenv';
 import { v4 as uuid } from 'uuid';
+import { EFileUsage } from 'src/type/file.type';
 
 config();
 
@@ -15,7 +16,11 @@ export class FileService {
     private fileRepository: Repository<File>,
   ) {}
 
-  async uploadFile(file: Express.Multer.File, userId: string) {
+  async uploadFile(
+    file: Express.Multer.File,
+    userId: string,
+    usage: EFileUsage,
+  ) {
     AWS.config.update({
       region: 'ap-northeast-2',
       credentials: {
@@ -45,6 +50,7 @@ export class FileService {
         id,
         userId,
         url: returnedUrl,
+        usage,
       });
 
       return await this.fileRepository.save(file);
