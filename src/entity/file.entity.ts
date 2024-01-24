@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { EFileUsage } from 'src/type/file.type';
 import {
   Column,
   CreateDateColumn,
@@ -32,4 +33,8 @@ export class File {
   @ApiProperty({ description: '파일 url' })
   @Column({ comment: '파일 url' })
   url: string;
+
+  @ApiProperty({ description: '파일 업로드 용도', default: EFileUsage.PROJECT })
+  @Column({ comment: '파일 업로드 용도', default: EFileUsage.PROJECT })
+  usage: EFileUsage;
 }

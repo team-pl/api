@@ -18,6 +18,7 @@ import { PostProjectResDto } from './dto/response.dto';
 import { JwtAuthGuard } from 'src/auth/jwtAuth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileService } from 'src/file/file.service';
+import { EFileUsage } from 'src/type/file.type';
 
 @Controller('project')
 @ApiExtraModels(CreateProjectDto, PostProjectResDto)
@@ -48,7 +49,11 @@ export class ProjectController {
     let fileUrl: string | null = null;
 
     if (file) {
-      const uploadedFile = await this.fileService.uploadFile(file, id);
+      const uploadedFile = await this.fileService.uploadFile(
+        file,
+        id,
+        EFileUsage.PROJECT,
+      );
       fileUrl = uploadedFile.url;
     }
 
