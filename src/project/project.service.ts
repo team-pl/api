@@ -15,7 +15,7 @@ export class ProjectService {
   async create(data: CreateProjectDto, userId: string, fileUrl: string | null) {
     const id = uuid();
 
-    const { recruitExpiredAt, content, ...rest } = data;
+    const { recruitExpiredAt, content, file, ...rest } = data;
 
     const [year, month, date] = recruitExpiredAt.split('-').map(Number);
 

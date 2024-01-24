@@ -10,7 +10,7 @@ import {
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
-import { ApiExtraModels, ApiTags } from '@nestjs/swagger';
+import { ApiConsumes, ApiExtraModels, ApiTags } from '@nestjs/swagger';
 import { ProjectService } from './project.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { SwaggerPostResponse } from 'src/decorator/swagger.decorator';
@@ -31,19 +31,21 @@ export class ProjectController {
   @Post()
   @SwaggerPostResponse(PostProjectResDto)
   @UseGuards(JwtAuthGuard)
+  @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file'))
   async create(
     @Request() req,
     @Body(new ValidationPipe()) data: CreateProjectDto,
-    @UploadedFile() file: Express.Multer.File,
   ) {
     const { id } = req.user.name;
+
+    const { file } = data;
 
     if (!id) {
       throw new HttpException('NotFound', HttpStatus.NOT_FOUND);
     }
 
-    let fileUrl = null;
+    let fileUrl: string | null = null;
 
     if (file) {
       const uploadedFile = await this.fileService.uploadFile(file, id);

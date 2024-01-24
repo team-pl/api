@@ -41,6 +41,13 @@ export class CreateProjectDto {
   })
   url: string;
 
+  @ApiPropertyOptional({
+    type: 'string',
+    format: 'binary',
+    description: '프로젝트 관련 참고 파일',
+  })
+  file: Express.Multer.File;
+
   @IsNumber()
   @ApiProperty({
     description: '프로젝트 총 모집인원',
