@@ -415,6 +415,14 @@ export class Profile {
   @Column({ comment: '스킬', default: '' })
   skill: string;
 
+  @ApiPropertyOptional({ description: '포트폴리오 url', default: '' })
+  @Column({ comment: '포트폴리오 url', default: '' })
+  portfolioUrl: string;
+
+  @ApiPropertyOptional({ description: '포트폴리오 파일', default: '' })
+  @Column({ comment: '포트폴리오 파일', default: '' })
+  portfolioFile: string;
+
   // --------------------------
 
   @ApiProperty({ description: '프로필을 등록한 사용자 정보' })
