@@ -13,7 +13,7 @@ export class CreateProjectDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
-    description: '프로젝트 등록일',
+    description: '프로젝트 이름',
     example: '팀+ 프로젝트 모집',
   })
   name: string;

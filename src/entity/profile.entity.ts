@@ -14,7 +14,7 @@ import { EEduCategory } from 'src/type/profile.type';
 
 @Entity({ name: 'profile' })
 export class Profile {
-  @PrimaryColumn({ name: 'id', comment: 'id' })
+  @PrimaryColumn({ name: '프로필 id', comment: '프로필 id' })
   id: string;
 
   @ApiProperty({ description: '프로필 등록일' })
@@ -59,11 +59,11 @@ export class Profile {
 
   @ApiPropertyOptional({ description: '학력1>입학일자', nullable: true })
   @Column({ comment: '학력1>입학일자', nullable: true })
-  eduAdmissionDate1: Date | null;
+  eduAdmissionDate1: string | null;
 
   @ApiPropertyOptional({ description: '학력1>졸업일자', nullable: true })
   @Column({ comment: '학력1>졸업일자', nullable: true })
-  eduGraduationDate1: Date | null;
+  eduGraduationDate1: string | null;
 
   @ApiPropertyOptional({ description: '학력1>재학중 여부', nullable: true })
   @Column({ comment: '학력1>재학중 여부', nullable: true })
@@ -89,11 +89,11 @@ export class Profile {
 
   @ApiPropertyOptional({ description: '학력2>입학일자', nullable: true })
   @Column({ comment: '학력2>입학일자', nullable: true })
-  eduAdmissionDate2: Date | null;
+  eduAdmissionDate2: string | null;
 
   @ApiPropertyOptional({ description: '학력2>졸업일자', nullable: true })
   @Column({ comment: '학력2>졸업일자', nullable: true })
-  eduGraduationDate2: Date | null;
+  eduGraduationDate2: string | null;
 
   @ApiPropertyOptional({ description: '학력2>재학중 여부', nullable: true })
   @Column({ comment: '학력2>재학중 여부', nullable: true })
@@ -119,11 +119,11 @@ export class Profile {
 
   @ApiPropertyOptional({ description: '학력3>입학일자', nullable: true })
   @Column({ comment: '학력3>입학일자', nullable: true })
-  eduAdmissionDate3: Date | null;
+  eduAdmissionDate3: string | null;
 
   @ApiPropertyOptional({ description: '학력3>졸업일자', nullable: true })
   @Column({ comment: '학력3>졸업일자', nullable: true })
-  eduGraduationDate3: Date | null;
+  eduGraduationDate3: string | null;
 
   @ApiPropertyOptional({ description: '학력3>재학중 여부', nullable: true })
   @Column({ comment: '학력3>재학중 여부', nullable: true })
@@ -149,11 +149,11 @@ export class Profile {
 
   @ApiPropertyOptional({ description: '학력4>입학일자', nullable: true })
   @Column({ comment: '학력4>입학일자', nullable: true })
-  eduAdmissionDate4: Date | null;
+  eduAdmissionDate4: string | null;
 
   @ApiPropertyOptional({ description: '학력4>졸업일자', nullable: true })
   @Column({ comment: '학력4>졸업일자', nullable: true })
-  eduGraduationDate4: Date | null;
+  eduGraduationDate4: string | null;
 
   @ApiPropertyOptional({ description: '학력4>재학중 여부', nullable: true })
   @Column({ comment: '학력4>재학중 여부', nullable: true })
@@ -179,11 +179,11 @@ export class Profile {
 
   @ApiPropertyOptional({ description: '학력5>입학일자', nullable: true })
   @Column({ comment: '학력5>입학일자', nullable: true })
-  eduAdmissionDate5: Date | null;
+  eduAdmissionDate5: string | null;
 
   @ApiPropertyOptional({ description: '학력5>졸업일자', nullable: true })
   @Column({ comment: '학력5>졸업일자', nullable: true })
-  eduGraduationDate5: Date | null;
+  eduGraduationDate5: string | null;
 
   @ApiPropertyOptional({ description: '학력5>재학중 여부', nullable: true })
   @Column({ comment: '학력5>재학중 여부', nullable: true })
@@ -201,11 +201,11 @@ export class Profile {
 
   @ApiPropertyOptional({ description: '경력1>입사일자', nullable: true })
   @Column({ comment: '경력1>입사일자', nullable: true })
-  careerJoinDate1: Date | null;
+  careerJoinDate1: string | null;
 
   @ApiPropertyOptional({ description: '경력1>퇴사일자', nullable: true })
   @Column({ comment: '경력1>퇴사일자', nullable: true })
-  careerQuitDate1: Date | null;
+  careerQuitDate1: string | null;
 
   @ApiPropertyOptional({ description: '경력1>재직중 여부', nullable: true })
   @Column({ comment: '경력1>재직중 여부', nullable: true })
@@ -223,11 +223,11 @@ export class Profile {
 
   @ApiPropertyOptional({ description: '경력2>입사일자', nullable: true })
   @Column({ comment: '경력2>입사일자', nullable: true })
-  careerJoinDate2: Date | null;
+  careerJoinDate2: string | null;
 
   @ApiPropertyOptional({ description: '경력2>퇴사일자', nullable: true })
   @Column({ comment: '경력2>퇴사일자', nullable: true })
-  careerQuitDate2: Date | null;
+  careerQuitDate2: string | null;
 
   @ApiPropertyOptional({ description: '경력2>재직중 여부', nullable: true })
   @Column({ comment: '경력2>재직중 여부', nullable: true })
@@ -245,11 +245,11 @@ export class Profile {
 
   @ApiPropertyOptional({ description: '경력3>입사일자', nullable: true })
   @Column({ comment: '경력3>입사일자', nullable: true })
-  careerJoinDate3: Date | null;
+  careerJoinDate3: string | null;
 
   @ApiPropertyOptional({ description: '경력3>퇴사일자', nullable: true })
   @Column({ comment: '경력3>퇴사일자', nullable: true })
-  careerQuitDate3: Date | null;
+  careerQuitDate3: string | null;
 
   @ApiPropertyOptional({ description: '경력3>재직중 여부', nullable: true })
   @Column({ comment: '경력3>재직중 여부', nullable: true })
@@ -267,11 +267,11 @@ export class Profile {
 
   @ApiPropertyOptional({ description: '경력4>입사일자', nullable: true })
   @Column({ comment: '경력4>입사일자', nullable: true })
-  careerJoinDate4: Date | null;
+  careerJoinDate4: string | null;
 
   @ApiPropertyOptional({ description: '경력4>퇴사일자', nullable: true })
   @Column({ comment: '경력4>퇴사일자', nullable: true })
-  careerQuitDate4: Date | null;
+  careerQuitDate4: string | null;
 
   @ApiPropertyOptional({ description: '경력4>재직중 여부', nullable: true })
   @Column({ comment: '경력4>재직중 여부', nullable: true })
@@ -289,11 +289,11 @@ export class Profile {
 
   @ApiPropertyOptional({ description: '경력5>입사일자', nullable: true })
   @Column({ comment: '경력5>입사일자', nullable: true })
-  careerJoinDate5: Date | null;
+  careerJoinDate5: string | null;
 
   @ApiPropertyOptional({ description: '경력5>퇴사일자', nullable: true })
   @Column({ comment: '경력5>퇴사일자', nullable: true })
-  careerQuitDate5: Date | null;
+  careerQuitDate5: string | null;
 
   @ApiPropertyOptional({ description: '경력5>재직중 여부', nullable: true })
   @Column({ comment: '경력5>재직중 여부', nullable: true })
@@ -311,11 +311,11 @@ export class Profile {
 
   @ApiPropertyOptional({ description: '경력6>입사일자', nullable: true })
   @Column({ comment: '경력6>입사일자', nullable: true })
-  careerJoinDate6: Date | null;
+  careerJoinDate6: string | null;
 
   @ApiPropertyOptional({ description: '경력6>퇴사일자', nullable: true })
   @Column({ comment: '경력6>퇴사일자', nullable: true })
-  careerQuitDate6: Date | null;
+  careerQuitDate6: string | null;
 
   @ApiPropertyOptional({ description: '경력6>재직중 여부', nullable: true })
   @Column({ comment: '경력6>재직중 여부', nullable: true })
@@ -333,11 +333,11 @@ export class Profile {
 
   @ApiPropertyOptional({ description: '경력7>입사일자', nullable: true })
   @Column({ comment: '경력7>입사일자', nullable: true })
-  careerJoinDate7: Date | null;
+  careerJoinDate7: string | null;
 
   @ApiPropertyOptional({ description: '경력7>퇴사일자', nullable: true })
   @Column({ comment: '경력7>퇴사일자', nullable: true })
-  careerQuitDate7: Date | null;
+  careerQuitDate7: string | null;
 
   @ApiPropertyOptional({ description: '경력7>재직중 여부', nullable: true })
   @Column({ comment: '경력7>재직중 여부', nullable: true })
@@ -355,11 +355,11 @@ export class Profile {
 
   @ApiPropertyOptional({ description: '경력8>입사일자', nullable: true })
   @Column({ comment: '경력8>입사일자', nullable: true })
-  careerJoinDate8: Date | null;
+  careerJoinDate8: string | null;
 
   @ApiPropertyOptional({ description: '경력8>퇴사일자', nullable: true })
   @Column({ comment: '경력8>퇴사일자', nullable: true })
-  careerQuitDate8: Date | null;
+  careerQuitDate8: string | null;
 
   @ApiPropertyOptional({ description: '경력8>재직중 여부', nullable: true })
   @Column({ comment: '경력8>재직중 여부', nullable: true })
@@ -377,11 +377,11 @@ export class Profile {
 
   @ApiPropertyOptional({ description: '경력9>입사일자', nullable: true })
   @Column({ comment: '경력9>입사일자', nullable: true })
-  careerJoinDate9: Date | null;
+  careerJoinDate9: string | null;
 
   @ApiPropertyOptional({ description: '경력9>퇴사일자', nullable: true })
   @Column({ comment: '경력9>퇴사일자', nullable: true })
-  careerQuitDate9: Date | null;
+  careerQuitDate9: string | null;
 
   @ApiPropertyOptional({ description: '경력9>재직중 여부', nullable: true })
   @Column({ comment: '경력9>재직중 여부', nullable: true })
@@ -399,29 +399,45 @@ export class Profile {
 
   @ApiPropertyOptional({ description: '경력10>입사일자', nullable: true })
   @Column({ comment: '경력10>입사일자', nullable: true })
-  careerJoinDate10: Date | null;
+  careerJoinDate10: string | null;
 
   @ApiPropertyOptional({ description: '경력10>퇴사일자', nullable: true })
   @Column({ comment: '경력10>퇴사일자', nullable: true })
-  careerQuitDate10: Date | null;
+  careerQuitDate10: string | null;
 
-  @ApiPropertyOptional({ description: '경력10>재직중 여부', nullable: true })
-  @Column({ comment: '경력10>재직중 여부', nullable: true })
+  @ApiPropertyOptional({
+    description: '경력10>재직중 여부',
+    nullable: true,
+    default: null,
+  })
+  @Column({ comment: '경력10>재직중 여부', default: null, nullable: true })
   careerIsWorking10: boolean | null;
 
   // --------------------------
 
-  @ApiPropertyOptional({ description: '스킬', default: '' })
+  @ApiProperty({
+    description: '스킬',
+    default: '',
+    example: 'React/React Native/Figma',
+  })
   @Column({ comment: '스킬', default: '' })
   skill: string;
 
-  @ApiPropertyOptional({ description: '포트폴리오 url', default: '' })
-  @Column({ comment: '포트폴리오 url', default: '' })
-  portfolioUrl: string;
+  @ApiPropertyOptional({
+    description: '포트폴리오 url',
+    nullable: true,
+    default: null,
+  })
+  @Column({ comment: '포트폴리오 url', default: null, nullable: true })
+  portfolioUrl: string | null;
 
-  @ApiPropertyOptional({ description: '포트폴리오 파일', default: '' })
-  @Column({ comment: '포트폴리오 파일', default: '' })
-  portfolioFile: string;
+  @ApiPropertyOptional({
+    description: '포트폴리오 파일',
+    nullable: true,
+    default: null,
+  })
+  @Column({ comment: '포트폴리오 파일', default: null, nullable: true })
+  portfolioFile: string | null;
 
   // --------------------------
 

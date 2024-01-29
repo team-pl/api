@@ -9,6 +9,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Profile } from './profile.entity';
+import { EJob, ESignUp } from 'src/type/user.type';
 
 @Entity({ name: 'user' })
 export class User {
@@ -31,6 +32,10 @@ export class User {
   @Column({ comment: '이름' })
   name: string;
 
+  @ApiProperty({ description: '닉네임(별명)', default: '' })
+  @Column({ comment: '닉네임(별명)', default: '' })
+  nickname: string;
+
   @ApiProperty({ description: '휴대폰 번호' })
   @Column({ comment: '휴대폰 번호' })
   phone: string;
@@ -43,6 +48,7 @@ export class User {
     nullable: true,
     description:
       '카카오 ID(카카오에서 제공해주며, 카카오 소셜 로그인으로 가입한 사용자는 고유 ID를 가짐)',
+    default: null,
   })
   @Column({
     nullable: true,
@@ -56,6 +62,7 @@ export class User {
     nullable: true,
     description:
       '네이버 ID(네이버에서 제공해주며, 네이버 소셜 로그인으로 가입한 사용자는 고유 ID를 가짐)',
+    default: null,
   })
   @Column({
     nullable: true,
@@ -68,6 +75,7 @@ export class User {
   @ApiProperty({
     description: 'Refresh Token',
     nullable: true,
+    default: null,
   })
   @Column({ comment: 'Refresh Token', default: null, nullable: true })
   refreshToken: string | null;
@@ -75,9 +83,60 @@ export class User {
   @ApiProperty({
     description: '프로필사진 url',
     nullable: true,
+    default: null,
   })
   @Column({ comment: '프로필사진 url', default: null, nullable: true })
   profileImageUrl: string | null;
+
+  @ApiProperty({
+    description: '대표 프로필 ID',
+    nullable: true,
+    default: null,
+  })
+  @Column({ comment: '대표 프로필 ID', default: null, nullable: true })
+  representativeProfileId: string | null;
+
+  @ApiProperty({
+    description: '회원가입 종류(네이버/카카오)',
+    default: ESignUp.KAKAO,
+  })
+  @Column({ comment: '회원가입 종류(네이버/카카오)', default: ESignUp.KAKAO })
+  signUpType: ESignUp;
+
+  @ApiProperty({
+    description: '직업 종류(엔지니어/디자이너)',
+    default: EJob.ENGINEER,
+  })
+  @Column({ comment: '직업 종류(엔지니어/디자이너)', default: EJob.ENGINEER })
+  jobType: EJob;
+
+  @ApiProperty({
+    description: '찜한 공고수',
+    default: 0,
+  })
+  @Column({ comment: '찜한 공고수', default: 0 })
+  numberOfLikes: number;
+
+  @ApiProperty({
+    description: '등록한 공고수',
+    default: 0,
+  })
+  @Column({ comment: '등록한 공고수', default: 0 })
+  numberOfRegistrations: number;
+
+  @ApiProperty({
+    description: '지원한 공고수',
+    default: 0,
+  })
+  @Column({ comment: '지원한 공고수', default: 0 })
+  numberOfApplications: number;
+
+  @ApiProperty({
+    description: '참여확정수',
+    default: 0,
+  })
+  @Column({ comment: '참여확정수', default: 0 })
+  numberOfConfirmed: number;
 
   @ApiProperty({ description: '사용자의 프로필 정보' })
   @OneToMany(() => Profile, (profile) => profile.user)

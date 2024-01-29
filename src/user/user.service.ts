@@ -5,6 +5,7 @@ import { UpdateUserDto } from 'src/user/dto/update-user.dto';
 import { User } from 'src/entity/user.entity';
 import { IsNull, Repository } from 'typeorm';
 import { v4 as uuid } from 'uuid';
+import { ESignUp } from 'src/type/user.type';
 
 @Injectable()
 export class UserService {
@@ -50,6 +51,7 @@ export class UserService {
       phone: '',
       email,
       profileImageUrl,
+      signUpType: ESignUp.KAKAO,
     });
     return await this.userRepository.save(user);
   }
@@ -69,6 +71,7 @@ export class UserService {
       phone,
       email,
       profileImageUrl,
+      signUpType: ESignUp.NAVER,
     });
     return await this.userRepository.save(user);
   }
