@@ -405,23 +405,39 @@ export class Profile {
   @Column({ comment: '경력10>퇴사일자', nullable: true })
   careerQuitDate10: Date | null;
 
-  @ApiPropertyOptional({ description: '경력10>재직중 여부', nullable: true })
-  @Column({ comment: '경력10>재직중 여부', nullable: true })
+  @ApiPropertyOptional({
+    description: '경력10>재직중 여부',
+    nullable: true,
+    default: null,
+  })
+  @Column({ comment: '경력10>재직중 여부', default: null, nullable: true })
   careerIsWorking10: boolean | null;
 
   // --------------------------
 
-  @ApiPropertyOptional({ description: '스킬', default: '' })
+  @ApiProperty({
+    description: '스킬',
+    default: '',
+    example: 'React/React Native/Figma',
+  })
   @Column({ comment: '스킬', default: '' })
   skill: string;
 
-  @ApiPropertyOptional({ description: '포트폴리오 url', default: '' })
-  @Column({ comment: '포트폴리오 url', default: '' })
-  portfolioUrl: string;
+  @ApiPropertyOptional({
+    description: '포트폴리오 url',
+    nullable: true,
+    default: null,
+  })
+  @Column({ comment: '포트폴리오 url', default: null, nullable: true })
+  portfolioUrl: string | null;
 
-  @ApiPropertyOptional({ description: '포트폴리오 파일', default: '' })
-  @Column({ comment: '포트폴리오 파일', default: '' })
-  portfolioFile: string;
+  @ApiPropertyOptional({
+    description: '포트폴리오 파일',
+    nullable: true,
+    default: null,
+  })
+  @Column({ comment: '포트폴리오 파일', default: null, nullable: true })
+  portfolioFile: string | null;
 
   // --------------------------
 
