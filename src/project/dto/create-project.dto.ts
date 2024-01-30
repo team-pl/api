@@ -22,7 +22,7 @@ export class CreateProjectDto {
   @IsNotEmpty()
   @ApiProperty({
     description: '프로젝트 모집마감일',
-    example: '2024-08-01',
+    example: '2024/08/01',
   })
   recruitExpiredAt: string;
 
@@ -35,12 +35,14 @@ export class CreateProjectDto {
   content: string;
 
   @IsUrl()
+  @IsOptional()
   @ApiPropertyOptional({
     description: '프로젝트 관련 참고 url',
     example: 'https://teampl-plus.com',
   })
   url: string;
 
+  @IsOptional()
   @ApiPropertyOptional({
     type: 'string',
     format: 'binary',
@@ -51,9 +53,26 @@ export class CreateProjectDto {
   @IsNumber()
   @ApiProperty({
     description: '프로젝트 총 모집인원',
-    example: 10,
   })
   recruitTotalNumber: number;
+
+  @IsNumber()
+  @ApiProperty({
+    description: '프로젝트 개발자 모집인원',
+  })
+  recruitDevTotalNumber: number;
+
+  @IsNumber()
+  @ApiProperty({
+    description: '프로젝트 디자이너 모집인원',
+  })
+  recruitDesignTotalNumber: number;
+
+  @IsString()
+  @ApiProperty({
+    description: '프로젝트 모집자가 선택한 프로필 ID',
+  })
+  profileId: string;
 
   @IsString()
   @IsNotEmpty()
@@ -104,7 +123,6 @@ export class CreateProjectDto {
   @IsNumber()
   @ApiPropertyOptional({
     description: '프로젝트 카테고리2의 모집인원',
-    example: 1,
     nullable: true,
   })
   category2Number: number | null;
@@ -131,7 +149,6 @@ export class CreateProjectDto {
   @IsNumber()
   @ApiPropertyOptional({
     description: '프로젝트 카테고리3의 모집인원',
-    example: 1,
     nullable: true,
   })
   category3Number: number | null;
@@ -158,7 +175,6 @@ export class CreateProjectDto {
   @IsNumber()
   @ApiPropertyOptional({
     description: '프로젝트 카테고리4의 모집인원',
-    example: 1,
     nullable: true,
   })
   category4Number: number | null;
@@ -185,7 +201,6 @@ export class CreateProjectDto {
   @IsNumber()
   @ApiPropertyOptional({
     description: '프로젝트 카테고리5의 모집인원',
-    example: 1,
     nullable: true,
   })
   category5Number: number | null;
@@ -212,7 +227,6 @@ export class CreateProjectDto {
   @IsNumber()
   @ApiPropertyOptional({
     description: '프로젝트 카테고리6의 모집인원',
-    example: 1,
     nullable: true,
   })
   category6Number: number | null;
@@ -239,7 +253,6 @@ export class CreateProjectDto {
   @IsNumber()
   @ApiPropertyOptional({
     description: '프로젝트 카테고리7의 모집인원',
-    example: 1,
     nullable: true,
   })
   category7Number: number | null;
@@ -266,7 +279,6 @@ export class CreateProjectDto {
   @IsNumber()
   @ApiPropertyOptional({
     description: '프로젝트 카테고리8의 모집인원',
-    example: 1,
     nullable: true,
   })
   category8Number: number | null;
@@ -293,7 +305,6 @@ export class CreateProjectDto {
   @IsNumber()
   @ApiPropertyOptional({
     description: '프로젝트 카테고리9의 모집인원',
-    example: 1,
     nullable: true,
   })
   category9Number: number | null;
@@ -320,7 +331,6 @@ export class CreateProjectDto {
   @IsNumber()
   @ApiPropertyOptional({
     description: '프로젝트 카테고리10의 모집인원',
-    example: 1,
     nullable: true,
   })
   category10Number: number | null;
