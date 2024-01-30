@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Profile } from 'src/entity/profile.entity';
 import { ECategory1, ECategory2 } from 'src/type/project.type';
 
 export class PostProjectResDto {
@@ -23,6 +24,18 @@ export class PostProjectResDto {
   @ApiProperty({ description: '프로젝트 모집인원', default: 0 })
   recruitTotalNumber: number;
 
+  @ApiProperty({ description: '프로젝트 개발자 모집인원', default: 0 })
+  recruitDevTotalNumber: number;
+
+  @ApiProperty({ description: '프로젝트 디자이너 모집인원', default: 0 })
+  recruitDesignTotalNumber: number;
+
+  @ApiProperty({ description: '프로젝트 조회수', default: 0 })
+  numberOfViews: number;
+
+  @ApiProperty({ description: '프로젝트 좋아요수', default: 0 })
+  numberOfLikes: number;
+
   @ApiProperty({ description: '프로젝트 모집내용', default: '' })
   content: string;
 
@@ -32,9 +45,8 @@ export class PostProjectResDto {
   @ApiProperty({ description: '프로젝트 관련 파일', nullable: true })
   file: string | null;
 
-  // FIXME: 대표프로필 타입 변경하기 => 프로필 테이블 설계 후!!!
-  @ApiProperty({ description: '프로젝트 모집자의 대표프로필' })
-  profile: string;
+  @ApiProperty({ description: '프로젝트 모집자가 선택한 프로필 정보' })
+  profile: Profile[];
 
   @ApiProperty({ description: '프로젝트 모집자의 ID (user_entity.id)' })
   userId: string;
