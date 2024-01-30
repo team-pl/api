@@ -5,9 +5,12 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { User } from './user.entity';
 
 @Entity({ name: 'project' })
 export class Project {
@@ -38,6 +41,22 @@ export class Project {
   @Column({ comment: '프로젝트 모집인원', default: 0 })
   recruitTotalNumber: number;
 
+  @ApiProperty({ description: '프로젝트 개발자 모집인원', default: 0 })
+  @Column({ comment: '프로젝트 개발자 모집인원', default: 0 })
+  recruitDevTotalNumber: number;
+
+  @ApiProperty({ description: '프로젝트 디자이너 모집인원', default: 0 })
+  @Column({ comment: '프로젝트 디자이너 모집인원', default: 0 })
+  recruitDesignTotalNumber: number;
+
+  @ApiProperty({ description: '프로젝트 조회수', default: 0 })
+  @Column({ comment: '프로젝트 조회수', default: 0 })
+  numberOfViews: number;
+
+  @ApiProperty({ description: '프로젝트 좋아요수', default: 0 })
+  @Column({ comment: '프로젝트 좋아요수', default: 0 })
+  numberOfLikes: number;
+
   @ApiProperty({ description: '프로젝트 모집내용', default: '' })
   @Column('bytea', { comment: '프로젝트 모집내용', default: '' })
   content: Buffer;
@@ -50,9 +69,9 @@ export class Project {
   @Column({ comment: '프로젝트 관련 파일', default: null, nullable: true })
   file: string | null;
 
-  @ApiProperty({ description: '프로젝트 모집자의 대표프로필' })
-  @Column({ comment: '프로젝트 모집자의 대표프로필', default: '' })
-  profile: string;
+  @ApiProperty({ description: '프로젝트 모집자가 선택한 프로필 ID' })
+  @Column({ comment: '프로젝트 모집자가 선택한 프로필 ID' })
+  profileId: string;
 
   @ApiProperty({ description: '프로젝트 모집자의 ID (user_entity.id)' })
   @Column({ comment: '프로젝트 모집자의 ID (user_entity.id)', default: '' })
@@ -354,4 +373,9 @@ export class Project {
     nullable: true,
   })
   category10Number: number | null;
+
+  @ApiProperty({ description: '프로젝트를 등록한 사용자 정보' })
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'userId' })
+  user: User;
 }
