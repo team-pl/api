@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Profile } from 'src/entity/profile.entity';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { v4 as uuid } from 'uuid';
 
@@ -25,5 +25,16 @@ export class ProfileService {
     });
 
     return await this.profileRepository.save(project);
+  }
+
+  async getProfileById(id: string) {
+    const profileData = await this.profileRepository.findOneBy({
+      id,
+      deletedAt: IsNull(),
+    });
+
+    if (!profileData) throw new HttpException('NotFound', HttpStatus.NOT_FOUND);
+
+    return profileData;
   }
 }
