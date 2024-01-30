@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { Profile } from './profile.entity';
 import { EJob, ESignUp } from 'src/type/user.type';
+import { Project } from './project.entity';
 
 @Entity({ name: 'user' })
 export class User {
@@ -141,4 +142,8 @@ export class User {
   @ApiProperty({ description: '사용자의 프로필 정보' })
   @OneToMany(() => Profile, (profile) => profile.user)
   profile: Profile[];
+
+  @ApiProperty({ description: '사용자가 등록한 프로젝트' })
+  @OneToMany(() => Project, (project) => project.user)
+  project: Project[];
 }
