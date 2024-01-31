@@ -79,7 +79,7 @@ export class CreateProfileDto {
   eduGraduationDate1: string | null;
 
   @IsOptional()
-  @IsString()
+  @IsBoolean()
   @ApiPropertyOptional({
     description: '학력1>재학중 여부',
     nullable: true,
@@ -132,7 +132,7 @@ export class CreateProfileDto {
   eduGraduationDate2: string | null;
 
   @IsOptional()
-  @IsString()
+  @IsBoolean()
   @ApiPropertyOptional({
     description: '학력2>재학중 여부',
     nullable: true,
@@ -185,7 +185,7 @@ export class CreateProfileDto {
   eduGraduationDate3: string | null;
 
   @IsOptional()
-  @IsString()
+  @IsBoolean()
   @ApiPropertyOptional({
     description: '학력3>재학중 여부',
     nullable: true,
@@ -238,7 +238,7 @@ export class CreateProfileDto {
   eduGraduationDate4: string | null;
 
   @IsOptional()
-  @IsString()
+  @IsBoolean()
   @ApiPropertyOptional({
     description: '학력4>재학중 여부',
     nullable: true,
@@ -291,7 +291,7 @@ export class CreateProfileDto {
   eduGraduationDate5: string | null;
 
   @IsOptional()
-  @IsString()
+  @IsBoolean()
   @ApiPropertyOptional({
     description: '학력5>재학중 여부',
     nullable: true,
