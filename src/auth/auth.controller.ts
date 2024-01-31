@@ -102,8 +102,9 @@ export class AuthController {
       profile,
       phone,
     );
-    res.cookie('accessToken', accessToken, { httpOnly: true });
-    res.cookie('refreshToken', refreshToken, { httpOnly: true });
+
+    res.cookie('accessToken', accessToken, cookieOption);
+    res.cookie('refreshToken', refreshToken, cookieOption);
     res.redirect(process.env.SIGNUP_REDIRECT_URL);
     return user;
   }
