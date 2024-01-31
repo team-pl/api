@@ -9,7 +9,7 @@ import {
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
-import { ApiExtraModels, ApiTags } from '@nestjs/swagger';
+import { ApiConsumes, ApiExtraModels, ApiTags } from '@nestjs/swagger';
 import { ProfileService } from './profile.service';
 import { FileService } from 'src/file/file.service';
 import { SwaggerPostResponse } from 'src/decorator/swagger.decorator';
@@ -31,6 +31,7 @@ export class ProfileController {
   @Post()
   @SwaggerPostResponse(PostProfileResDto)
   @UseGuards(JwtAuthGuard)
+  @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file'))
   async create(
     @Request() req,
