@@ -14,7 +14,7 @@ import { EEduCategory } from 'src/type/profile.type';
 
 @Entity({ name: 'profile' })
 export class Profile {
-  @PrimaryColumn({ name: '프로필 id', comment: '프로필 id' })
+  @PrimaryColumn({ name: 'id', comment: '프로필 id' })
   id: string;
 
   @ApiProperty({ description: '프로필 등록일' })
