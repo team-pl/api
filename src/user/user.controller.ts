@@ -6,6 +6,7 @@ import {
   HttpException,
   HttpStatus,
   Param,
+  Patch,
   Post,
   Put,
   Request,
@@ -13,20 +14,29 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { ApiExtraModels, ApiTags } from '@nestjs/swagger';
-import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { ApiExtraModels, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UpdateUserDto } from 'src/user/dto/update-user.dto';
-import { GetUserResDto, PostUserResDto } from './dto/response.dto';
+import {
+  GetUserResDto,
+  NicknameDuplicateResDto,
+  PostUserResDto,
+} from './dto/response.dto';
 import {
   SwaggerGetListResponse,
   SwaggerGetResponse,
   SwaggerPostResponse,
 } from 'src/decorator/swagger.decorator';
-import { SignupKakaoUserDto } from './dto/signup-user.dto';
+import { SignupUserDto } from './dto/signup-user.dto';
 import { JwtAuthGuard } from 'src/auth/jwtAuth.guard';
+import { NicknameDuplicateDto } from './dto/nickname-duplicate.dto';
 
 @Controller('user')
-@ApiExtraModels(GetUserResDto, PostUserResDto)
+@ApiExtraModels(
+  GetUserResDto,
+  PostUserResDto,
+  NicknameDuplicateDto,
+  NicknameDuplicateResDto,
+)
 @ApiTags('User')
 export class UserController {
   constructor(private readonly service: UserService) {}
@@ -38,30 +48,47 @@ export class UserController {
     return this.service.getAllUser();
   }
 
+  // NOTE: 닉네임 중복체크 API
+  @Post('nickname-check')
+  @UseGuards(JwtAuthGuard)
+  @ApiResponse({
+    status: 401,
+    description: 'user ID NotFound',
+  })
+  @ApiResponse({
+    status: 200,
+    type: NicknameDuplicateResDto,
+  })
+  nicknameDuplicateCheck(
+    @Request() req,
+    @Body(new ValidationPipe()) data: NicknameDuplicateDto,
+  ) {
+    const { id } = req.user.name;
+
+    if (!id) {
+      throw new HttpException('NotFound', HttpStatus.UNAUTHORIZED);
+    }
+
+    const { nickname } = data;
+
+    return this.service.nicknameDuplicateCheck(nickname);
+  }
+
   @SwaggerGetResponse(GetUserResDto)
   @Get(':id')
   getOneUser(@Param('id') id: string) {
     return this.service.getUser(id);
   }
 
-  @SwaggerPostResponse(PostUserResDto)
-  @Post()
-  signUp(@Body(new ValidationPipe()) data: CreateUserDto) {
-    return this.service.signUp(data);
-  }
-
-  @Put('/signup')
+  @Patch('/signup')
   @UseGuards(JwtAuthGuard)
-  signUpKakaoUser(
-    @Request() req,
-    @Body(new ValidationPipe()) data: SignupKakaoUserDto,
-  ) {
+  signUp(@Request() req, @Body(new ValidationPipe()) data: SignupUserDto) {
     const { id } = req.user.name;
-    const { phone, name } = data;
+
     if (!id) {
       throw new HttpException('NotFound', HttpStatus.NOT_FOUND);
     }
-    return this.service.kakaoNextSignUp(id, phone, name);
+    return this.service.signUp(id, data);
   }
 
   @Put(':id')
