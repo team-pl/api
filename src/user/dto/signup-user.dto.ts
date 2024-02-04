@@ -1,11 +1,11 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsPhoneNumber, IsString } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsOptional, IsPhoneNumber, IsString } from 'class-validator';
 
-export class SignupKakaoUserDto {
+export class SignupUserDto {
+  @IsOptional()
   @IsString()
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: '사용자 이름',
-    example: '임지현',
   })
   name: string;
 
@@ -15,4 +15,10 @@ export class SignupKakaoUserDto {
     example: '010-1234-5678',
   })
   phone: string;
+
+  @IsString()
+  @ApiProperty({
+    description: '닉네임',
+  })
+  nickname: string;
 }
