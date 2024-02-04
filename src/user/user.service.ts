@@ -1,4 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { UpdateUserDto } from 'src/user/dto/update-user.dto';
@@ -6,6 +11,7 @@ import { User } from 'src/entity/user.entity';
 import { IsNull, Repository } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 import { ESignUp } from 'src/type/user.type';
+import { SignupUserDto } from './dto/signup-user.dto';
 
 @Injectable()
 export class UserService {
@@ -29,12 +35,6 @@ export class UserService {
     if (!user) throw new HttpException('NotFound', HttpStatus.NOT_FOUND);
 
     return this.getUserById(id);
-  }
-
-  async signUp(data: CreateUserDto) {
-    const id = uuid();
-    const user = await this.userRepository.create({ id, ...data });
-    return await this.userRepository.save(user);
   }
 
   async kakaoSignUp(
@@ -130,7 +130,7 @@ export class UserService {
     this.userRepository.update(id, { refreshToken: token });
   }
 
-  async kakaoNextSignUp(id: string, phone: string, name: string) {
+  async signUp(id: string, data: SignupUserDto) {
     const user = await this.userRepository.findOneBy({
       id,
       deletedAt: IsNull(),
@@ -138,6 +138,19 @@ export class UserService {
 
     if (!user) throw new HttpException('NotFound', HttpStatus.NOT_FOUND);
 
-    return await this.userRepository.update(id, { phone, name });
+    return await this.userRepository.update(id, { ...data });
+  }
+
+  // NOTE: 닉네임 중복체크 함수
+  async nicknameDuplicateCheck(nickname: string) {
+    const isSameNickname = await this.userRepository.exist({
+      where: { nickname },
+    });
+
+    if (isSameNickname) {
+      throw new UnauthorizedException('해당 닉네임이 이미 존재합니다.');
+    }
+
+    return true;
   }
 }
