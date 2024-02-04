@@ -12,8 +12,10 @@ import { FileService } from './file.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from 'src/auth/jwtAuth.guard';
 import { EFileUsage } from 'src/type/file.type';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('file')
+@ApiTags('File')
 export class FileController {
   constructor(private readonly service: FileService) {}
 
