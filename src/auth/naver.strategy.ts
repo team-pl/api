@@ -1,5 +1,5 @@
 import { PassportStrategy } from '@nestjs/passport';
-import { Strategy } from 'passport-naver';
+import { Strategy } from 'passport-naver-v2';
 import { Injectable } from '@nestjs/common';
 import { config } from 'dotenv';
 
@@ -17,10 +17,10 @@ export class NaverStrategy extends PassportStrategy(Strategy) {
 
   async validate(accessToken: string, refreshToken: string, profile: any) {
     return {
-      name: profile.displayName,
-      email: profile._json.email,
+      name: profile.name,
+      email: profile.email,
       naverId: profile.id,
-      profile: profile._json.profile_image,
+      profile: profile.profileImage,
       accessToken,
       refreshToken,
     };
