@@ -10,10 +10,14 @@ import {
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
-import { ApiConsumes, ApiExtraModels, ApiTags } from '@nestjs/swagger';
+import {
+  ApiConsumes,
+  ApiExtraModels,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { ProjectService } from './project.service';
 import { CreateProjectDto } from './dto/create-project.dto';
-import { SwaggerPostResponse } from 'src/decorator/swagger.decorator';
 import { PostProjectResDto } from './dto/response.dto';
 import { JwtAuthGuard } from 'src/auth/jwtAuth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -30,10 +34,21 @@ export class ProjectController {
   ) {}
 
   @Post()
-  @SwaggerPostResponse(PostProjectResDto)
   @UseGuards(JwtAuthGuard)
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file'))
+  @ApiResponse({
+    status: 401,
+    description: 'user ID NotFound',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Profile NotFound',
+  })
+  @ApiResponse({
+    status: 200,
+    type: PostProjectResDto,
+  })
   async create(
     @Request() req,
     @Body(new ValidationPipe()) data: CreateProjectDto,
@@ -43,7 +58,7 @@ export class ProjectController {
     const { file } = data;
 
     if (!id) {
-      throw new HttpException('NotFound', HttpStatus.NOT_FOUND);
+      throw new HttpException('NotFound', HttpStatus.UNAUTHORIZED);
     }
 
     let fileUrl: string | null = null;
