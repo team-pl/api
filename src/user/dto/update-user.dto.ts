@@ -1,18 +1,17 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEmail, IsOptional, IsPhoneNumber, IsString } from 'class-validator';
 
 export class UpdateUserDto {
   @IsString()
   @IsOptional()
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: '사용자 이름',
-    example: '임지현',
   })
   name?: string;
 
   @IsPhoneNumber('KR')
   @IsOptional()
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: '휴대폰번호',
     example: '010-1234-5678',
   })
@@ -20,9 +19,15 @@ export class UpdateUserDto {
 
   @IsEmail()
   @IsOptional()
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: '이메일주소',
-    example: 'aa@gamil.com',
   })
   email?: string;
+
+  @IsString()
+  @IsOptional()
+  @ApiPropertyOptional({
+    description: '대표 프로필 ID',
+  })
+  representativeProfileId?: string;
 }
