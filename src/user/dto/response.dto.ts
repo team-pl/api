@@ -45,3 +45,8 @@ export class PostUserResDto {
   @ApiProperty({ description: '이메일' })
   email: string;
 }
+
+export class NicknameDuplicateResDto {
+  @ApiProperty({ description: '닉네임 중복체크 결과' })
+  result: boolean;
+}
