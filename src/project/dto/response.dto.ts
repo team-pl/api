@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Profile } from 'src/entity/profile.entity';
+import { CreateProfileDto } from 'src/profile/dto/create-profile.dto';
 import { ECategory1, ECategory2 } from 'src/type/project.type';
 
 export class PostProjectResDto {
@@ -45,8 +45,11 @@ export class PostProjectResDto {
   @ApiProperty({ description: '프로젝트 관련 파일', nullable: true })
   file: string | null;
 
-  @ApiProperty({ description: '프로젝트 모집자가 선택한 프로필 정보' })
-  profile: Profile[];
+  @ApiProperty({
+    description: '프로젝트 모집자가 선택한 프로필 정보',
+    type: CreateProfileDto,
+  })
+  profile: CreateProfileDto[];
 
   @ApiProperty({ description: '프로젝트 모집자의 ID (user_entity.id)' })
   userId: string;
