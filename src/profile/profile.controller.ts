@@ -9,10 +9,14 @@ import {
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
-import { ApiConsumes, ApiExtraModels, ApiTags } from '@nestjs/swagger';
+import {
+  ApiConsumes,
+  ApiExtraModels,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { ProfileService } from './profile.service';
 import { FileService } from 'src/file/file.service';
-import { SwaggerPostResponse } from 'src/decorator/swagger.decorator';
 import { JwtAuthGuard } from 'src/auth/jwtAuth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateProfileDto } from './dto/create-profile.dto';
@@ -29,10 +33,21 @@ export class ProfileController {
   ) {}
 
   @Post()
-  @SwaggerPostResponse(PostProfileResDto)
   @UseGuards(JwtAuthGuard)
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file'))
+  @ApiResponse({
+    status: 401,
+    description: 'user ID NotFound',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Number of profile registrations exceeded',
+  })
+  @ApiResponse({
+    status: 200,
+    type: PostProfileResDto,
+  })
   async create(
     @Request() req,
     @Body(new ValidationPipe()) data: CreateProfileDto,
@@ -42,7 +57,7 @@ export class ProfileController {
     const { portfolioFile } = data;
 
     if (!id) {
-      throw new HttpException('NotFound', HttpStatus.NOT_FOUND);
+      throw new HttpException('NotFound', HttpStatus.UNAUTHORIZED);
     }
 
     let fileUrl: string | null = null;
