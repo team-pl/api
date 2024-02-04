@@ -19,8 +19,10 @@ export class ProjectService {
 
     const { recruitExpiredAt, content, file, profileId, ...rest } = data;
 
+    // NOTE: 모집마감일이 YYYY/MM/DD 형식의 string 으로 들어옴
     const [year, month, date] = recruitExpiredAt.split('/').map(Number);
 
+    // NOTE: 사용자가 설정한 날짜의 23시 59분 59초까지로 모집마감일을 정함
     const expiredAt = new Date(year, month - 1, date, 23, 59, 59);
 
     const bufferContent = Buffer.from(content, 'utf-8');
