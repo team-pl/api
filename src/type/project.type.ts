@@ -1,6 +1,7 @@
 enum ECategory1 {
   DESIGN = 'DESIGN', // 디자인
   DEVELOPER = 'DEVELOPER', // 개발
+  ETC = 'ETC', // 기타
 }
 
 enum ECategory2 {
@@ -23,6 +24,13 @@ enum ECategory2 {
   DESIGN_BI = 'DESIGN_BI', // BI(Brand identity) 디자이너
   DESIGN_BE = 'DESIGN_BE', // BE(Brand experience) 디자이너
   DESIGN_ETC = 'DESIGN_ETC', // 기타 디자인분야
+  ETC = 'ETC', // 기타
 }
 
-export { ECategory1, ECategory2 };
+enum EProjectState {
+  RECRUITING = 'RECRUITING', // 모집중
+  COMPLETED = 'COMPLETED', // 모집완료
+  END = 'END', // 모집종료
+}
+
+export { ECategory1, ECategory2, EProjectState };
