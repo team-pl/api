@@ -9,7 +9,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Profile } from './profile.entity';
-import { EJob, ESignUp } from 'src/type/user.type';
+import { ESignUp } from 'src/type/user.type';
 import { Project } from './project.entity';
 
 @Entity({ name: 'user' })
@@ -33,9 +33,9 @@ export class User {
   @Column({ comment: '이름' })
   name: string;
 
-  @ApiProperty({ description: '닉네임(별명)', default: '' })
-  @Column({ comment: '닉네임(별명)', default: '' })
-  nickname: string;
+  @ApiProperty({ description: '닉네임(별명)', nullable: true, default: null })
+  @Column({ comment: '닉네임(별명)', nullable: true, default: null })
+  nickname: string | null;
 
   @ApiProperty({ description: '휴대폰 번호' })
   @Column({ comment: '휴대폰 번호' })
@@ -105,11 +105,16 @@ export class User {
   signUpType: ESignUp;
 
   @ApiProperty({
-    description: '직업 종류(엔지니어/디자이너)',
-    default: EJob.ENGINEER,
+    description: '직업 종류',
+    nullable: true,
+    default: null,
   })
-  @Column({ comment: '직업 종류(엔지니어/디자이너)', default: EJob.ENGINEER })
-  jobType: EJob;
+  @Column({
+    comment: '직업 종류',
+    nullable: true,
+    default: null,
+  })
+  jobType: string | null;
 
   @ApiProperty({
     description: '찜한 공고수',
