@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpException,
   HttpStatus,
   Post,
@@ -73,5 +74,14 @@ export class ProjectController {
     }
 
     return this.service.create(data, id, fileUrl);
+  }
+
+  @Get('home')
+  @ApiResponse({
+    status: 200,
+    type: PostProjectResDto,
+  })
+  async getHomeProject() {
+    return this.service.getHomeProject();
   }
 }
