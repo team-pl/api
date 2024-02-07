@@ -153,4 +153,13 @@ export class UserService {
 
     return true;
   }
+
+  async getUserNicknameById(id: string) {
+    const user = await this.userRepository.findOneBy({
+      id,
+      deletedAt: IsNull(),
+    });
+
+    return user.nickname;
+  }
 }
