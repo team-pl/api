@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ECategory1, ECategory2 } from 'src/type/project.type';
+import { ECategory1, ECategory2, EProjectState } from 'src/type/project.type';
 import {
   Column,
   CreateDateColumn,
@@ -33,6 +33,18 @@ export class Project {
   @Column({ comment: '프로젝트명', default: '' })
   name: string;
 
+  @ApiProperty({
+    description: '프로젝트 모집 상태',
+    default: EProjectState.RECRUITING,
+    enum: EProjectState,
+  })
+  @Column({
+    comment: '프로젝트 모집 상태',
+    default: EProjectState.RECRUITING,
+    enum: EProjectState,
+  })
+  state: EProjectState;
+
   @ApiProperty({ description: '프로젝트 모집마감일' })
   @Column({ comment: '프로젝트 모집마감일' })
   recruitExpiredAt: Date;
@@ -40,6 +52,10 @@ export class Project {
   @ApiProperty({ description: '프로젝트 모집인원', default: 0 })
   @Column({ comment: '프로젝트 모집인원', default: 0 })
   recruitTotalNumber: number;
+
+  @ApiProperty({ description: '프로젝트 확정인원', default: 0 })
+  @Column({ comment: '프로젝트 확정인원', default: 0 })
+  confirmedNumber: number;
 
   @ApiProperty({ description: '프로젝트 개발자 모집인원', default: 0 })
   @Column({ comment: '프로젝트 개발자 모집인원', default: 0 })
@@ -49,6 +65,23 @@ export class Project {
   @Column({ comment: '프로젝트 디자이너 모집인원', default: 0 })
   recruitDesignTotalNumber: number;
 
+  @ApiProperty({ description: '프로젝트 기타 모집인원', default: 0 })
+  @Column({ comment: '프로젝트 기타 모집인원', default: 0 })
+  recruitEtcTotalNumber: number;
+
+  @ApiProperty({
+    description: '프로젝트 모집 카테고리',
+    example: 'DEVELOPER/DESIGN/ETC',
+  })
+  @Column({ comment: '프로젝트 모집 카테고리' })
+  recruitCategory: string;
+
+  @ApiProperty({
+    description: '프로젝트 모집글을 작성한 사용자 이름',
+  })
+  @Column({ comment: '프로젝트 모집글을 작성한 사용자 이름' })
+  userName: string;
+
   @ApiProperty({ description: '프로젝트 조회수', default: 0 })
   @Column({ comment: '프로젝트 조회수', default: 0 })
   numberOfViews: number;
@@ -56,6 +89,10 @@ export class Project {
   @ApiProperty({ description: '프로젝트 좋아요수', default: 0 })
   @Column({ comment: '프로젝트 좋아요수', default: 0 })
   numberOfLikes: number;
+
+  @ApiProperty({ description: '프로젝트 인기 score', default: 0 })
+  @Column({ comment: '프로젝트 인기 score', default: 0 })
+  numberOfScore: number;
 
   @ApiProperty({ description: '프로젝트 모집내용', default: '' })
   @Column('bytea', { comment: '프로젝트 모집내용', default: '' })
