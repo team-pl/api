@@ -56,25 +56,13 @@ export class CreateProjectDto {
   })
   recruitTotalNumber: number;
 
-  @IsNumber()
-  @ApiProperty({
-    description: '프로젝트 개발자 모집인원',
-  })
-  recruitDevTotalNumber: number;
-
-  @IsNumber()
-  @ApiProperty({
-    description: '프로젝트 디자이너 모집인원',
-  })
-  recruitDesignTotalNumber: number;
-
   @IsString()
   @ApiProperty({
     description: '프로젝트 모집자가 선택한 프로필 ID',
   })
   profileId: string;
 
-  @IsString()
+  @IsEnum(ECategory1)
   @IsNotEmpty()
   @ApiProperty({
     description: '프로젝트 카테고리1의 카테고리1',
@@ -83,7 +71,7 @@ export class CreateProjectDto {
   })
   category1_1: ECategory1;
 
-  @IsString()
+  @IsEnum(ECategory2)
   @IsNotEmpty()
   @ApiProperty({
     description: '프로젝트 카테고리1의 카테고리2',
@@ -96,8 +84,6 @@ export class CreateProjectDto {
   @IsNotEmpty()
   @ApiProperty({
     description: '프로젝트 카테고리1의 모집인원',
-    example: 1,
-    default: 0,
   })
   category1Number: number;
 
