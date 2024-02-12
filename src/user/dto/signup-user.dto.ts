@@ -1,10 +1,9 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsPhoneNumber, IsString } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsPhoneNumber, IsString } from 'class-validator';
 
 export class SignupUserDto {
-  @IsOptional()
   @IsString()
-  @ApiPropertyOptional({
+  @ApiProperty({
     description: '사용자 이름',
   })
   name: string;
