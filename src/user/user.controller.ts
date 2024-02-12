@@ -82,11 +82,23 @@ export class UserController {
 
   @Patch('/signup')
   @UseGuards(JwtAuthGuard)
+  @ApiResponse({
+    status: 401,
+    description: 'user ID NotFound',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'user data NotFound',
+  })
+  @ApiResponse({
+    status: 200,
+    type: GetUserResDto,
+  })
   signUp(@Request() req, @Body(new ValidationPipe()) data: SignupUserDto) {
     const { id } = req.user.name;
 
     if (!id) {
-      throw new HttpException('NotFound', HttpStatus.NOT_FOUND);
+      throw new HttpException('NotFound', HttpStatus.UNAUTHORIZED);
     }
     return this.service.signUp(id, data);
   }
