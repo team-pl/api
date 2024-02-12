@@ -19,14 +19,14 @@ import {
 } from '@nestjs/swagger';
 import { ProjectService } from './project.service';
 import { CreateProjectDto } from './dto/create-project.dto';
-import { PostProjectResDto } from './dto/response.dto';
+import { HomeProjectResDto, PostProjectResDto } from './dto/response.dto';
 import { JwtAuthGuard } from 'src/auth/jwtAuth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileService } from 'src/file/file.service';
 import { EFileUsage } from 'src/type/file.type';
 
 @Controller('project')
-@ApiExtraModels(CreateProjectDto, PostProjectResDto)
+@ApiExtraModels(CreateProjectDto, PostProjectResDto, HomeProjectResDto)
 @ApiTags('Project')
 export class ProjectController {
   constructor(
@@ -79,7 +79,7 @@ export class ProjectController {
   @Get('home')
   @ApiResponse({
     status: 200,
-    type: PostProjectResDto,
+    type: HomeProjectResDto,
   })
   async getHomeProject() {
     return this.service.getHomeProject();
