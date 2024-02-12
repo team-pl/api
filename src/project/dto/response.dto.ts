@@ -248,3 +248,65 @@ export class PostProjectResDto {
   })
   category10Number: number | null;
 }
+
+export class HomeProjectListResDto {
+  @ApiProperty({ description: '프로젝트 고유 Id' })
+  id: string;
+
+  @ApiProperty({ description: '프로젝트명' })
+  name: string;
+
+  @ApiProperty({ description: '프로젝트 모집내용' })
+  content: string;
+
+  @ApiProperty({
+    description: '프로젝트 모집 상태',
+    enum: EProjectState,
+  })
+  state: EProjectState;
+
+  @ApiProperty({
+    description: '프로젝트 모집 카테고리',
+    example: 'DEVELOPER/DESIGN/ETC',
+  })
+  recruitCategory: string;
+
+  @ApiProperty({ description: '프로젝트 모집인원' })
+  recruitTotalNumber: number;
+
+  @ApiProperty({ description: '프로젝트 확정인원' })
+  confirmedNumber: number;
+
+  @ApiProperty({
+    description: '프로젝트 모집글을 작성한 사용자 이름',
+  })
+  userName: string;
+
+  @ApiProperty({ description: '프로젝트 모집마감일', type: Date })
+  recruitExpiredAt: Date;
+}
+
+export class HomeProjectDataResDto {
+  @ApiProperty({
+    description: '프로젝트 데이터 형식',
+    type: HomeProjectListResDto,
+  })
+  list: HomeProjectListResDto[];
+
+  @ApiProperty({ description: '프로젝트 개수' })
+  count: number;
+}
+
+export class HomeProjectResDto {
+  @ApiProperty({
+    description: '인기 프로젝트 조회 결과',
+    type: HomeProjectDataResDto,
+  })
+  popular: HomeProjectDataResDto;
+
+  @ApiProperty({
+    description: '신규 프로젝트 조회 결과',
+    type: HomeProjectDataResDto,
+  })
+  new: HomeProjectDataResDto;
+}
