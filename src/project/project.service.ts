@@ -92,6 +92,7 @@ export class ProjectService {
       take: 8,
       order: { numberOfScore: 'DESC' },
       select: [
+        'id',
         'name',
         'content',
         'state',
@@ -103,11 +104,19 @@ export class ProjectService {
       ],
     });
 
+    const finalPopularList = popularList[0].map((data) => {
+      return {
+        ...data,
+        content: data.content.toString(),
+      };
+    });
+
     // NOTE: 프로젝트 생성일 내림차순으로 프로젝트 8개를 가져옴
     const newList = await this.projectRepository.findAndCount({
       where: { deletedAt: IsNull() },
       take: 8,
       select: [
+        'id',
         'name',
         'content',
         'state',
@@ -120,9 +129,22 @@ export class ProjectService {
       order: { createdAt: 'DESC' },
     });
 
+    const finalNewList = newList[0].map((data) => {
+      return {
+        ...data,
+        content: data.content.toString(),
+      };
+    });
+
     return {
-      popular: popularList,
-      new: newList,
+      popular: {
+        list: finalPopularList,
+        count: popularList[1],
+      },
+      new: {
+        list: finalNewList,
+        count: newList[1],
+      },
     };
   }
 }
