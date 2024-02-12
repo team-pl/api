@@ -136,9 +136,15 @@ export class UserService {
       deletedAt: IsNull(),
     });
 
-    if (!user) throw new HttpException('NotFound', HttpStatus.NOT_FOUND);
+    if (!user) {
+      throw new HttpException('user data NotFound', HttpStatus.NOT_FOUND);
+    }
 
-    return await this.userRepository.update(id, { ...data });
+    await this.userRepository.update(id, { ...data });
+
+    const result = await this.userRepository.findOneBy({ id });
+
+    return result;
   }
 
   // NOTE: 닉네임 중복체크 함수
