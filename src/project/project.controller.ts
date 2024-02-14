@@ -5,8 +5,8 @@ import {
   HttpException,
   HttpStatus,
   Post,
+  Query,
   Request,
-  UploadedFile,
   UseGuards,
   UseInterceptors,
   ValidationPipe,
@@ -14,19 +14,32 @@ import {
 import {
   ApiConsumes,
   ApiExtraModels,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { ProjectService } from './project.service';
 import { CreateProjectDto } from './dto/create-project.dto';
-import { HomeProjectResDto, PostProjectResDto } from './dto/response.dto';
+import {
+  HomeProjectResDto,
+  PostProjectResDto,
+  ProjectDataResDto,
+} from './dto/response.dto';
 import { JwtAuthGuard } from 'src/auth/jwtAuth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileService } from 'src/file/file.service';
 import { EFileUsage } from 'src/type/file.type';
+import { GetProjectQueryDto } from './dto/get-project.dto';
+import { ECategorySelect } from 'src/type/project.type';
 
 @Controller('project')
-@ApiExtraModels(CreateProjectDto, PostProjectResDto, HomeProjectResDto)
+@ApiExtraModels(
+  CreateProjectDto,
+  PostProjectResDto,
+  HomeProjectResDto,
+  GetProjectQueryDto,
+  ProjectDataResDto,
+)
 @ApiTags('Project')
 export class ProjectController {
   constructor(
@@ -74,6 +87,44 @@ export class ProjectController {
     }
 
     return this.service.create(data, id, fileUrl);
+  }
+
+  @Get()
+  @ApiQuery({
+    name: 'skip',
+    required: true,
+    description: '현재까지 조회한 프로젝트 개수',
+    type: 'string',
+  })
+  @ApiQuery({
+    name: 'take',
+    required: false,
+    type: 'string',
+    description: '조회하려는 프로젝트 개수',
+  })
+  @ApiQuery({
+    name: 'category',
+    required: false,
+    description: '조회 카테고리',
+    enum: ECategorySelect,
+  })
+  @ApiQuery({
+    name: 'searchWord',
+    required: false,
+    type: 'string',
+    description: '검색어',
+  })
+  @ApiResponse({
+    status: 200,
+    type: ProjectDataResDto,
+  })
+  async getProjectList(
+    @Query('skip') skip: string,
+    @Query('take') take?: string,
+    @Query('category') category?: ECategorySelect,
+    @Query('searchWord') searchWord?: string,
+  ) {
+    return this.service.getProjectList({ skip, take, category, searchWord });
   }
 
   @Get('home')
