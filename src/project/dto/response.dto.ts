@@ -286,7 +286,7 @@ export class HomeProjectListResDto {
   recruitExpiredAt: Date;
 }
 
-export class HomeProjectDataResDto {
+export class ProjectDataResDto {
   @ApiProperty({
     description: '프로젝트 데이터 형식',
     type: HomeProjectListResDto,
@@ -300,13 +300,13 @@ export class HomeProjectDataResDto {
 export class HomeProjectResDto {
   @ApiProperty({
     description: '인기 프로젝트 조회 결과',
-    type: HomeProjectDataResDto,
+    type: ProjectDataResDto,
   })
-  popular: HomeProjectDataResDto;
+  popular: ProjectDataResDto;
 
   @ApiProperty({
     description: '신규 프로젝트 조회 결과',
-    type: HomeProjectDataResDto,
+    type: ProjectDataResDto,
   })
-  new: HomeProjectDataResDto;
+  new: ProjectDataResDto;
 }
