@@ -33,4 +33,12 @@ enum EProjectState {
   END = 'END', // 모집종료
 }
 
-export { ECategory1, ECategory2, EProjectState };
+// NOTE: 프로젝트 찾기 페이지에서 카테고리별로 검색할 때 사용
+enum ECategorySelect {
+  ALL = 'ALL', // 전체
+  DESIGN = 'DESIGN', // 디자인
+  DEVELOPER = 'DEVELOPER', // 개발
+  ETC = 'ETC', // 기타
+}
+
+export { ECategory1, ECategory2, EProjectState, ECategorySelect };
