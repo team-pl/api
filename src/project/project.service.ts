@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Project } from 'src/entity/project.entity';
-import { IsNull, Repository } from 'typeorm';
+import { IsNull, Like, Raw, Repository } from 'typeorm';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { v4 as uuid } from 'uuid';
 import { ProfileService } from 'src/profile/profile.service';
-import { ECategory1 } from 'src/type/project.type';
+import { ECategory1, ECategorySelect } from 'src/type/project.type';
 import { UserService } from 'src/user/user.service';
+import { GetProjectQueryDto } from './dto/get-project.dto';
 
 @Injectable()
 export class ProjectService {
@@ -145,6 +146,68 @@ export class ProjectService {
         list: finalNewList,
         count: newList[1],
       },
+    };
+  }
+
+  async getProjectList({ ...query }: GetProjectQueryDto) {
+    const {
+      skip,
+      take = '12',
+      category = ECategorySelect.ALL,
+      searchWord = '',
+    } = query;
+
+    const transCategory = category === ECategorySelect.ALL ? '' : category;
+
+    const bufferSearchWord = Buffer.from(searchWord, 'utf-8');
+
+    // NOTE: 최신순으로 프로젝트 조회
+    const list = await this.projectRepository.findAndCount({
+      where: [
+        {
+          deletedAt: IsNull(),
+          recruitCategory: Like(`%${transCategory}%`),
+          name: Like(`%${searchWord}%`),
+        },
+        {
+          deletedAt: IsNull(),
+          recruitCategory: Like(`%${transCategory}%`),
+          userName: Like(`%${searchWord}%`),
+        },
+        {
+          deletedAt: IsNull(),
+          recruitCategory: Like(`%${transCategory}%`),
+          content: Raw(
+            (data) => `ENCODE(${data}, 'escape') LIKE '%${searchWord}%'`,
+          ),
+        },
+      ],
+      skip: Number(skip),
+      take: Number(take),
+      order: { createdAt: 'DESC' },
+      select: [
+        'id',
+        'name',
+        'content',
+        'state',
+        'recruitCategory',
+        'recruitTotalNumber',
+        'confirmedNumber',
+        'userName',
+        'recruitExpiredAt',
+      ],
+    });
+
+    const finalList = list[0].map((data) => {
+      return {
+        ...data,
+        content: data.content.toString(),
+      };
+    });
+
+    return {
+      list: finalList,
+      count: list[1],
     };
   }
 }
