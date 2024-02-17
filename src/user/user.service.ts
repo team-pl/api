@@ -154,7 +154,7 @@ export class UserService {
     });
 
     if (isSameNickname) {
-      throw new UnauthorizedException('해당 닉네임이 이미 존재합니다.');
+      return false;
     }
 
     return true;
