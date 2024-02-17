@@ -95,17 +95,23 @@ export class AuthController {
   @Get('naver')
   async getNaverInfo(@Request() req, @Res() res) {
     const { name, email, profile, phone } = req.user;
-    const { accessToken, refreshToken, user } = await this.service.getNaverJWT(
-      req.user.naverId,
-      name,
-      email,
-      profile,
-      phone,
-    );
+    const { accessToken, refreshToken, user, isNewUser } =
+      await this.service.getNaverJWT(
+        req.user.naverId,
+        name,
+        email,
+        profile,
+        phone,
+      );
 
     res.cookie('accessToken', accessToken, cookieOption);
     res.cookie('refreshToken', refreshToken, cookieOption);
-    res.redirect(process.env.SIGNUP_REDIRECT_URL);
+
+    if (isNewUser) {
+      res.redirect(process.env.SIGNUP_KAKAO_REDIRECT_URL);
+    } else {
+      res.redirect(process.env.SIGNUP_REDIRECT_URL);
+    }
     return user;
   }
 }
