@@ -1,11 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Project } from 'src/entity/project.entity';
-import { IsNull, Like, Raw, Repository } from 'typeorm';
+import { In, IsNull, Like, Raw, Repository } from 'typeorm';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { v4 as uuid } from 'uuid';
 import { ProfileService } from 'src/profile/profile.service';
-import { ECategory1, ECategorySelect } from 'src/type/project.type';
+import {
+  ECategory1,
+  ECategorySelect,
+  EProjectState,
+} from 'src/type/project.type';
 import { UserService } from 'src/user/user.service';
 import { GetProjectQueryDto } from './dto/get-project.dto';
 
@@ -89,7 +93,11 @@ export class ProjectService {
   async getHomeProject() {
     // NOTE: 인기 점수 내림차순으로 프로젝트 8개를 가져옴
     const popularList = await this.projectRepository.findAndCount({
-      where: { deletedAt: IsNull() },
+      // NOTE: 현재 프로젝트 상태가 모집중이거나 기한이 남았지만 모집인원이 다 차서 마감된 모집 종료 상태일때 SELECT 해옴
+      where: {
+        deletedAt: IsNull(),
+        state: In([EProjectState.RECRUITING, EProjectState.END]),
+      },
       take: 8,
       order: { numberOfScore: 'DESC' },
       select: [
@@ -114,7 +122,11 @@ export class ProjectService {
 
     // NOTE: 프로젝트 생성일 내림차순으로 프로젝트 8개를 가져옴
     const newList = await this.projectRepository.findAndCount({
-      where: { deletedAt: IsNull() },
+      // NOTE: 현재 프로젝트 상태가 모집중이거나 기한이 남았지만 모집인원이 다 차서 마감된 모집 종료 상태일때 SELECT 해옴
+      where: {
+        deletedAt: IsNull(),
+        state: In([EProjectState.RECRUITING, EProjectState.END]),
+      },
       take: 8,
       select: [
         'id',
