@@ -100,7 +100,8 @@ export class AuthService {
     email: string,
     profile: string,
     phone: string = '',
-  ): Promise<User> {
+  ): Promise<{ user: User; isNewUser: boolean }> {
+    let isNewUser = false;
     let user = await this.userService.getUserByNaverId(naverId);
     if (!user) {
       user = await this.userService.naverSignUp(
@@ -111,7 +112,13 @@ export class AuthService {
         phone,
       );
     }
-    return user;
+    if (!user.phone) {
+      isNewUser = true;
+    }
+    return {
+      user,
+      isNewUser,
+    };
   }
 
   async generateRefreshToken(user: User) {
@@ -156,7 +163,7 @@ export class AuthService {
     profile: string,
     phone: string,
   ) {
-    const user = await this.naverValidateUser(
+    const { user, isNewUser } = await this.naverValidateUser(
       kakaoId,
       name,
       email,
@@ -165,6 +172,6 @@ export class AuthService {
     );
     const accessToken = await this.generateAccessToken(user);
     const refreshToken = await this.generateRefreshToken(user); // refreshToken 생성
-    return { accessToken, refreshToken, user };
+    return { accessToken, refreshToken, user, isNewUser };
   }
 }
