@@ -5,6 +5,7 @@ import { IsNull, Repository } from 'typeorm';
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { v4 as uuid } from 'uuid';
 import { UserService } from 'src/user/user.service';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @Injectable()
 export class ProfileService {
@@ -19,7 +20,7 @@ export class ProfileService {
 
     const { portfolioFile, ...rest } = data;
 
-    // NOTE: 아존애 둥록한 프로필 SELECT
+    // NOTE: 이전에 둥록한 프로필 SELECT
     const prevProfiles = await this.profileRepository.find({
       where: { deletedAt: IsNull(), userId },
     });
@@ -73,5 +74,59 @@ export class ProfileService {
       throw new HttpException('Profile NotFound', HttpStatus.NOT_FOUND);
 
     return profileData;
+  }
+
+  async deleteProfile(id: string) {
+    const now = new Date();
+    await this.profileRepository.update(id, { deletedAt: now });
+    return true;
+  }
+
+  async updateProfile(
+    profileId: string,
+    data: UpdateProfileDto,
+    userId: string,
+    fileUrl: string | null,
+  ) {
+    const { portfolioFile, ...rest } = data;
+
+    // NOTE: 이전에 둥록한 프로필 SELECT
+    const prevProfiles = await this.profileRepository.find({
+      where: { deletedAt: IsNull(), userId },
+    });
+
+    // NOTE: 현재 수정하는 프로필을 대표 프로필로 지정하려고 할때
+    if (rest.isRepresentative) {
+      // NOTE: 이전에 등록한 프로필 중에서 대표 프로필이 있는지 확인
+      const prevRepresentative = prevProfiles.filter(
+        (data) => data.isRepresentative,
+      );
+
+      if (prevRepresentative.length > 0) {
+        // NOTE: 기존 대표 프로필을 기본 프로필로 변경
+        await this.profileRepository.update(prevRepresentative[0].id, {
+          isRepresentative: false,
+        });
+      }
+
+      // NOTE: user 테이블에서 대표 프로필 ID 수정
+      await this.userService.updateUser(userId, {
+        representativeProfileId: profileId,
+      });
+    }
+
+    // NOTE: 프로필 수정
+    if (fileUrl) {
+      await this.profileRepository.update(profileId, {
+        portfolioFile: fileUrl,
+        ...rest,
+      });
+    } else {
+      await this.profileRepository.update(profileId, {
+        ...rest,
+      });
+    }
+
+    return await this.getProfileById(profileId);
   }
 }
