@@ -42,12 +42,12 @@ export class AuthController {
   //   return this.service.login(name, phone, email);
   // }
 
-  @UseGuards(KakaoAuthGuard)
-  @Get('login-kakao')
-  async loginKakao(@Res() res) {
-    const url = this.service.kakaoRedirect();
-    return res.redirect(url);
-  }
+  // @UseGuards(KakaoAuthGuard)
+  // @Get('login-kakao')
+  // async loginKakao(@Res() res) {
+  //   const url = this.service.kakaoRedirect();
+  //   return res.redirect(url);
+  // }
 
   @UseGuards(KakaoAuthGuard)
   @Get('kakao')
@@ -75,21 +75,21 @@ export class AuthController {
     return await this.service.userValidation(name, phone);
   }
 
-  @UseGuards(NaverAuthGuard)
-  @Get('login-naver')
-  async loginNaver(@Request() req, @Res() res) {
-    const api_url =
-      'https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=' +
-      process.env.NAVER_CLIENT_ID +
-      '&redirect_uri=' +
-      process.env.NAVER_CALLBACK_URL;
-    res.writeHead(200, { 'Content-Type': 'text/html;charset=utf-8' });
-    res.end(
-      "<a href='" +
-        api_url +
-        "'><img height='50' src='http://static.nid.naver.com/oauth/small_g_in.PNG'/></a>",
-    );
-  }
+  // @UseGuards(NaverAuthGuard)
+  // @Get('login-naver')
+  // async loginNaver(@Request() req, @Res() res) {
+  //   const api_url =
+  //     'https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=' +
+  //     process.env.NAVER_CLIENT_ID +
+  //     '&redirect_uri=' +
+  //     process.env.NAVER_CALLBACK_URL;
+  //   res.writeHead(200, { 'Content-Type': 'text/html;charset=utf-8' });
+  //   res.end(
+  //     "<a href='" +
+  //       api_url +
+  //       "'><img height='50' src='http://static.nid.naver.com/oauth/small_g_in.PNG'/></a>",
+  //   );
+  // }
 
   @UseGuards(NaverAuthGuard)
   @Get('naver')
