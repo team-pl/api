@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { PostProfileResDto } from 'src/profile/dto/response.dto';
 import { ESignUp } from 'src/type/user.type';
 
 export class GetUserResDto {
@@ -156,4 +157,60 @@ export class PostUserResDto {
 export class NicknameDuplicateResDto {
   @ApiProperty({ description: '닉네임 중복체크 결과' })
   result: boolean;
+}
+
+export class GetMyInfoResDto {
+  @ApiProperty({ description: '사용자ID' })
+  id: string;
+
+  @ApiProperty({
+    description: '프로필사진 url',
+  })
+  profileImageUrl: string;
+
+  @ApiProperty({ description: '닉네임(별명)' })
+  nickname: string;
+
+  @ApiProperty({
+    description: '회원가입 종류(네이버/카카오)',
+    enum: ESignUp,
+  })
+  signUpType: ESignUp;
+
+  @ApiProperty({
+    description: '직업 종류',
+    nullable: true,
+  })
+  jobType: string | null;
+
+  @ApiProperty({
+    description: '대표 프로필 ID',
+    nullable: true,
+  })
+  representativeProfileId: string | null;
+
+  @ApiProperty({
+    description: '프로필 정보',
+    isArray: true,
+  })
+  profile: PostProfileResDto;
+}
+
+export class UpdateProfileResDto {
+  @ApiProperty({ description: '사용자ID' })
+  id: string;
+
+  @ApiProperty({
+    description: '프로필사진 url',
+    nullable: true,
+  })
+  profileImageUrl: string | null;
+
+  @ApiProperty({ description: '닉네임(별명)' })
+  nickname: string;
+
+  @ApiProperty({
+    description: '직업 종류',
+  })
+  jobType: string;
 }
