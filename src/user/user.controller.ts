@@ -11,24 +11,34 @@ import {
   Put,
   Request,
   UseGuards,
+  UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { ApiExtraModels, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiConsumes,
+  ApiExtraModels,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { UpdateUserDto } from 'src/user/dto/update-user.dto';
 import {
+  GetMyInfoResDto,
   GetUserResDto,
   NicknameDuplicateResDto,
   PostUserResDto,
+  UpdateProfileResDto,
 } from './dto/response.dto';
 import {
   SwaggerGetListResponse,
   SwaggerGetResponse,
-  SwaggerPostResponse,
 } from 'src/decorator/swagger.decorator';
 import { SignupUserDto } from './dto/signup-user.dto';
 import { JwtAuthGuard } from 'src/auth/jwtAuth.guard';
 import { NicknameDuplicateDto } from './dto/nickname-duplicate.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @Controller('user')
 @ApiExtraModels(
@@ -36,6 +46,9 @@ import { NicknameDuplicateDto } from './dto/nickname-duplicate.dto';
   PostUserResDto,
   NicknameDuplicateDto,
   NicknameDuplicateResDto,
+  GetMyInfoResDto,
+  UpdateProfileDto,
+  UpdateProfileResDto,
 )
 @ApiTags('User')
 export class UserController {
@@ -43,13 +56,14 @@ export class UserController {
 
   @SwaggerGetListResponse(GetUserResDto)
   @Get()
+  @ApiOperation({ summary: '사용자 전체 조회 API' })
   getAllUsers() {
-    console.log('/GET API ');
     return this.service.getAllUser();
   }
 
   // NOTE: 닉네임 중복체크 API
   @Post('nickname-check')
+  @ApiOperation({ summary: '닉네임 중복체크 API' })
   @UseGuards(JwtAuthGuard)
   @ApiResponse({
     status: 401,
@@ -74,6 +88,57 @@ export class UserController {
     return this.service.nicknameDuplicateCheck(nickname);
   }
 
+  @Patch('profile')
+  @ApiOperation({
+    summary: '내정보 페이지>프로필 사진/닉네임/직책 및 전공 수정 API',
+  })
+  @UseGuards(JwtAuthGuard)
+  @ApiResponse({
+    status: 401,
+    description: 'user ID NotFound',
+  })
+  @ApiResponse({
+    status: 200,
+    type: UpdateProfileResDto,
+  })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('file'))
+  updateProfile(
+    @Request() req,
+    @Body(new ValidationPipe()) data: UpdateProfileDto,
+  ) {
+    const { id } = req.user.name;
+
+    if (!id) {
+      throw new HttpException('user ID NotFound', HttpStatus.UNAUTHORIZED);
+    }
+
+    return this.service.updateProfile(id, data);
+  }
+
+  @Get('/myInfo')
+  @ApiOperation({
+    summary: '내정보 페이지>조회 API',
+  })
+  @UseGuards(JwtAuthGuard)
+  @ApiResponse({
+    status: 401,
+    description: 'user ID NotFound',
+  })
+  @ApiResponse({
+    status: 200,
+    type: GetMyInfoResDto,
+  })
+  getMyInfo(@Request() req) {
+    const { id } = req.user.name;
+
+    if (!id) {
+      throw new HttpException('user ID NotFound', HttpStatus.UNAUTHORIZED);
+    }
+
+    return this.service.getMyInfo(id);
+  }
+
   @SwaggerGetResponse(GetUserResDto)
   @Get(':id')
   getOneUser(@Param('id') id: string) {
@@ -81,6 +146,9 @@ export class UserController {
   }
 
   @Patch('/signup')
+  @ApiOperation({
+    summary: '회원가입 API',
+  })
   @UseGuards(JwtAuthGuard)
   @ApiResponse({
     status: 401,
