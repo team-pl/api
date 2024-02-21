@@ -15,7 +15,7 @@ import { SignupUserDto } from './dto/signup-user.dto';
 import { randomProfile } from 'src/lib/random-profile';
 import { FileService } from 'src/file/file.service';
 import { EFileUsage } from 'src/type/file.type';
-import { UpdateProfileDto } from './dto/update-profile.dto';
+import { UpdateUserProfileDto } from './dto/update-profile.dto';
 
 @Injectable()
 export class UserService {
@@ -206,7 +206,7 @@ export class UserService {
     return user;
   }
 
-  async updateProfile(id: string, data: UpdateProfileDto) {
+  async updateProfile(id: string, data: UpdateUserProfileDto) {
     const { file, nickname, jobType } = data;
 
     let fileUrl: string | null = null;

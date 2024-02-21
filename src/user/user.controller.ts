@@ -38,7 +38,7 @@ import { SignupUserDto } from './dto/signup-user.dto';
 import { JwtAuthGuard } from 'src/auth/jwtAuth.guard';
 import { NicknameDuplicateDto } from './dto/nickname-duplicate.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { UpdateProfileDto } from './dto/update-profile.dto';
+import { UpdateUserProfileDto } from './dto/update-profile.dto';
 
 @Controller('user')
 @ApiExtraModels(
@@ -47,7 +47,7 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
   NicknameDuplicateDto,
   NicknameDuplicateResDto,
   GetMyInfoResDto,
-  UpdateProfileDto,
+  UpdateUserProfileDto,
   UpdateProfileResDto,
 )
 @ApiTags('User')
@@ -56,7 +56,7 @@ export class UserController {
 
   @SwaggerGetListResponse(GetUserResDto)
   @Get()
-  @ApiOperation({ summary: '사용자 전체 조회 API' })
+  // @ApiOperation({ summary: '사용자 전체 조회 API' })
   getAllUsers() {
     return this.service.getAllUser();
   }
@@ -105,7 +105,7 @@ export class UserController {
   @UseInterceptors(FileInterceptor('file'))
   updateProfile(
     @Request() req,
-    @Body(new ValidationPipe()) data: UpdateProfileDto,
+    @Body(new ValidationPipe()) data: UpdateUserProfileDto,
   ) {
     const { id } = req.user.name;
 
