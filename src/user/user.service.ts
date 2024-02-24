@@ -42,20 +42,12 @@ export class UserService {
     return this.getUserById(id);
   }
 
-  async kakaoSignUp(
-    kakaoId: string,
-    name: string,
-    email: string,
-    profileImageUrl: string,
-  ) {
+  async kakaoSignUp(kakaoId: string, name: string, email: string) {
     const id = uuid();
 
-    let url = profileImageUrl;
+    // NOTE: 프로필 사진을 랜덤 이미지로 설정
+    const url = randomProfile();
 
-    // NOTE: 프로필 사진이 없을떄 랜덤 이미지로 설정
-    if (!profileImageUrl) {
-      url = randomProfile();
-    }
     const user = await this.userRepository.create({
       id,
       kakaoId,
@@ -72,17 +64,12 @@ export class UserService {
     naverId: string,
     name: string,
     email: string,
-    profileImageUrl: string,
     phone: string = '',
   ) {
     const id = uuid();
 
-    let url = profileImageUrl;
-
-    // NOTE: 프로필 사진이 없을떄 랜덤 이미지로 설정
-    if (!profileImageUrl) {
-      url = randomProfile();
-    }
+    // NOTE: 프로필 사진을 랜덤 이미지로 설정
+    const url = randomProfile();
 
     const user = await this.userRepository.create({
       id,

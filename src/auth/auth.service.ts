@@ -78,12 +78,11 @@ export class AuthService {
     kakaoId: string,
     name: string,
     email: string,
-    profile: string,
   ): Promise<{ user: User; isNewUser: boolean }> {
     let isNewUser = false;
     let user = await this.userService.getUserByKakaoId(kakaoId);
     if (!user) {
-      user = await this.userService.kakaoSignUp(kakaoId, name, email, profile);
+      user = await this.userService.kakaoSignUp(kakaoId, name, email);
     }
     if (!user.phone) {
       isNewUser = true;
@@ -98,19 +97,12 @@ export class AuthService {
     naverId: string,
     name: string,
     email: string,
-    profile: string,
     phone: string = '',
   ): Promise<{ user: User; isNewUser: boolean }> {
     let isNewUser = false;
     let user = await this.userService.getUserByNaverId(naverId);
     if (!user) {
-      user = await this.userService.naverSignUp(
-        naverId,
-        name,
-        email,
-        profile,
-        phone,
-      );
+      user = await this.userService.naverSignUp(naverId, name, email, phone);
     }
     if (!user.phone) {
       isNewUser = true;
@@ -139,17 +131,11 @@ export class AuthService {
     return refreshToken;
   }
 
-  async getKakaoJWT(
-    kakaoId: string,
-    name: string,
-    email: string,
-    profile: string,
-  ) {
+  async getKakaoJWT(kakaoId: string, name: string, email: string) {
     const { user, isNewUser } = await this.kakaoValidateUser(
       kakaoId,
       name,
       email,
-      profile,
     );
     const accessToken = await this.generateAccessToken(user);
     const refreshToken = await this.generateRefreshToken(user); // refreshToken 생성
@@ -160,14 +146,12 @@ export class AuthService {
     kakaoId: string,
     name: string,
     email: string,
-    profile: string,
     phone: string,
   ) {
     const { user, isNewUser } = await this.naverValidateUser(
       kakaoId,
       name,
       email,
-      profile,
       phone,
     );
     const accessToken = await this.generateAccessToken(user);

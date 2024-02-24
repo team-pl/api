@@ -52,9 +52,9 @@ export class AuthController {
   @UseGuards(KakaoAuthGuard)
   @Get('kakao')
   async getKakaoInfo(@Request() req, @Res() res) {
-    const { name, email, profile } = req.user;
+    const { name, email } = req.user;
     const { accessToken, refreshToken, user, isNewUser } =
-      await this.service.getKakaoJWT(req.user.kakaoId, name, email, profile);
+      await this.service.getKakaoJWT(req.user.kakaoId, name, email);
 
     res.cookie('accessToken', accessToken, cookieOption);
     res.cookie('refreshToken', refreshToken, cookieOption);
@@ -94,15 +94,9 @@ export class AuthController {
   @UseGuards(NaverAuthGuard)
   @Get('naver')
   async getNaverInfo(@Request() req, @Res() res) {
-    const { name, email, profile, phone } = req.user;
+    const { name, email, phone } = req.user;
     const { accessToken, refreshToken, user, isNewUser } =
-      await this.service.getNaverJWT(
-        req.user.naverId,
-        name,
-        email,
-        profile,
-        phone,
-      );
+      await this.service.getNaverJWT(req.user.naverId, name, email, phone);
 
     res.cookie('accessToken', accessToken, cookieOption);
     res.cookie('refreshToken', refreshToken, cookieOption);

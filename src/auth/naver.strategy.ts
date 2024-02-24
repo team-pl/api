@@ -20,7 +20,6 @@ export class NaverStrategy extends PassportStrategy(Strategy) {
       name: profile.name,
       email: profile.email,
       naverId: profile.id,
-      profile: profile.profileImage,
       accessToken,
       refreshToken,
     };
