@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Project } from 'src/entity/project.entity';
 import { In, IsNull, Like, Raw, Repository } from 'typeorm';
@@ -14,6 +14,7 @@ import {
 } from 'src/type/project.type';
 import { UserService } from 'src/user/user.service';
 import { GetProjectQueryDto } from './dto/get-project.dto';
+import { UpdateProjectDto } from './dto/update-project.dto';
 
 @Injectable()
 export class ProjectService {
@@ -233,6 +234,122 @@ export class ProjectService {
     return {
       list: finalList,
       count: list[1],
+    };
+  }
+
+  async getProjectById(id: string) {
+    const projectData = await this.projectRepository.findOneBy({
+      id,
+      deletedAt: IsNull(),
+    });
+
+    if (!projectData)
+      throw new HttpException('Project NotFound', HttpStatus.NOT_FOUND);
+
+    return projectData;
+  }
+
+  async updateProject(
+    projectId: string,
+    data: UpdateProjectDto,
+    fileUrl: string | null,
+  ) {
+    let devCount = 0;
+    let designCount = 0;
+    let etcCount = 0;
+
+    const category: ECategory1[] = [];
+    const subCategory: ECategory2[] = [];
+
+    const { recruitExpiredAt, content, file, profileId, ...rest } = data;
+
+    // NOTE: 모집마감일이 YYYY/MM/DD 형식의 string 으로 들어옴
+    const [year, month, date] = recruitExpiredAt.split('/').map(Number);
+
+    // NOTE: 사용자가 설정한 날짜의 23시 59분 59초까지로 모집마감일을 정함
+    const expiredAt = new Date(year, month - 1, date, 23, 59, 59);
+
+    const bufferContent = Buffer.from(content, 'utf-8');
+
+    const profileData = await this.profileService.getProfileById(profileId);
+
+    for (let i = 1; i <= 10; i++) {
+      if (!rest[`category${i}_1`]) break;
+
+      subCategory.push(rest[`category${i}_2`]);
+
+      if (rest[`category${i}_1`] === ECategory1.DEVELOPER) {
+        devCount += rest[`category${i}Number`];
+      } else if (rest[`category${i}_1`] === ECategory1.DESIGN) {
+        designCount += rest[`category${i}Number`];
+      } else {
+        etcCount += rest[`category${i}Number`];
+      }
+    }
+
+    if (devCount > 0) {
+      category.push(ECategory1.DEVELOPER);
+    }
+
+    if (designCount > 0) {
+      category.push(ECategory1.DESIGN);
+    }
+
+    if (etcCount > 0) {
+      category.push(ECategory1.ETC);
+    }
+
+    await this.projectRepository.update(projectId, {
+      recruitExpiredAt: expiredAt,
+      content: bufferContent,
+      file: fileUrl,
+      profileId,
+      recruitDevTotalNumber: devCount,
+      recruitDesignTotalNumber: designCount,
+      recruitEtcTotalNumber: etcCount,
+      recruitCategory: category.join('/'),
+      recruitSubCategory: subCategory.join('/'),
+      ...rest,
+    });
+
+    const result = await this.getProjectById(projectId);
+
+    return {
+      ...result,
+      content: result.content.toString(),
+      profile: profileData,
+    };
+  }
+
+  async deleteProfile(id: string) {
+    const now = new Date();
+    await this.projectRepository.update(id, { deletedAt: now });
+    return true;
+  }
+
+  async getOneProject(id: string) {
+    const projectData = await this.projectRepository.find({
+      where: { id, deletedAt: IsNull() },
+      relations: ['user'],
+    });
+
+    if (!projectData.length) {
+      throw new HttpException('Project NotFound', HttpStatus.NOT_FOUND);
+    }
+
+    // NOTE: 사용자가 프로젝트 등록시 입력한 프로필 ID로 조회
+    const profile = await this.profileService.getProfileById(
+      projectData[0].profileId,
+    );
+
+    await this.projectRepository.update(id, {
+      numberOfViews: projectData[0].numberOfViews + 1,
+    });
+
+    return {
+      ...projectData[0],
+      content: projectData[0].content.toString(),
+      profile,
     };
   }
 }
