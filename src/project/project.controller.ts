@@ -14,6 +14,7 @@ import {
 import {
   ApiConsumes,
   ApiExtraModels,
+  ApiOperation,
   ApiQuery,
   ApiResponse,
   ApiTags,
@@ -30,7 +31,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { FileService } from 'src/file/file.service';
 import { EFileUsage } from 'src/type/file.type';
 import { GetProjectQueryDto } from './dto/get-project.dto';
-import { ECategorySelect } from 'src/type/project.type';
+import { ECategorySelect, ESubCategorySelect } from 'src/type/project.type';
 
 @Controller('project')
 @ApiExtraModels(
@@ -48,6 +49,7 @@ export class ProjectController {
   ) {}
 
   @Post()
+  @ApiOperation({ summary: '프로젝트 등록 API' })
   @UseGuards(JwtAuthGuard)
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file'))
@@ -90,6 +92,7 @@ export class ProjectController {
   }
 
   @Get()
+  @ApiOperation({ summary: '프로젝트 찾기>목록 조회 API' })
   @ApiQuery({
     name: 'skip',
     required: true,
@@ -109,6 +112,12 @@ export class ProjectController {
     enum: ECategorySelect,
   })
   @ApiQuery({
+    name: 'subCategory',
+    required: false,
+    description: '조회 하위카테고리',
+    enum: ESubCategorySelect,
+  })
+  @ApiQuery({
     name: 'searchWord',
     required: false,
     type: 'string',
@@ -122,12 +131,20 @@ export class ProjectController {
     @Query('skip') skip: string,
     @Query('take') take?: string,
     @Query('category') category?: ECategorySelect,
+    @Query('subCategory') subCategory?: ESubCategorySelect,
     @Query('searchWord') searchWord?: string,
   ) {
-    return this.service.getProjectList({ skip, take, category, searchWord });
+    return this.service.getProjectList({
+      skip,
+      take,
+      category,
+      subCategory,
+      searchWord,
+    });
   }
 
   @Get('home')
+  @ApiOperation({ summary: '홈>인기/신규 프로젝트 목록 조회 API' })
   @ApiResponse({
     status: 200,
     type: HomeProjectResDto,
