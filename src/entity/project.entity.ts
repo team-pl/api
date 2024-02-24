@@ -77,6 +77,13 @@ export class Project {
   recruitCategory: string;
 
   @ApiProperty({
+    description: '프로젝트 모집 하위카테고리',
+    example: 'DEV_BE/DEV_FE/DESIGN_UX/DESIGN_ETC',
+  })
+  @Column({ comment: '프로젝트 모집 하위카테고리' })
+  recruitSubCategory: string;
+
+  @ApiProperty({
     description: '프로젝트 모집글을 작성한 사용자 이름',
   })
   @Column({ comment: '프로젝트 모집글을 작성한 사용자 이름' })
