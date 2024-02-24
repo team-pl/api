@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { ECategorySelect } from 'src/type/project.type';
+import { ECategorySelect, ESubCategorySelect } from 'src/type/project.type';
 
 export class GetProjectQueryDto {
   @IsString()
@@ -24,6 +24,14 @@ export class GetProjectQueryDto {
     enum: ECategorySelect,
   })
   category?: ECategorySelect;
+
+  @IsOptional()
+  @IsEnum(ESubCategorySelect)
+  @ApiPropertyOptional({
+    description: '조회 하위 카테고리',
+    enum: ESubCategorySelect,
+  })
+  subCategory?: ESubCategorySelect;
 
   @IsOptional()
   @IsString()
