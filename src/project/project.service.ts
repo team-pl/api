@@ -7,8 +7,10 @@ import { v4 as uuid } from 'uuid';
 import { ProfileService } from 'src/profile/profile.service';
 import {
   ECategory1,
+  ECategory2,
   ECategorySelect,
   EProjectState,
+  ESubCategorySelect,
 } from 'src/type/project.type';
 import { UserService } from 'src/user/user.service';
 import { GetProjectQueryDto } from './dto/get-project.dto';
@@ -27,6 +29,7 @@ export class ProjectService {
     let designCount = 0;
     let etcCount = 0;
     const category: ECategory1[] = [];
+    const subCategory: ECategory2[] = [];
 
     const id = uuid();
 
@@ -47,11 +50,15 @@ export class ProjectService {
     for (let i = 1; i <= 10; i++) {
       if (!rest[`category${i}_1`]) break;
 
-      if (rest[`category${i}_1`] === ECategory1.DEVELOPER)
+      subCategory.push(rest[`category${i}_2`]);
+
+      if (rest[`category${i}_1`] === ECategory1.DEVELOPER) {
         devCount += rest[`category${i}Number`];
-      else if (rest[`category${i}_1`] === ECategory1.DESIGN)
+      } else if (rest[`category${i}_1`] === ECategory1.DESIGN) {
         designCount += rest[`category${i}Number`];
-      else etcCount += rest[`category${i}Number`];
+      } else {
+        etcCount += rest[`category${i}Number`];
+      }
     }
 
     if (devCount > 0) {
@@ -77,6 +84,7 @@ export class ProjectService {
       recruitDesignTotalNumber: designCount,
       recruitEtcTotalNumber: etcCount,
       recruitCategory: category.join('/'),
+      recruitSubCategory: subCategory.join('/'),
       userName: userNickname,
       ...rest,
     });
@@ -166,12 +174,14 @@ export class ProjectService {
       skip,
       take = '12',
       category = ECategorySelect.ALL,
+      subCategory = ESubCategorySelect.ALL,
       searchWord = '',
     } = query;
 
     const transCategory = category === ECategorySelect.ALL ? '' : category;
 
-    const bufferSearchWord = Buffer.from(searchWord, 'utf-8');
+    const transSubCategory =
+      subCategory === ESubCategorySelect.ALL ? '' : subCategory;
 
     // NOTE: 최신순으로 프로젝트 조회
     const list = await this.projectRepository.findAndCount({
@@ -179,16 +189,19 @@ export class ProjectService {
         {
           deletedAt: IsNull(),
           recruitCategory: Like(`%${transCategory}%`),
+          recruitSubCategory: Like(`%${transSubCategory}%`),
           name: Like(`%${searchWord}%`),
         },
         {
           deletedAt: IsNull(),
           recruitCategory: Like(`%${transCategory}%`),
+          recruitSubCategory: Like(`%${transSubCategory}%`),
           userName: Like(`%${searchWord}%`),
         },
         {
           deletedAt: IsNull(),
           recruitCategory: Like(`%${transCategory}%`),
+          recruitSubCategory: Like(`%${transSubCategory}%`),
           content: Raw(
             (data) => `ENCODE(${data}, 'escape') LIKE '%${searchWord}%'`,
           ),
