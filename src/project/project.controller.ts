@@ -234,16 +234,31 @@ export class ProjectController {
 
   @Delete(':id')
   @ApiOperation({ summary: '프로젝트 삭제 API' })
+  @UseGuards(JwtAuthGuard)
   @ApiParam({
     name: 'id',
     required: true,
     description: '삭제할 프로젝트 ID',
   })
   @ApiResponse({
+    status: 401,
+    description: 'user ID NotFound',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Profile NotFound',
+  })
+  @ApiResponse({
     status: 200,
     type: DeleteProjectResDto,
   })
-  deleteUser(@Param('id') id: string) {
-    return this.service.deleteProfile(id);
+  deleteProject(@Param('id') projectId: string, @Request() req) {
+    const { id } = req.user.name;
+
+    if (!id) {
+      throw new HttpException('NotFound', HttpStatus.UNAUTHORIZED);
+    }
+
+    return this.service.deleteProject(projectId);
   }
 }
