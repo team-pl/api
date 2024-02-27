@@ -321,9 +321,15 @@ export class ProjectService {
     };
   }
 
-  async deleteProfile(id: string) {
+  async deleteProject(id: string) {
     const now = new Date();
-    await this.projectRepository.update(id, { deletedAt: now });
+
+    try {
+      await this.projectRepository.update(id, { deletedAt: now });
+    } catch (e) {
+      throw new HttpException(e, HttpStatus.NOT_FOUND);
+    }
+
     return true;
   }
 
