@@ -176,23 +176,6 @@ export class UserService {
     return user.nickname;
   }
 
-  async getMyInfo(id: string) {
-    const user = await this.userRepository.findOne({
-      where: { deletedAt: IsNull(), id },
-      select: [
-        'id',
-        'profileImageUrl',
-        'nickname',
-        'signUpType',
-        'jobType',
-        'representativeProfileId',
-      ],
-      relations: ['profile'],
-    });
-
-    return user;
-  }
-
   async updateProfile(id: string, data: UpdateUserProfileDto) {
     const { file, nickname, jobType } = data;
 
@@ -226,6 +209,22 @@ export class UserService {
         deletedAt: IsNull(),
       },
       select: ['id', 'profileImageUrl', 'nickname', 'jobType'],
+    });
+
+    return user;
+  }
+
+  async getMyInfo(id: string) {
+    const user = await this.userRepository.findOne({
+      where: { deletedAt: IsNull(), id },
+      select: [
+        'id',
+        'profileImageUrl',
+        'nickname',
+        'signUpType',
+        'jobType',
+        'representativeProfileId',
+      ],
     });
 
     return user;
