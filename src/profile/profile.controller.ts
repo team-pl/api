@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   HttpException,
   HttpStatus,
   Param,
@@ -28,6 +29,7 @@ import { CreateProfileDto } from './dto/create-profile.dto';
 import { EFileUsage } from 'src/type/file.type';
 import {
   DeleteProfileResDto,
+  GetMyInfoResDto,
   PostProfileResDto,
   UpdateProfileResDto,
 } from './dto/response.dto';
@@ -40,6 +42,7 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
   DeleteProfileResDto,
   UpdateProfileDto,
   UpdateProfileResDto,
+  GetMyInfoResDto,
 )
 @ApiTags('Profile')
 export class ProfileController {
@@ -149,5 +152,28 @@ export class ProfileController {
   })
   deleteUser(@Param('id') id: string) {
     return this.service.deleteProfile(id);
+  }
+
+  @Get('/myInfo')
+  @ApiOperation({
+    summary: '내정보 페이지>조회 API',
+  })
+  @UseGuards(JwtAuthGuard)
+  @ApiResponse({
+    status: 401,
+    description: 'user ID NotFound',
+  })
+  @ApiResponse({
+    status: 200,
+    type: GetMyInfoResDto,
+  })
+  getMyInfo(@Request() req) {
+    const { id } = req.user.name;
+
+    if (!id) {
+      throw new HttpException('user ID NotFound', HttpStatus.UNAUTHORIZED);
+    }
+
+    return this.service.getAllProfile(id);
   }
 }
