@@ -24,7 +24,6 @@ import {
 } from '@nestjs/swagger';
 import { UpdateUserDto } from 'src/user/dto/update-user.dto';
 import {
-  GetMyInfoResDto,
   GetUserResDto,
   NicknameDuplicateResDto,
   PostUserResDto,
@@ -46,7 +45,6 @@ import { UpdateUserProfileDto } from './dto/update-profile.dto';
   PostUserResDto,
   NicknameDuplicateDto,
   NicknameDuplicateResDto,
-  GetMyInfoResDto,
   UpdateUserProfileDto,
   UpdateProfileResDto,
 )
@@ -114,29 +112,6 @@ export class UserController {
     }
 
     return this.service.updateProfile(id, data);
-  }
-
-  @Get('/myInfo')
-  @ApiOperation({
-    summary: '내정보 페이지>조회 API',
-  })
-  @UseGuards(JwtAuthGuard)
-  @ApiResponse({
-    status: 401,
-    description: 'user ID NotFound',
-  })
-  @ApiResponse({
-    status: 200,
-    type: GetMyInfoResDto,
-  })
-  getMyInfo(@Request() req) {
-    const { id } = req.user.name;
-
-    if (!id) {
-      throw new HttpException('user ID NotFound', HttpStatus.UNAUTHORIZED);
-    }
-
-    return this.service.getMyInfo(id);
   }
 
   @SwaggerGetResponse(GetUserResDto)
