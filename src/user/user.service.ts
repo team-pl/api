@@ -229,4 +229,34 @@ export class UserService {
 
     return user;
   }
+
+  async getNicknameForProject(id: string) {
+    // NOTE: 조회
+    const user = await this.userRepository.findOneBy({
+      id,
+      deletedAt: IsNull(),
+    });
+
+    // NOTE: 등록한 공고수 +
+
+    await this.userRepository.update(id, {
+      numberOfRegistrations: user.numberOfRegistrations + 1,
+    });
+
+    return user.nickname;
+  }
+
+  async updateForDeleteProject(id: string) {
+    // NOTE: 조회
+    const user = await this.userRepository.findOneBy({
+      id,
+      deletedAt: IsNull(),
+    });
+
+    // NOTE: 등록한 공고수 -
+
+    await this.userRepository.update(id, {
+      numberOfRegistrations: user.numberOfRegistrations - 1,
+    });
+  }
 }
