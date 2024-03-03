@@ -31,9 +31,11 @@ import {
   DeleteProfileResDto,
   GetMyInfoResDto,
   PostProfileResDto,
+  PostTempProfileResDto,
   UpdateProfileResDto,
 } from './dto/response.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { CreateProfileTempDto } from './dto/create-profile-temporary.dto';
 
 @Controller('profile')
 @ApiExtraModels(
@@ -43,6 +45,8 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
   UpdateProfileDto,
   UpdateProfileResDto,
   GetMyInfoResDto,
+  CreateProfileTempDto,
+  PostTempProfileResDto,
 )
 @ApiTags('Profile')
 export class ProfileController {
@@ -92,6 +96,49 @@ export class ProfileController {
     }
 
     return this.service.create(data, id, fileUrl);
+  }
+
+  @Post('temporary-storage')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: '프로필 임시저장 API' })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiResponse({
+    status: 401,
+    description: 'user ID NotFound',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Number of profile registrations exceeded',
+  })
+  @ApiResponse({
+    status: 200,
+    type: PostTempProfileResDto,
+  })
+  async temporaryStorage(
+    @Request() req,
+    @Body(new ValidationPipe()) data: CreateProfileTempDto,
+  ) {
+    const { id } = req.user.name;
+
+    const { portfolioFile } = data;
+
+    if (!id) {
+      throw new HttpException('NotFound', HttpStatus.UNAUTHORIZED);
+    }
+
+    let fileUrl: string | null = null;
+
+    if (portfolioFile) {
+      const uploadedFile = await this.fileService.uploadFile(
+        portfolioFile,
+        id,
+        EFileUsage.PROFILE,
+      );
+      fileUrl = uploadedFile.url;
+    }
+
+    return this.service.temporaryStorage(data, id, fileUrl);
   }
 
   @Patch(':id')
