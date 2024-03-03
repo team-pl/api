@@ -126,4 +126,11 @@ export class CreateProfileDto {
     default: null,
   })
   portfolioFile: Express.Multer.File;
+
+  @IsOptional()
+  @ApiPropertyOptional({
+    description: '임시저장된 프로필 ID(임시 저장 후 등록할때 추가)',
+    nullable: true,
+  })
+  tempProfileId: string | null;
 }
