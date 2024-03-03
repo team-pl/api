@@ -439,6 +439,13 @@ export class Profile {
   @Column({ comment: '포트폴리오 파일', default: null, nullable: true })
   portfolioFile: string | null;
 
+  @ApiProperty({
+    description: '임시저장 여부',
+    default: false,
+  })
+  @Column({ comment: '임시저장 여부', default: false })
+  isTemporaryStorage: boolean;
+
   // --------------------------
 
   @ApiProperty({ description: '프로필을 등록한 사용자 정보' })
