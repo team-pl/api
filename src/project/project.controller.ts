@@ -259,6 +259,6 @@ export class ProjectController {
       throw new HttpException('NotFound', HttpStatus.UNAUTHORIZED);
     }
 
-    return this.service.deleteProject(projectId);
+    return this.service.deleteProject(projectId, id);
   }
 }
