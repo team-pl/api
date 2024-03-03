@@ -46,7 +46,7 @@ export class ProjectService {
 
     const profileData = await this.profileService.getProfileById(profileId);
 
-    const userNickname = await this.userService.getUserNicknameById(userId);
+    const userNickname = await this.userService.getNicknameForProject(userId);
 
     for (let i = 1; i <= 10; i++) {
       if (!rest[`category${i}_1`]) break;
@@ -321,11 +321,12 @@ export class ProjectService {
     };
   }
 
-  async deleteProject(id: string) {
+  async deleteProject(id: string, userId: string) {
     const now = new Date();
 
     try {
       await this.projectRepository.update(id, { deletedAt: now });
+      await this.userService.updateForDeleteProject(userId);
     } catch (e) {
       throw new HttpException(e, HttpStatus.NOT_FOUND);
     }
