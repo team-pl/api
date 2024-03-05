@@ -4,11 +4,13 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { User } from './user.entity';
 
 @Entity({ name: 'comment' })
 export class Comment {
@@ -39,24 +41,6 @@ export class Comment {
   @Column({ comment: '댓글을 작성한 사용자 ID' })
   userId: string;
 
-  @ApiProperty({
-    description: '댓글을 남긴 사용자 nickname',
-  })
-  @Column({ comment: '댓글을 남긴 사용자 nickname' })
-  name: string;
-
-  @ApiProperty({
-    description: '댓글을 남긴 사용자 직업 종류',
-    nullable: true,
-    default: null,
-  })
-  @Column({
-    comment: '댓글을 남긴 사용자 직업 종류',
-    nullable: true,
-    default: null,
-  })
-  jobType: string | null;
-
   @ApiProperty({ description: '댓글 내용' })
   @Column({ comment: '댓글 내용' })
   content: string;
@@ -66,4 +50,9 @@ export class Comment {
 
   @OneToMany(() => Comment, (comment) => comment.parentComment)
   replies: Comment[];
+
+  @ApiProperty({ description: '댓글을 작성한 사용자 정보' })
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'userId' })
+  user: User;
 }
