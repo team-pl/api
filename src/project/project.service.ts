@@ -34,7 +34,14 @@ export class ProjectService {
 
     const id = uuid();
 
-    const { recruitExpiredAt, content, file, profileId, ...rest } = data;
+    const {
+      recruitExpiredAt,
+      content,
+      file,
+      profileId,
+      categoryInfo,
+      ...rest
+    } = data;
 
     // NOTE: 모집마감일이 YYYY/MM/DD 형식의 string 으로 들어옴
     const [year, month, date] = recruitExpiredAt.split('/').map(Number);
@@ -48,19 +55,23 @@ export class ProjectService {
 
     const userNickname = await this.userService.getUserNicknameById(userId);
 
-    for (let i = 1; i <= 10; i++) {
-      if (!rest[`category${i}_1`]) break;
+    const categoryData = {};
 
-      subCategory.push(rest[`category${i}_2`]);
+    categoryInfo?.map((data, index) => {
+      subCategory.push(data.subCategory);
 
-      if (rest[`category${i}_1`] === ECategory1.DEVELOPER) {
-        devCount += rest[`category${i}Number`];
-      } else if (rest[`category${i}_1`] === ECategory1.DESIGN) {
-        designCount += rest[`category${i}Number`];
+      categoryData[`category${index + 1}_1`] = data.category;
+      categoryData[`category${index + 1}_2`] = data.subCategory;
+      categoryData[`category${index + 1}Number`] = data.count;
+
+      if (data.category === ECategory1.DEVELOPER) {
+        devCount += data.count;
+      } else if (data.category === ECategory1.DESIGN) {
+        designCount += data.count;
       } else {
-        etcCount += rest[`category${i}Number`];
+        etcCount += data.count;
       }
-    }
+    });
 
     if (devCount > 0) {
       category.push(ECategory1.DEVELOPER);
@@ -87,15 +98,34 @@ export class ProjectService {
       recruitCategory: category.join('/'),
       recruitSubCategory: subCategory.join('/'),
       userName: userNickname,
+      ...categoryData,
       ...rest,
     });
 
     const result = await this.projectRepository.save(project);
 
     return {
-      ...result,
+      id: result.id,
+      createdAt: result.createdAt,
+      name: result.name,
+      state: result.state,
+      recruitExpiredAt: result.recruitExpiredAt,
+      recruitTotalNumber: result.recruitTotalNumber,
+      confirmedNumber: result.confirmedNumber,
+      recruitDevTotalNumber: result.recruitDevTotalNumber,
+      recruitDesignTotalNumber: result.recruitDesignTotalNumber,
+      recruitEtcTotalNumber: result.recruitEtcTotalNumber,
+      recruitCategory: category,
+      recruitSubCategory: subCategory,
+      userName: result.userName,
+      numberOfViews: result.numberOfViews,
+      numberOfLikes: result.numberOfLikes,
       content: result.content.toString(),
+      url: result.url,
+      file: result.file,
       profile: profileData,
+      userId: result.userId,
+      categoryInfo,
     };
   }
 
@@ -125,6 +155,7 @@ export class ProjectService {
     const finalPopularList = popularList[0].map((data) => {
       return {
         ...data,
+        recruitCategory: data.recruitCategory.split('/'),
         content: data.content.toString(),
       };
     });
@@ -154,6 +185,7 @@ export class ProjectService {
     const finalNewList = newList[0].map((data) => {
       return {
         ...data,
+        recruitCategory: data.recruitCategory.split('/'),
         content: data.content.toString(),
       };
     });
@@ -227,6 +259,7 @@ export class ProjectService {
     const finalList = list[0].map((data) => {
       return {
         ...data,
+        recruitCategory: data.recruitCategory.split('/'),
         content: data.content.toString(),
       };
     });
@@ -261,7 +294,14 @@ export class ProjectService {
     const category: ECategory1[] = [];
     const subCategory: ECategory2[] = [];
 
-    const { recruitExpiredAt, content, file, profileId, ...rest } = data;
+    const {
+      recruitExpiredAt,
+      content,
+      file,
+      profileId,
+      categoryInfo,
+      ...rest
+    } = data;
 
     // NOTE: 모집마감일이 YYYY/MM/DD 형식의 string 으로 들어옴
     const [year, month, date] = recruitExpiredAt.split('/').map(Number);
@@ -273,19 +313,23 @@ export class ProjectService {
 
     const profileData = await this.profileService.getProfileById(profileId);
 
-    for (let i = 1; i <= 10; i++) {
-      if (!rest[`category${i}_1`]) break;
+    const categoryData = {};
 
-      subCategory.push(rest[`category${i}_2`]);
+    categoryInfo?.map((data, index) => {
+      subCategory.push(data.subCategory);
 
-      if (rest[`category${i}_1`] === ECategory1.DEVELOPER) {
-        devCount += rest[`category${i}Number`];
-      } else if (rest[`category${i}_1`] === ECategory1.DESIGN) {
-        designCount += rest[`category${i}Number`];
+      categoryData[`category${index + 1}_1`] = data.category;
+      categoryData[`category${index + 1}_2`] = data.subCategory;
+      categoryData[`category${index + 1}Number`] = data.count;
+
+      if (data.category === ECategory1.DEVELOPER) {
+        devCount += data.count;
+      } else if (data.category === ECategory1.DESIGN) {
+        designCount += data.count;
       } else {
-        etcCount += rest[`category${i}Number`];
+        etcCount += data.count;
       }
-    }
+    });
 
     if (devCount > 0) {
       category.push(ECategory1.DEVELOPER);
@@ -315,9 +359,27 @@ export class ProjectService {
     const result = await this.getProjectById(projectId);
 
     return {
-      ...result,
+      id: result.id,
+      createdAt: result.createdAt,
+      name: result.name,
+      state: result.state,
+      recruitExpiredAt: result.recruitExpiredAt,
+      recruitTotalNumber: result.recruitTotalNumber,
+      confirmedNumber: result.confirmedNumber,
+      recruitDevTotalNumber: result.recruitDevTotalNumber,
+      recruitDesignTotalNumber: result.recruitDesignTotalNumber,
+      recruitEtcTotalNumber: result.recruitEtcTotalNumber,
+      recruitCategory: category,
+      recruitSubCategory: subCategory,
+      userName: result.userName,
+      numberOfViews: result.numberOfViews,
+      numberOfLikes: result.numberOfLikes,
       content: result.content.toString(),
+      url: result.url,
+      file: result.file,
       profile: profileData,
+      userId: result.userId,
+      categoryInfo,
     };
   }
 
@@ -352,9 +414,40 @@ export class ProjectService {
       numberOfViews: projectData[0].numberOfViews + 1,
     });
 
+    const categoryArray = [];
+
+    for (let i = 1; i <= 10; i++) {
+      if (!projectData[0][`category${i}_1`]) break;
+
+      categoryArray.push({
+        category: projectData[0][`category${i}_1`],
+        subCategory: projectData[0][`category${i}_2`],
+        count: projectData[0][`category${i}Number`],
+      });
+    }
+
     return {
-      ...projectData[0],
+      id: projectData[0].id,
+      createdAt: projectData[0].createdAt,
+      name: projectData[0].name,
+      state: projectData[0].state,
+      recruitExpiredAt: projectData[0].recruitExpiredAt,
+      recruitTotalNumber: projectData[0].recruitTotalNumber,
+      confirmedNumber: projectData[0].confirmedNumber,
+      recruitDevTotalNumber: projectData[0].recruitDevTotalNumber,
+      recruitDesignTotalNumber: projectData[0].recruitDesignTotalNumber,
+      recruitEtcTotalNumber: projectData[0].recruitEtcTotalNumber,
+      recruitCategory: projectData[0].recruitCategory.split('/'),
+      recruitSubCategory: projectData[0].recruitSubCategory.split('/'),
+      userName: projectData[0].userName,
+      numberOfViews: projectData[0].numberOfViews,
+      numberOfLikes: projectData[0].numberOfLikes,
       content: projectData[0].content.toString(),
+      url: projectData[0].url,
+      file: projectData[0].file,
+      userId: projectData[0].userId,
+      categoryInfo: categoryArray,
+      user: projectData[0].user,
       profile,
     };
   }
