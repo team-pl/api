@@ -1,21 +1,31 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { CreateProfileDto } from 'src/profile/dto/create-profile.dto';
-import { PostProfileResDto } from 'src/profile/dto/response.dto';
 import { ECategory1, ECategory2, EProjectState } from 'src/type/project.type';
 import { GetUserResDto } from 'src/user/dto/response.dto';
 
+export class CategoryResDto {
+  @ApiProperty({
+    description: '프로젝트 카테고리1',
+    enum: ECategory1,
+  })
+  category: ECategory1;
+
+  @ApiProperty({
+    description: '프로젝트 카테고리2',
+    enum: ECategory2,
+  })
+  subCategory: ECategory2;
+
+  @ApiProperty({ description: '모집인원' })
+  count: number;
+}
+
 export class PostProjectResDto {
-  @ApiProperty({ description: '프로젝트 고유 Id' })
+  @ApiProperty({ description: '프로젝트 고유 ID' })
   id: string;
 
   @ApiProperty({ description: '프로젝트 등록일' })
   createdAt: Date;
-
-  @ApiProperty({ description: '프로젝트 정보 수정일' })
-  updatedAt: Date;
-
-  @ApiProperty({ description: '프로젝트 삭제일' })
-  deletedAt: Date | null;
 
   @ApiProperty({ description: '프로젝트명' })
   name: string;
@@ -46,15 +56,17 @@ export class PostProjectResDto {
 
   @ApiProperty({
     description: '프로젝트 모집 카테고리',
-    example: 'DEVELOPER/DESIGN/ETC',
+    isArray: true,
+    enum: ECategory1,
   })
-  recruitCategory: string;
+  recruitCategory: ECategory1[];
 
   @ApiProperty({
     description: '프로젝트 모집 하위카테고리',
-    example: 'DEV_BE/DEV_FE/DESIGN_UX/DESIGN_ETC',
+    isArray: true,
+    enum: ECategory2,
   })
-  recruitSubCategory: string;
+  recruitSubCategory: ECategory2[];
 
   @ApiProperty({
     description: '프로젝트 모집글을 작성한 사용자 이름',
@@ -86,175 +98,10 @@ export class PostProjectResDto {
   userId: string;
 
   @ApiProperty({
-    description: '프로젝트 카테고리1의 카테고리1',
-    enum: ECategory1,
+    description: '모집 카테고리 정보',
+    isArray: true,
   })
-  category1_1: ECategory1;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리1의 카테고리2',
-    enum: ECategory2,
-  })
-  category1_2: ECategory2;
-
-  @ApiProperty({ description: '프로젝트 카테고리1의 모집인원' })
-  category1Number: number;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리2의 카테고리1',
-    nullable: true,
-    enum: ECategory1,
-  })
-  category2_1: ECategory1 | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리2의 카테고리2',
-    nullable: true,
-    enum: ECategory2,
-  })
-  category2_2: ECategory2 | null;
-
-  @ApiProperty({ description: '프로젝트 카테고리2의 모집인원', nullable: true })
-  category2Number: number | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리3의 카테고리1',
-    nullable: true,
-    enum: ECategory1,
-  })
-  category3_1: ECategory1 | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리3의 카테고리2',
-    nullable: true,
-    enum: ECategory2,
-  })
-  category3_2: ECategory2 | null;
-
-  @ApiProperty({ description: '프로젝트 카테고리3의 모집인원', nullable: true })
-  category3Number: number | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리4의 카테고리1',
-    nullable: true,
-    enum: ECategory1,
-  })
-  category4_1: ECategory1 | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리4의 카테고리2',
-    nullable: true,
-    enum: ECategory2,
-  })
-  category4_2: ECategory2 | null;
-
-  @ApiProperty({ description: '프로젝트 카테고리4의 모집인원', nullable: true })
-  category4Number: number | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리5의 카테고리1',
-    nullable: true,
-    enum: ECategory1,
-  })
-  category5_1: ECategory1 | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리5의 카테고리2',
-    nullable: true,
-    enum: ECategory2,
-  })
-  category5_2: ECategory2 | null;
-
-  @ApiProperty({ description: '프로젝트 카테고리5의 모집인원', nullable: true })
-  category5Number: number | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리6의 카테고리1',
-    nullable: true,
-    enum: ECategory1,
-  })
-  category6_1: ECategory1 | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리6의 카테고리2',
-    nullable: true,
-    enum: ECategory2,
-  })
-  category6_2: ECategory2 | null;
-
-  @ApiProperty({ description: '프로젝트 카테고리6의 모집인원', nullable: true })
-  category6Number: number | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리7의 카테고리1',
-    nullable: true,
-    enum: ECategory1,
-  })
-  category7_1: ECategory1 | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리7의 카테고리2',
-    nullable: true,
-    enum: ECategory2,
-  })
-  category7_2: ECategory2 | null;
-
-  @ApiProperty({ description: '프로젝트 카테고리7의 모집인원', nullable: true })
-  category7Number: number | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리8의 카테고리1',
-    nullable: true,
-    enum: ECategory1,
-  })
-  category8_1: ECategory1 | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리8의 카테고리2',
-    nullable: true,
-    enum: ECategory2,
-  })
-  category8_2: ECategory2 | null;
-
-  @ApiProperty({ description: '프로젝트 카테고리8의 모집인원', nullable: true })
-  category8Number: number | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리9의 카테고리1',
-    nullable: true,
-    enum: ECategory1,
-  })
-  category9_1: ECategory1 | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리9의 카테고리2',
-    nullable: true,
-    enum: ECategory2,
-  })
-  category9_2: ECategory2 | null;
-
-  @ApiProperty({ description: '프로젝트 카테고리9의 모집인원', nullable: true })
-  category9Number: number | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리10의 카테고리1',
-    nullable: true,
-    enum: ECategory1,
-  })
-  category10_1: ECategory1 | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리10의 카테고리2',
-    nullable: true,
-    enum: ECategory2,
-  })
-  category10_2: ECategory2 | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리10의 모집인원',
-    nullable: true,
-  })
-  category10Number: number | null;
+  categoryInfo: CategoryResDto;
 }
 
 export class HomeProjectListResDto {
@@ -275,9 +122,10 @@ export class HomeProjectListResDto {
 
   @ApiProperty({
     description: '프로젝트 모집 카테고리',
-    example: 'DEVELOPER/DESIGN/ETC',
+    isArray: true,
+    enum: ECategory1,
   })
-  recruitCategory: string;
+  recruitCategory: ECategory1[];
 
   @ApiProperty({ description: '프로젝트 모집인원' })
   recruitTotalNumber: number;
@@ -326,12 +174,6 @@ export class UpdateProjectResDto {
   @ApiProperty({ description: '프로젝트 등록일' })
   createdAt: Date;
 
-  @ApiProperty({ description: '프로젝트 정보 수정일' })
-  updatedAt: Date;
-
-  @ApiProperty({ description: '프로젝트 삭제일' })
-  deletedAt: Date | null;
-
   @ApiProperty({ description: '프로젝트명' })
   name: string;
 
@@ -361,15 +203,17 @@ export class UpdateProjectResDto {
 
   @ApiProperty({
     description: '프로젝트 모집 카테고리',
-    example: 'DEVELOPER/DESIGN/ETC',
+    isArray: true,
+    enum: ECategory1,
   })
-  recruitCategory: string;
+  recruitCategory: ECategory1[];
 
   @ApiProperty({
     description: '프로젝트 모집 하위카테고리',
-    example: 'DEV_BE/DEV_FE/DESIGN_UX/DESIGN_ETC',
+    isArray: true,
+    enum: ECategory2,
   })
-  recruitSubCategory: string;
+  recruitSubCategory: ECategory2[];
 
   @ApiProperty({
     description: '프로젝트 모집글을 작성한 사용자 이름',
@@ -401,175 +245,10 @@ export class UpdateProjectResDto {
   userId: string;
 
   @ApiProperty({
-    description: '프로젝트 카테고리1의 카테고리1',
-    enum: ECategory1,
+    description: '모집 카테고리 정보',
+    isArray: true,
   })
-  category1_1: ECategory1;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리1의 카테고리2',
-    enum: ECategory2,
-  })
-  category1_2: ECategory2;
-
-  @ApiProperty({ description: '프로젝트 카테고리1의 모집인원' })
-  category1Number: number;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리2의 카테고리1',
-    nullable: true,
-    enum: ECategory1,
-  })
-  category2_1: ECategory1 | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리2의 카테고리2',
-    nullable: true,
-    enum: ECategory2,
-  })
-  category2_2: ECategory2 | null;
-
-  @ApiProperty({ description: '프로젝트 카테고리2의 모집인원', nullable: true })
-  category2Number: number | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리3의 카테고리1',
-    nullable: true,
-    enum: ECategory1,
-  })
-  category3_1: ECategory1 | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리3의 카테고리2',
-    nullable: true,
-    enum: ECategory2,
-  })
-  category3_2: ECategory2 | null;
-
-  @ApiProperty({ description: '프로젝트 카테고리3의 모집인원', nullable: true })
-  category3Number: number | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리4의 카테고리1',
-    nullable: true,
-    enum: ECategory1,
-  })
-  category4_1: ECategory1 | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리4의 카테고리2',
-    nullable: true,
-    enum: ECategory2,
-  })
-  category4_2: ECategory2 | null;
-
-  @ApiProperty({ description: '프로젝트 카테고리4의 모집인원', nullable: true })
-  category4Number: number | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리5의 카테고리1',
-    nullable: true,
-    enum: ECategory1,
-  })
-  category5_1: ECategory1 | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리5의 카테고리2',
-    nullable: true,
-    enum: ECategory2,
-  })
-  category5_2: ECategory2 | null;
-
-  @ApiProperty({ description: '프로젝트 카테고리5의 모집인원', nullable: true })
-  category5Number: number | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리6의 카테고리1',
-    nullable: true,
-    enum: ECategory1,
-  })
-  category6_1: ECategory1 | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리6의 카테고리2',
-    nullable: true,
-    enum: ECategory2,
-  })
-  category6_2: ECategory2 | null;
-
-  @ApiProperty({ description: '프로젝트 카테고리6의 모집인원', nullable: true })
-  category6Number: number | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리7의 카테고리1',
-    nullable: true,
-    enum: ECategory1,
-  })
-  category7_1: ECategory1 | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리7의 카테고리2',
-    nullable: true,
-    enum: ECategory2,
-  })
-  category7_2: ECategory2 | null;
-
-  @ApiProperty({ description: '프로젝트 카테고리7의 모집인원', nullable: true })
-  category7Number: number | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리8의 카테고리1',
-    nullable: true,
-    enum: ECategory1,
-  })
-  category8_1: ECategory1 | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리8의 카테고리2',
-    nullable: true,
-    enum: ECategory2,
-  })
-  category8_2: ECategory2 | null;
-
-  @ApiProperty({ description: '프로젝트 카테고리8의 모집인원', nullable: true })
-  category8Number: number | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리9의 카테고리1',
-    nullable: true,
-    enum: ECategory1,
-  })
-  category9_1: ECategory1 | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리9의 카테고리2',
-    nullable: true,
-    enum: ECategory2,
-  })
-  category9_2: ECategory2 | null;
-
-  @ApiProperty({ description: '프로젝트 카테고리9의 모집인원', nullable: true })
-  category9Number: number | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리10의 카테고리1',
-    nullable: true,
-    enum: ECategory1,
-  })
-  category10_1: ECategory1 | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리10의 카테고리2',
-    nullable: true,
-    enum: ECategory2,
-  })
-  category10_2: ECategory2 | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리10의 모집인원',
-    nullable: true,
-  })
-  category10Number: number | null;
+  categoryInfo: CategoryResDto;
 }
 
 export class DeleteProjectResDto {
@@ -585,12 +264,6 @@ export class GetOneProjectResDto {
 
   @ApiProperty({ description: '프로젝트 등록일' })
   createdAt: Date;
-
-  @ApiProperty({ description: '프로젝트 정보 수정일' })
-  updatedAt: Date;
-
-  @ApiProperty({ description: '프로젝트 삭제일' })
-  deletedAt: Date | null;
 
   @ApiProperty({ description: '프로젝트명' })
   name: string;
@@ -621,15 +294,17 @@ export class GetOneProjectResDto {
 
   @ApiProperty({
     description: '프로젝트 모집 카테고리',
-    example: 'DEVELOPER/DESIGN/ETC',
+    isArray: true,
+    enum: ECategory1,
   })
-  recruitCategory: string;
+  recruitCategory: ECategory1[];
 
   @ApiProperty({
     description: '프로젝트 모집 하위카테고리',
-    example: 'DEV_BE/DEV_FE/DESIGN_UX/DESIGN_ETC',
+    isArray: true,
+    enum: ECategory2,
   })
-  recruitSubCategory: string;
+  recruitSubCategory: ECategory2[];
 
   @ApiProperty({
     description: '프로젝트 모집글을 작성한 사용자 이름',
@@ -655,175 +330,10 @@ export class GetOneProjectResDto {
   userId: string;
 
   @ApiProperty({
-    description: '프로젝트 카테고리1의 카테고리1',
-    enum: ECategory1,
+    description: '모집 카테고리 정보',
+    isArray: true,
   })
-  category1_1: ECategory1;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리1의 카테고리2',
-    enum: ECategory2,
-  })
-  category1_2: ECategory2;
-
-  @ApiProperty({ description: '프로젝트 카테고리1의 모집인원' })
-  category1Number: number;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리2의 카테고리1',
-    nullable: true,
-    enum: ECategory1,
-  })
-  category2_1: ECategory1 | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리2의 카테고리2',
-    nullable: true,
-    enum: ECategory2,
-  })
-  category2_2: ECategory2 | null;
-
-  @ApiProperty({ description: '프로젝트 카테고리2의 모집인원', nullable: true })
-  category2Number: number | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리3의 카테고리1',
-    nullable: true,
-    enum: ECategory1,
-  })
-  category3_1: ECategory1 | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리3의 카테고리2',
-    nullable: true,
-    enum: ECategory2,
-  })
-  category3_2: ECategory2 | null;
-
-  @ApiProperty({ description: '프로젝트 카테고리3의 모집인원', nullable: true })
-  category3Number: number | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리4의 카테고리1',
-    nullable: true,
-    enum: ECategory1,
-  })
-  category4_1: ECategory1 | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리4의 카테고리2',
-    nullable: true,
-    enum: ECategory2,
-  })
-  category4_2: ECategory2 | null;
-
-  @ApiProperty({ description: '프로젝트 카테고리4의 모집인원', nullable: true })
-  category4Number: number | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리5의 카테고리1',
-    nullable: true,
-    enum: ECategory1,
-  })
-  category5_1: ECategory1 | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리5의 카테고리2',
-    nullable: true,
-    enum: ECategory2,
-  })
-  category5_2: ECategory2 | null;
-
-  @ApiProperty({ description: '프로젝트 카테고리5의 모집인원', nullable: true })
-  category5Number: number | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리6의 카테고리1',
-    nullable: true,
-    enum: ECategory1,
-  })
-  category6_1: ECategory1 | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리6의 카테고리2',
-    nullable: true,
-    enum: ECategory2,
-  })
-  category6_2: ECategory2 | null;
-
-  @ApiProperty({ description: '프로젝트 카테고리6의 모집인원', nullable: true })
-  category6Number: number | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리7의 카테고리1',
-    nullable: true,
-    enum: ECategory1,
-  })
-  category7_1: ECategory1 | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리7의 카테고리2',
-    nullable: true,
-    enum: ECategory2,
-  })
-  category7_2: ECategory2 | null;
-
-  @ApiProperty({ description: '프로젝트 카테고리7의 모집인원', nullable: true })
-  category7Number: number | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리8의 카테고리1',
-    nullable: true,
-    enum: ECategory1,
-  })
-  category8_1: ECategory1 | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리8의 카테고리2',
-    nullable: true,
-    enum: ECategory2,
-  })
-  category8_2: ECategory2 | null;
-
-  @ApiProperty({ description: '프로젝트 카테고리8의 모집인원', nullable: true })
-  category8Number: number | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리9의 카테고리1',
-    nullable: true,
-    enum: ECategory1,
-  })
-  category9_1: ECategory1 | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리9의 카테고리2',
-    nullable: true,
-    enum: ECategory2,
-  })
-  category9_2: ECategory2 | null;
-
-  @ApiProperty({ description: '프로젝트 카테고리9의 모집인원', nullable: true })
-  category9Number: number | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리10의 카테고리1',
-    nullable: true,
-    enum: ECategory1,
-  })
-  category10_1: ECategory1 | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리10의 카테고리2',
-    nullable: true,
-    enum: ECategory2,
-  })
-  category10_2: ECategory2 | null;
-
-  @ApiProperty({
-    description: '프로젝트 카테고리10의 모집인원',
-    nullable: true,
-  })
-  category10Number: number | null;
+  categoryInfo: CategoryResDto;
 
   @ApiProperty({
     description: '프로젝트를 등록한 사용자 정보',
