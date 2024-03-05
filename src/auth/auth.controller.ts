@@ -61,8 +61,6 @@ export class AuthController {
 
     if (isNewUser) {
       res.redirect(process.env.SIGNUP_KAKAO_REDIRECT_URL);
-    } else {
-      res.redirect(process.env.SIGNUP_REDIRECT_URL);
     }
     return user;
   }
@@ -103,8 +101,6 @@ export class AuthController {
 
     if (isNewUser) {
       res.redirect(process.env.SIGNUP_KAKAO_REDIRECT_URL);
-    } else {
-      res.redirect(process.env.SIGNUP_REDIRECT_URL);
     }
     return user;
   }
