@@ -60,6 +60,8 @@ export class AuthController {
     res.cookie('accessToken', accessToken, cookieOption);
     res.cookie('refreshToken', refreshToken, cookieOption);
 
+    console.log('protocol : ', req.protocol);
+
     if (isNewUser) {
       res.redirect(process.env.SIGNUP_KAKAO_REDIRECT_URL);
     } else {
