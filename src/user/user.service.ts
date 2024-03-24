@@ -60,12 +60,7 @@ export class UserService {
     return await this.userRepository.save(user);
   }
 
-  async naverSignUp(
-    naverId: string,
-    name: string,
-    email: string,
-    phone: string = '',
-  ) {
+  async naverSignUp(naverId: string, name: string, email: string) {
     const id = uuid();
 
     // NOTE: 프로필 사진을 랜덤 이미지로 설정
@@ -75,7 +70,7 @@ export class UserService {
       id,
       naverId,
       name,
-      phone,
+      phone: '',
       email,
       profileImageUrl: url,
       signUpType: ESignUp.NAVER,
