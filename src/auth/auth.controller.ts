@@ -1,13 +1,14 @@
 import {
+  Body,
   Controller,
   Get,
-  Query,
+  Post,
   Request,
   Res,
-  Session,
   UseGuards,
+  ValidationPipe,
 } from '@nestjs/common';
-import { ApiExtraModels, ApiTags } from '@nestjs/swagger';
+import { ApiExtraModels, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginResDto } from './dto/response.dto';
 import { SwaggerGetResponse } from 'src/decorator/swagger.decorator';
@@ -17,12 +18,14 @@ import { KakaoAuthGuard } from './kakaoAuth.guard';
 import { NaverAuthGuard } from './naver.guard';
 import { config } from 'dotenv';
 import { cookieOption } from 'src/lib/cookie';
+import { LoginKaKaoDto } from './dto/login-kakao.dto';
+import { LoginNaverDto } from './dto/login-naver.dto';
 // import * as session from 'express-session';
 
 config();
 
 @Controller('auth')
-@ApiExtraModels(LoginResDto)
+@ApiExtraModels(LoginResDto, LoginKaKaoDto, LoginNaverDto)
 @ApiTags('Auth')
 export class AuthController {
   constructor(private readonly service: AuthService) {}
@@ -49,6 +52,21 @@ export class AuthController {
   //   const url = this.service.kakaoRedirect();
   //   return res.redirect(url);
   // }
+
+  // NOTE: 새로운 카카오 로그인 방식
+  @Post('login-kakao')
+  @ApiOperation({ summary: '카카오 로그인 버튼 클릭 후 호출되는 API' })
+  async loginKakao(@Body(new ValidationPipe()) data: LoginKaKaoDto) {
+    return await this.service.loginKakao(data.authCode);
+  }
+
+  // NOTE: 새로운 네이버 로그인 방식
+  @Post('login-naver')
+  @ApiOperation({ summary: '네이버 로그인 버튼 클릭 후 호출되는 API' })
+  async loginNaver(@Body(new ValidationPipe()) data: LoginNaverDto) {
+    console.log('authCode : ', data.authCode);
+    return await this.service.loginNaver(data.authCode);
+  }
 
   @UseGuards(KakaoAuthGuard)
   @Get('kakao')
@@ -97,9 +115,9 @@ export class AuthController {
   @UseGuards(NaverAuthGuard)
   @Get('naver')
   async getNaverInfo(@Request() req, @Res() res) {
-    const { name, email, phone } = req.user;
+    const { name, email } = req.user;
     const { accessToken, refreshToken, user, isNewUser } =
-      await this.service.getNaverJWT(req.user.naverId, name, email, phone);
+      await this.service.getNaverJWT(req.user.naverId, name, email);
 
     res.cookie('accessToken', accessToken, cookieOption);
     res.cookie('refreshToken', refreshToken, cookieOption);
