@@ -11,6 +11,7 @@ import {
 import { Profile } from './profile.entity';
 import { ESignUp } from 'src/type/user.type';
 import { Project } from './project.entity';
+import { Comment } from './comment.entity';
 
 @Entity({ name: 'user' })
 export class User {
@@ -151,4 +152,8 @@ export class User {
   @ApiProperty({ description: '사용자가 등록한 프로젝트' })
   @OneToMany(() => Project, (project) => project.user)
   project: Project[];
+
+  @ApiProperty({ description: '사용자가 남긴 댓글' })
+  @OneToMany(() => Comment, (comment) => comment.user)
+  comment: Comment[];
 }

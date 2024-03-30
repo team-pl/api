@@ -451,4 +451,23 @@ export class ProjectService {
       profile,
     };
   }
+
+  async getforCreateComment(id: string, userId: string) {
+    // NOTE: 프로젝트 존재 여부 확인
+    const projectData = await this.projectRepository.findOneBy({
+      id,
+      deletedAt: IsNull(),
+    });
+
+    if (!projectData)
+      throw new HttpException('Project NotFound', HttpStatus.NOT_FOUND);
+
+    // NOTE: 사용자 데이터 조회
+    const userData = await this.userService.getUserById(userId);
+
+    return {
+      name: userData.nickname,
+      jobType: userData.jobType,
+    };
+  }
 }
