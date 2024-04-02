@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   HttpException,
   HttpStatus,
   Param,
@@ -20,11 +21,20 @@ import {
 import { CommentService } from './comment.service';
 import { JwtAuthGuard } from 'src/auth/jwtAuth.guard';
 import { CreateCommentDto } from './dto/create-comment.dto';
-import { PostCommentResDto, UpdateCommentResDto } from './dto/response.dto';
+import {
+  DeleteCommentResDto,
+  PostCommentResDto,
+  UpdateCommentResDto,
+} from './dto/response.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 
 @Controller('comment')
-@ApiExtraModels(CreateCommentDto, PostCommentResDto, UpdateCommentResDto)
+@ApiExtraModels(
+  CreateCommentDto,
+  PostCommentResDto,
+  UpdateCommentResDto,
+  DeleteCommentResDto,
+)
 @ApiTags('Comment')
 export class CommentController {
   constructor(private readonly service: CommentService) {}
@@ -81,5 +91,31 @@ export class CommentController {
     }
 
     return this.service.update(data, id, commentId);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: '댓글 삭제 API' })
+  @UseGuards(JwtAuthGuard)
+  @ApiParam({
+    name: 'id',
+    required: true,
+    description: '삭제할 댓글 ID',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'user ID NotFound',
+  })
+  @ApiResponse({
+    status: 200,
+    type: DeleteCommentResDto,
+  })
+  async deleteMyComment(@Request() req, @Param('id') commentId: string) {
+    const { id } = req.user.name;
+
+    if (!id) {
+      throw new HttpException('NotFound', HttpStatus.UNAUTHORIZED);
+    }
+
+    return this.service.delete(id, commentId);
   }
 }
