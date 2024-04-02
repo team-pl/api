@@ -58,3 +58,8 @@ export class UpdateCommentResDto {
   @ApiProperty({ description: '댓글 내용' })
   content: string;
 }
+
+export class DeleteCommentResDto {
+  @ApiProperty({ description: '삭제 결과(삭제완료=true/삭제실패=false)' })
+  result: boolean;
+}
