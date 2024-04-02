@@ -454,20 +454,26 @@ export class ProjectService {
 
   async getforCreateComment(id: string, userId: string) {
     // NOTE: 프로젝트 존재 여부 확인
-    const projectData = await this.projectRepository.findOneBy({
-      id,
-      deletedAt: IsNull(),
+    const projectData = await this.projectRepository.findOne({
+      where: {
+        id,
+        deletedAt: IsNull(),
+      },
+      relations: ['user'],
     });
 
     if (!projectData)
       throw new HttpException('Project NotFound', HttpStatus.NOT_FOUND);
 
-    // NOTE: 사용자 데이터 조회
+    // NOTE: 댓글을 등록한 사용자 데이터 조회
     const userData = await this.userService.getUserById(userId);
 
     return {
       name: userData.nickname,
       jobType: userData.jobType,
+      projectUserEmail: projectData.user.email,
+      projectUserName: projectData.user.nickname,
+      projectName: projectData.name,
     };
   }
 }
