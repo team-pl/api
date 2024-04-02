@@ -9,6 +9,7 @@ import { ProjectModule } from './project/project.module';
 import { FileModule } from './file/file.module';
 import { ProfileModule } from './profile/profile.module';
 import { CommentModule } from './comment/comment.module';
+import { EmailModule } from './email/email.module';
 import swaggerConfig from './config/swagger.config';
 
 @Module({
@@ -34,6 +35,7 @@ import swaggerConfig from './config/swagger.config';
     FileModule,
     ProfileModule,
     CommentModule,
+    EmailModule,
   ],
   controllers: [AppController],
   providers: [AppService],
