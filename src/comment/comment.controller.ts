@@ -2,11 +2,13 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   HttpException,
   HttpStatus,
   Param,
   Patch,
   Post,
+  Query,
   Request,
   UseGuards,
   ValidationPipe,
@@ -15,6 +17,7 @@ import {
   ApiExtraModels,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -23,6 +26,7 @@ import { JwtAuthGuard } from 'src/auth/jwtAuth.guard';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import {
   DeleteCommentResDto,
+  GetCommentsResDto,
   PostCommentResDto,
   UpdateCommentResDto,
 } from './dto/response.dto';
@@ -34,10 +38,29 @@ import { UpdateCommentDto } from './dto/update-comment.dto';
   PostCommentResDto,
   UpdateCommentResDto,
   DeleteCommentResDto,
+  GetCommentsResDto,
 )
 @ApiTags('Comment')
 export class CommentController {
   constructor(private readonly service: CommentService) {}
+
+  @Get()
+  @ApiOperation({ summary: '댓글 조회 API>프로젝트 상세 조회시 호출' })
+  @ApiQuery({
+    name: 'projectId',
+    required: true,
+    description: '프로젝트 ID',
+    type: 'string',
+  })
+  @ApiResponse({
+    status: 200,
+    type: GetCommentsResDto,
+  })
+  async getComment(@Query('projectId') projectId: string) {
+    const data = await this.service.getComments(projectId);
+
+    return { list: data };
+  }
 
   @Post()
   @ApiOperation({ summary: '댓글 등록 API' })
@@ -106,6 +129,14 @@ export class CommentController {
     description: 'user ID NotFound',
   })
   @ApiResponse({
+    status: 403,
+    description: '권한이 없어 이 댓글을 삭제할 수 없습니다.',
+  })
+  @ApiResponse({
+    status: 404,
+    description: '이미 삭제되거나 존재하지 않는 댓글입니다.',
+  })
+  @ApiResponse({
     status: 200,
     type: DeleteCommentResDto,
   })
@@ -113,7 +144,7 @@ export class CommentController {
     const { id } = req.user.name;
 
     if (!id) {
-      throw new HttpException('NotFound', HttpStatus.UNAUTHORIZED);
+      throw new HttpException('user ID NotFound', HttpStatus.UNAUTHORIZED);
     }
 
     return this.service.delete(id, commentId);
