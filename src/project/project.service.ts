@@ -459,7 +459,6 @@ export class ProjectService {
         id,
         deletedAt: IsNull(),
       },
-      relations: ['user'],
     });
 
     if (!projectData)
@@ -469,11 +468,10 @@ export class ProjectService {
     const userData = await this.userService.getUserById(userId);
 
     return {
-      name: userData.nickname,
+      nickname: userData.nickname,
       jobType: userData.jobType,
-      projectUserEmail: projectData.user.email,
-      projectUserName: projectData.user.nickname,
-      projectName: projectData.name,
+      profileImageUrl: userData.profileImageUrl,
+      projectUserId: projectData.userId,
     };
   }
 }
