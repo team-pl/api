@@ -10,7 +10,6 @@ import {
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { User } from './user.entity';
 
 @Entity({ name: 'comment' })
 export class Comment {
@@ -41,18 +40,54 @@ export class Comment {
   @Column({ comment: '댓글을 작성한 사용자 ID' })
   userId: string;
 
+  @ApiProperty({
+    description: '사용자 직업 종류',
+    nullable: true,
+    default: null,
+  })
+  @Column({
+    comment: '사용자 직업 종류',
+    nullable: true,
+    default: null,
+  })
+  jobType: string | null;
+
+  @ApiProperty({ description: '사용자 닉네임(별명)' })
+  @Column({ comment: '사용자 닉네임(별명)' })
+  nickname: string;
+
+  @ApiProperty({ description: '사용자 프로필사진 url' })
+  @Column({ comment: '사용자 프로필사진 url' })
+  profileImageUrl: string;
+
   @ApiProperty({ description: '댓글 내용' })
   @Column({ comment: '댓글 내용' })
   content: string;
 
+  @ApiProperty({ description: '댓글 수정 여부', default: false })
+  @Column({ comment: '댓글 수정 여부', default: false })
+  isUpdate: boolean;
+
+  @ApiProperty({ description: '댓글 삭제 여부', default: false })
+  @Column({ comment: '댓글 삭제 여부', default: false })
+  isDelete: boolean;
+
+  @ApiProperty({ description: '대댓글 등록시 부모 댓글 ID' })
+  @Column({ nullable: true, comment: '대댓글 등록시 부모 댓글 ID' })
+  parentCommentId: string | null;
+
+  @ApiProperty({ description: '대댓글 등록시 태그한 사용자 ID' })
+  @Column({ nullable: true, comment: '대댓글 등록시 태그한 사용자 ID' })
+  referenceUserId: string | null;
+
+  @ApiProperty({ description: '대댓글 등록시 태그한 사용자 이름' })
+  @Column({ nullable: true, comment: '대댓글 등록시 태그한 사용자 이름' })
+  referenceName: string | null;
+
   @ManyToOne(() => Comment, (comment) => comment.replies, { nullable: true })
+  @JoinColumn({ name: 'parentCommentId' })
   parentComment: Comment;
 
   @OneToMany(() => Comment, (comment) => comment.parentComment)
   replies: Comment[];
-
-  @ApiProperty({ description: '댓글을 작성한 사용자 정보' })
-  @ManyToOne(() => User)
-  @JoinColumn({ name: 'userId' })
-  user: User;
 }
