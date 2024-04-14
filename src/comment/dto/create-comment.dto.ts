@@ -23,4 +23,20 @@ export class CreateCommentDto {
     nullable: true,
   })
   parentCommentId: string | null;
+
+  @IsOptional()
+  @IsString()
+  @ApiPropertyOptional({
+    description: '대댓글 남길때>태그한 사용자 ID',
+    nullable: true,
+  })
+  referenceUserId: string | null;
+
+  @IsOptional()
+  @IsString()
+  @ApiPropertyOptional({
+    description: '대댓글 남길때>태그한 사용자 이름',
+    nullable: true,
+  })
+  referenceName: string | null;
 }
