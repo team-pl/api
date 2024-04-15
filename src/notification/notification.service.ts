@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Notification } from 'src/entity/notification.entity';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 
@@ -28,5 +28,14 @@ export class NotificationsService {
     await this.notificationRepository.save(notiData);
 
     return true;
+  }
+
+  async getNotifications(userId: string) {
+    const data = await this.notificationRepository.findBy({
+      deletedAt: IsNull(),
+      userId,
+    });
+
+    return data;
   }
 }
