@@ -35,6 +35,11 @@ export class NotificationsService {
     const now = new Date();
     const oneMonthBefore = now.getTime() - Time.oneMonthBefore;
 
+    await this.notificationRepository.update(
+      { userId, deletedAt: IsNull() },
+      { isRead: true },
+    );
+
     // NOTE: 30일 이후의 알림만 가져오도록 함
     const data = await this.notificationRepository.findBy({
       deletedAt: IsNull(),
