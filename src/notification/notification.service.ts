@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Notification } from 'src/entity/notification.entity';
-import { IsNull, Repository } from 'typeorm';
+import { IsNull, MoreThan, MoreThanOrEqual, Repository } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 import { CreateNotificationDto } from './dto/create-notification.dto';
+import { Time } from 'src/lib/date';
 
 @Injectable()
 export class NotificationsService {
@@ -31,9 +32,14 @@ export class NotificationsService {
   }
 
   async getNotifications(userId: string) {
+    const now = new Date();
+    const oneMonthBefore = now.getTime() - Time.oneMonthBefore;
+
+    // NOTE: 30일 이후의 알림만 가져오도록 함
     const data = await this.notificationRepository.findBy({
       deletedAt: IsNull(),
       userId,
+      createdAt: MoreThanOrEqual(new Date(oneMonthBefore)),
     });
 
     return data;
