@@ -474,4 +474,23 @@ export class ProjectService {
       projectUserId: projectData.userId,
     };
   }
+
+  async applyProject(projectId, userId) {
+    // NOTE: 조회하기
+    const result = await this.projectRepository.findOne(projectId);
+
+    // NOTE: 지원자 수 업데이트하기
+    await this.projectRepository.update(projectId, {
+      applicantTotalNumber: result.applicantTotalNumber + 1,
+    });
+
+    // NOTE: 사용자의 지원 횟수 업데이트하기
+    await this.userService.updateApply(userId);
+
+    return {
+      projectUserId: result.userId,
+      name: result.name,
+      applicantTotalNumber: result.applicantTotalNumber + 1,
+    };
+  }
 }
