@@ -1,11 +1,14 @@
 import {
+  Body,
   Controller,
+  Delete,
   Get,
   HttpException,
   HttpStatus,
   Query,
   Request,
   UseGuards,
+  ValidationPipe,
 } from '@nestjs/common';
 import {
   ApiExtraModels,
@@ -15,11 +18,19 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { NotificationsService } from './notification.service';
-import { GetNotificationsResDto } from './dto/response.dto';
+import {
+  DeleteNotificationResDto,
+  GetNotificationsResDto,
+} from './dto/response.dto';
 import { JwtAuthGuard } from 'src/auth/jwtAuth.guard';
+import { DeleteNotificationDto } from './dto/delete-notification.dto';
 
 @Controller('notification')
-@ApiExtraModels(GetNotificationsResDto)
+@ApiExtraModels(
+  GetNotificationsResDto,
+  DeleteNotificationResDto,
+  DeleteNotificationDto,
+)
 @ApiTags('Notification')
 export class NotificationController {
   constructor(private readonly service: NotificationsService) {}
@@ -47,5 +58,27 @@ export class NotificationController {
     const data = await this.service.getNotifications(userId);
 
     return { list: data };
+  }
+
+  @Delete()
+  @ApiOperation({ summary: '알림 삭제 API' })
+  @UseGuards(JwtAuthGuard)
+  @ApiResponse({
+    status: 200,
+    type: DeleteNotificationResDto,
+  })
+  async deleteNotification(
+    @Request() req,
+    @Body(new ValidationPipe()) data: DeleteNotificationDto,
+  ) {
+    const { id } = req.user.name;
+
+    if (!id) {
+      throw new HttpException('user ID NotFound', HttpStatus.UNAUTHORIZED);
+    }
+
+    const { notificationArray } = data;
+
+    return await this.service.deleteNotifications(notificationArray);
   }
 }

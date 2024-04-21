@@ -49,4 +49,10 @@ export class NotificationsService {
 
     return data;
   }
+
+  async deleteNotifications(deleteArray: string[]) {
+    const now = new Date();
+    await this.notificationRepository.update(deleteArray, { deletedAt: now });
+    return true;
+  }
 }

@@ -25,3 +25,8 @@ export class GetNotificationsResDto {
   @ApiProperty({ description: '알림 목록', isArray: true })
   list: GetNotificationResDto;
 }
+
+export class DeleteNotificationResDto {
+  @ApiProperty({ description: '알림 삭제 결과' })
+  result: boolean;
+}
