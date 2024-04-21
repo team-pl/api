@@ -1,13 +1,12 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Comment } from 'src/entity/comment.entity';
-import { IsNull, Repository, In, Not } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { ProjectService } from 'src/project/project.service';
 import { v4 as uuid } from 'uuid';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { NotificationsService } from 'src/notification/notification.service';
-import { IsNotEmpty } from 'class-validator';
 
 @Injectable()
 export class CommentService {
