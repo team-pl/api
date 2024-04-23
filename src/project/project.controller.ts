@@ -40,6 +40,7 @@ import { EFileUsage } from 'src/type/file.type';
 import { GetProjectQueryDto } from './dto/get-project.dto';
 import { ECategorySelect, ESubCategorySelect } from 'src/type/project.type';
 import { UpdateProjectDto } from './dto/update-project.dto';
+import { CreateTestProjectDto } from './dto/create-test-project.dto';
 
 @Controller('project')
 @ApiExtraModels(
@@ -51,6 +52,7 @@ import { UpdateProjectDto } from './dto/update-project.dto';
   DeleteProjectResDto,
   UpdateProjectResDto,
   GetOneProjectResDto,
+  CreateTestProjectDto,
 )
 @ApiTags('Project')
 export class ProjectController {
@@ -100,6 +102,27 @@ export class ProjectController {
     }
 
     return this.service.create(data, id, fileUrl);
+  }
+
+  // NOTE: 테스트 프로젝트 생성 API
+  @Post('test')
+  @ApiOperation({ summary: '테스트 프로젝트 등록 API' })
+  @ApiResponse({
+    status: 401,
+    description: 'user ID NotFound',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Profile NotFound',
+  })
+  @ApiResponse({
+    status: 200,
+    type: PostProjectResDto,
+  })
+  async createTestProject(
+    @Body(new ValidationPipe()) data: CreateTestProjectDto,
+  ) {
+    return this.service.createTest(data);
   }
 
   @Patch(':id')

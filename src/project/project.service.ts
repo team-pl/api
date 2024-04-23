@@ -15,6 +15,7 @@ import {
 import { UserService } from 'src/user/user.service';
 import { GetProjectQueryDto } from './dto/get-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
+import { CreateTestProjectDto } from './dto/create-test-project.dto';
 
 @Injectable()
 export class ProjectService {
@@ -472,6 +473,104 @@ export class ProjectService {
       jobType: userData.jobType,
       profileImageUrl: userData.profileImageUrl,
       projectUserId: projectData.userId,
+    };
+  }
+
+  async createTest(data: CreateTestProjectDto) {
+    let devCount = 0;
+    let designCount = 0;
+    let etcCount = 0;
+    const category: ECategory1[] = [];
+    const subCategory: ECategory2[] = [];
+
+    const id = uuid();
+
+    const { recruitExpiredAt, content, profileId, categoryInfo, ...rest } =
+      data;
+
+    // NOTE: 모집마감일이 YYYY/MM/DD 형식의 string 으로 들어옴
+    const [year, month, date] = recruitExpiredAt.split('/').map(Number);
+
+    // NOTE: 사용자가 설정한 날짜의 23시 59분 59초까지로 모집마감일을 정함
+    const expiredAt = new Date(year, month - 1, date, 23, 59, 59);
+
+    const bufferContent = Buffer.from(content, 'utf-8');
+
+    const profileData = await this.profileService.getProfileById(profileId);
+
+    const userNickname = await this.userService.getUserNicknameById(
+      rest.userId,
+    );
+
+    const categoryData = {};
+
+    categoryInfo?.map((data, index) => {
+      subCategory.push(data.subCategory);
+
+      categoryData[`category${index + 1}_1`] = data.category;
+      categoryData[`category${index + 1}_2`] = data.subCategory;
+      categoryData[`category${index + 1}Number`] = data.count;
+
+      if (data.category === ECategory1.DEVELOPER) {
+        devCount += data.count;
+      } else if (data.category === ECategory1.DESIGN) {
+        designCount += data.count;
+      } else {
+        etcCount += data.count;
+      }
+    });
+
+    if (devCount > 0) {
+      category.push(ECategory1.DEVELOPER);
+    }
+
+    if (designCount > 0) {
+      category.push(ECategory1.DESIGN);
+    }
+
+    if (etcCount > 0) {
+      category.push(ECategory1.ETC);
+    }
+
+    const project = await this.projectRepository.create({
+      id,
+      recruitExpiredAt: expiredAt,
+      content: bufferContent,
+      profileId,
+      recruitDevTotalNumber: devCount,
+      recruitDesignTotalNumber: designCount,
+      recruitEtcTotalNumber: etcCount,
+      recruitCategory: category.join('/'),
+      recruitSubCategory: subCategory.join('/'),
+      userName: userNickname,
+      ...categoryData,
+      ...rest,
+    });
+
+    const result = await this.projectRepository.save(project);
+
+    return {
+      id: result.id,
+      createdAt: result.createdAt,
+      name: result.name,
+      state: result.state,
+      recruitExpiredAt: result.recruitExpiredAt,
+      recruitTotalNumber: result.recruitTotalNumber,
+      confirmedNumber: result.confirmedNumber,
+      recruitDevTotalNumber: result.recruitDevTotalNumber,
+      recruitDesignTotalNumber: result.recruitDesignTotalNumber,
+      recruitEtcTotalNumber: result.recruitEtcTotalNumber,
+      recruitCategory: category,
+      recruitSubCategory: subCategory,
+      userName: result.userName,
+      numberOfViews: result.numberOfViews,
+      numberOfLikes: result.numberOfLikes,
+      content: result.content.toString(),
+      url: result.url,
+      file: result.file,
+      profile: profileData,
+      userId: result.userId,
+      categoryInfo,
     };
   }
 }
