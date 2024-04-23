@@ -104,26 +104,26 @@ export class ProjectController {
     return this.service.create(data, id, fileUrl);
   }
 
-  // NOTE: 테스트 프로젝트 생성 API
-  @Post('test')
-  @ApiOperation({ summary: '테스트 프로젝트 등록 API' })
-  @ApiResponse({
-    status: 401,
-    description: 'user ID NotFound',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Profile NotFound',
-  })
-  @ApiResponse({
-    status: 200,
-    type: PostProjectResDto,
-  })
-  async createTestProject(
-    @Body(new ValidationPipe()) data: CreateTestProjectDto,
-  ) {
-    return this.service.createTest(data);
-  }
+  // // NOTE: 테스트 프로젝트 생성 API
+  // @Post('test')
+  // @ApiOperation({ summary: '테스트 프로젝트 등록 API' })
+  // @ApiResponse({
+  //   status: 401,
+  //   description: 'user ID NotFound',
+  // })
+  // @ApiResponse({
+  //   status: 404,
+  //   description: 'Profile NotFound',
+  // })
+  // @ApiResponse({
+  //   status: 200,
+  //   type: PostProjectResDto,
+  // })
+  // async createTestProject(
+  //   @Body(new ValidationPipe()) data: CreateTestProjectDto,
+  // ) {
+  //   return this.service.createTest(data);
+  // }
 
   @Patch(':id')
   @ApiOperation({ summary: '프로젝트 수정 API' })
