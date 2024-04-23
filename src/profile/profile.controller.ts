@@ -143,13 +143,13 @@ export class ProfileController {
     return this.service.temporaryStorage(data, id, fileUrl);
   }
 
-  @Post('test')
-  @ApiOperation({ summary: '테스트 프로필 등록 API' })
-  async createTestProfile(
-    @Body(new ValidationPipe()) data: CreateTestProfileDto,
-  ) {
-    return this.service.createTestProfile(data);
-  }
+  // @Post('test')
+  // @ApiOperation({ summary: '테스트 프로필 등록 API' })
+  // async createTestProfile(
+  //   @Body(new ValidationPipe()) data: CreateTestProfileDto,
+  // ) {
+  //   return this.service.createTestProfile(data);
+  // }
 
   @Patch(':id')
   @ApiOperation({ summary: '프로필 수정 API' })

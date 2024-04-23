@@ -88,12 +88,12 @@ export class UserController {
     return this.service.nicknameDuplicateCheck(nickname);
   }
 
-  // NOTE: 테스터 유저 생성 API
-  @Post('test')
-  @ApiOperation({ summary: '테스터 유저 생성 API' })
-  createTestUser(@Body(new ValidationPipe()) data: CreateTestUserDto) {
-    return this.service.createTestUser(data);
-  }
+  // // NOTE: 테스터 유저 생성 API
+  // @Post('test')
+  // @ApiOperation({ summary: '테스터 유저 생성 API' })
+  // createTestUser(@Body(new ValidationPipe()) data: CreateTestUserDto) {
+  //   return this.service.createTestUser(data);
+  // }
 
   @Patch('profile')
   @ApiOperation({
