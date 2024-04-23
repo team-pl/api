@@ -36,6 +36,7 @@ import {
 } from './dto/response.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { CreateProfileTempDto } from './dto/create-profile-temporary.dto';
+import { CreateTestProfileDto } from './dto/create-test-profile.dto';
 
 @Controller('profile')
 @ApiExtraModels(
@@ -47,6 +48,7 @@ import { CreateProfileTempDto } from './dto/create-profile-temporary.dto';
   GetMyInfoResDto,
   CreateProfileTempDto,
   PostTempProfileResDto,
+  CreateTestProfileDto,
 )
 @ApiTags('Profile')
 export class ProfileController {
@@ -139,6 +141,14 @@ export class ProfileController {
     }
 
     return this.service.temporaryStorage(data, id, fileUrl);
+  }
+
+  @Post('test')
+  @ApiOperation({ summary: '테스트 프로필 등록 API' })
+  async createTestProfile(
+    @Body(new ValidationPipe()) data: CreateTestProfileDto,
+  ) {
+    return this.service.createTestProfile(data);
   }
 
   @Patch(':id')

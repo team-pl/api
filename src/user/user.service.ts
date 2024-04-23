@@ -16,6 +16,7 @@ import { randomProfile } from 'src/lib/random-profile';
 import { FileService } from 'src/file/file.service';
 import { EFileUsage } from 'src/type/file.type';
 import { UpdateUserProfileDto } from './dto/update-profile.dto';
+import { CreateTestUserDto } from './dto/create-test-user.dto';
 
 @Injectable()
 export class UserService {
@@ -223,5 +224,18 @@ export class UserService {
     });
 
     return user;
+  }
+
+  async createTestUser(data: CreateTestUserDto) {
+    const id = uuid();
+    // NOTE: 프로필 사진을 랜덤 이미지로 설정
+    const url = randomProfile();
+    const createData = await this.userRepository.create({
+      id,
+      profileImageUrl: url,
+      ...data,
+    });
+    await this.userRepository.save(createData);
+    return createData;
   }
 }

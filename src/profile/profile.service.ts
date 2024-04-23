@@ -7,6 +7,7 @@ import { v4 as uuid } from 'uuid';
 import { UserService } from 'src/user/user.service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { CreateProfileTempDto } from './dto/create-profile-temporary.dto';
+import { CreateTestProfileDto } from './dto/create-test-profile.dto';
 
 @Injectable()
 export class ProfileService {
@@ -414,5 +415,17 @@ export class ProfileService {
       user,
       profile: result,
     };
+  }
+
+  async createTestProfile(data: CreateTestProfileDto) {
+    const id = uuid();
+    const profileData = await this.profileRepository.create({
+      id,
+      ...data,
+    });
+
+    await this.profileRepository.save(profileData);
+
+    return profileData;
   }
 }

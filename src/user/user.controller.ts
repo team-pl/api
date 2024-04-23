@@ -38,6 +38,7 @@ import { JwtAuthGuard } from 'src/auth/jwtAuth.guard';
 import { NicknameDuplicateDto } from './dto/nickname-duplicate.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UpdateUserProfileDto } from './dto/update-profile.dto';
+import { CreateTestUserDto } from './dto/create-test-user.dto';
 
 @Controller('user')
 @ApiExtraModels(
@@ -47,6 +48,7 @@ import { UpdateUserProfileDto } from './dto/update-profile.dto';
   NicknameDuplicateResDto,
   UpdateUserProfileDto,
   UpdateProfileResDto,
+  CreateTestUserDto,
 )
 @ApiTags('User')
 export class UserController {
@@ -84,6 +86,13 @@ export class UserController {
     const { nickname } = data;
 
     return this.service.nicknameDuplicateCheck(nickname);
+  }
+
+  // NOTE: 테스터 유저 생성 API
+  @Post('test')
+  @ApiOperation({ summary: '테스터 유저 생성 API' })
+  createTestUser(@Body(new ValidationPipe()) data: CreateTestUserDto) {
+    return this.service.createTestUser(data);
   }
 
   @Patch('profile')
