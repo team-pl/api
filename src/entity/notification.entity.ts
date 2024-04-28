@@ -39,6 +39,18 @@ export class Notification {
   @Column({ comment: '알림 관련 프로젝트 ID', default: null, nullable: true })
   projectId: string | null;
 
+  @ApiProperty({
+    description: '알림 관련 프로젝트 이름(제목)',
+    default: null,
+    nullable: true,
+  })
+  @Column({
+    comment: '알림 관련 프로젝트 이름(제목)',
+    default: null,
+    nullable: true,
+  })
+  projectName: string | null;
+
   @ApiProperty({ description: '알림 내용' })
   @Column({ comment: '알림 내용' })
   message: string;

@@ -16,13 +16,14 @@ export class NotificationsService {
   async create(data: CreateNotificationDto) {
     const id = uuid();
 
-    const { userId, message, projectId } = data;
+    const { userId, message, projectId, projectName } = data;
 
     const notiData = await this.notificationRepository.create({
       id,
       userId,
       message,
       projectId,
+      projectName,
       isRead: false,
     });
 
