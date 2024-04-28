@@ -39,3 +39,23 @@ export class PostApplyResDto {
   })
   details: string;
 }
+
+export class CheckApplyResDto {
+  @ApiProperty({ description: '프로젝트 확인완료 결과' })
+  result: boolean;
+}
+
+export class ConfirmApplyResDto {
+  @ApiProperty({ description: '프로젝트 참여확정 결과' })
+  result: boolean;
+}
+
+export class CancelApplyResDto {
+  @ApiProperty({ description: '프로젝트 확정취소 결과' })
+  result: boolean;
+}
+
+export class RejectApplyResDto {
+  @ApiProperty({ description: '프로젝트 거절 결과' })
+  result: boolean;
+}

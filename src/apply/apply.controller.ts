@@ -20,10 +20,23 @@ import {
 import { ApplyService } from './apply.service';
 import { JwtAuthGuard } from 'src/auth/jwtAuth.guard';
 import { CreateApplyDto } from './dto/create-apply.dto';
-import { CheckedApplyResDto, PostApplyResDto } from './dto/response.dto';
+import {
+  CancelApplyResDto,
+  CheckApplyResDto,
+  ConfirmApplyResDto,
+  PostApplyResDto,
+  RejectApplyResDto,
+} from './dto/response.dto';
 
 @Controller('apply')
-@ApiExtraModels(CreateApplyDto, PostApplyResDto, CheckedApplyResDto)
+@ApiExtraModels(
+  CreateApplyDto,
+  PostApplyResDto,
+  CheckApplyResDto,
+  ConfirmApplyResDto,
+  CancelApplyResDto,
+  RejectApplyResDto,
+)
 @ApiTags('프로젝트 지원')
 export class ApplyController {
   constructor(private readonly service: ApplyService) {}
@@ -78,7 +91,7 @@ export class ApplyController {
   })
   @ApiResponse({
     status: 200,
-    type: CheckedApplyResDto,
+    type: CheckApplyResDto,
   })
   async check(@Request() req, @Param('id') applyId: string) {
     const { id } = req.user.name;
@@ -105,6 +118,10 @@ export class ApplyController {
   @ApiResponse({
     status: 422,
     description: '해당 인원은 프로젝트에 이미 참여확정되었습니다.',
+  })
+  @ApiResponse({
+    status: 200,
+    type: ConfirmApplyResDto,
   })
   async confirm(@Request() req, @Param('id') applyId: string) {
     const { id } = req.user.name;
@@ -134,7 +151,7 @@ export class ApplyController {
   })
   @ApiResponse({
     status: 200,
-    type: CheckedApplyResDto,
+    type: CancelApplyResDto,
   })
   async cancel(@Request() req, @Param('id') applyId: string) {
     const { id } = req.user.name;
@@ -164,7 +181,7 @@ export class ApplyController {
   })
   @ApiResponse({
     status: 200,
-    type: CheckedApplyResDto,
+    type: RejectApplyResDto,
   })
   async reject(@Request() req, @Param('id') applyId: string) {
     const { id } = req.user.name;
