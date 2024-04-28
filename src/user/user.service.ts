@@ -16,7 +16,6 @@ import { randomProfile } from 'src/lib/random-profile';
 import { FileService } from 'src/file/file.service';
 import { EFileUsage } from 'src/type/file.type';
 import { UpdateUserProfileDto } from './dto/update-profile.dto';
-import { CreateTestUserDto } from './dto/create-test-user.dto';
 
 @Injectable()
 export class UserService {
@@ -226,12 +225,20 @@ export class UserService {
     return user;
   }
 
-  async updateApply(userId) {
-    const data = await this.userRepository.findOne(userId);
+  async updateApply(userId: string) {
+    const data = await this.userRepository.findOneBy({ id: userId });
     await this.userRepository.update(userId, {
       numberOfApplications: data.numberOfApplications + 1,
     });
+    return true;
+  }
 
+  // NOTE: 지원 확정될 때
+  async confirmedApply(userId: string) {
+    const data = await this.userRepository.findOneBy({ id: userId });
+    await this.userRepository.update(userId, {
+      numberOfConfirmed: data.numberOfConfirmed + 1,
+    });
     return true;
   }
 }
