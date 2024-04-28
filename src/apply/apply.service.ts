@@ -1,12 +1,12 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Apply } from 'src/entity/apply.entity';
-import { Repository } from 'typeorm';
+import { In, IsNull, Repository } from 'typeorm';
 import { CreateApplyDto } from './dto/create-apply.dto';
 import { v4 as uuid } from 'uuid';
 import { ProjectService } from 'src/project/project.service';
 import { NotificationsService } from 'src/notification/notification.service';
-import { EApplyState } from 'src/type/apply.type';
+import { EApplyState, EGetApplyState } from 'src/type/apply.type';
 
 @Injectable()
 export class ApplyService {
@@ -222,5 +222,62 @@ export class ApplyService {
     });
 
     return { result: true };
+  }
+
+  async getApplicantsList(
+    projectId: string,
+    state: EGetApplyState = EGetApplyState.ALL,
+  ) {
+    const list = [];
+
+    if (state === EGetApplyState.ALL) {
+      const data = await this.applyRepository.find({
+        where: {
+          deletedAt: IsNull(),
+          projectId,
+        },
+        order: {
+          createdAt: 'DESC',
+        },
+        select: [
+          'id',
+          'createdAt',
+          'nickname',
+          'profileImageUrl',
+          'jobType',
+          'state',
+          'userId',
+          'profileId',
+        ],
+      });
+      list.push(...data);
+    } else {
+      const data = await this.applyRepository.find({
+        where: {
+          deletedAt: IsNull(),
+          state: In([state]),
+          projectId,
+        },
+        order: {
+          createdAt: 'DESC',
+        },
+        select: [
+          'id',
+          'createdAt',
+          'nickname',
+          'profileImageUrl',
+          'jobType',
+          'state',
+          'userId',
+          'profileId',
+        ],
+      });
+      list.push(...data);
+    }
+
+    return {
+      list,
+      count: list.length,
+    };
   }
 }

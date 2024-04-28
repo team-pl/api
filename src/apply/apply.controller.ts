@@ -1,11 +1,13 @@
 import {
   Body,
   Controller,
+  Get,
   HttpException,
   HttpStatus,
   Param,
   Patch,
   Post,
+  Query,
   Request,
   UseGuards,
   ValidationPipe,
@@ -14,6 +16,7 @@ import {
   ApiExtraModels,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -24,9 +27,11 @@ import {
   CancelApplyResDto,
   CheckApplyResDto,
   ConfirmApplyResDto,
+  GetApplicantsResDto,
   PostApplyResDto,
   RejectApplyResDto,
 } from './dto/response.dto';
+import { EApplyState, EGetApplyState } from 'src/type/apply.type';
 
 @Controller('apply')
 @ApiExtraModels(
@@ -36,6 +41,7 @@ import {
   ConfirmApplyResDto,
   CancelApplyResDto,
   RejectApplyResDto,
+  GetApplicantsResDto,
 )
 @ApiTags('프로젝트 지원')
 export class ApplyController {
@@ -191,5 +197,38 @@ export class ApplyController {
     }
 
     return this.service.reject(applyId);
+  }
+
+  @Get()
+  @ApiOperation({ summary: '프로젝트 지원자 조회 API' })
+  @UseGuards(JwtAuthGuard)
+  @ApiQuery({
+    name: 'state',
+    required: true,
+    description: '지원 상태',
+    enum: EGetApplyState,
+  })
+  @ApiQuery({
+    name: 'projectId',
+    required: true,
+    description: '프로젝트 ID',
+    type: 'string',
+  })
+  @ApiResponse({
+    status: 200,
+    type: GetApplicantsResDto,
+  })
+  async getApplicantsList(
+    @Request() req,
+    @Query('state') state: EGetApplyState,
+    @Query('projectId') projectId: string,
+  ) {
+    const { id } = req.user.name;
+
+    if (!id) {
+      throw new HttpException('NotFound', HttpStatus.UNAUTHORIZED);
+    }
+
+    return this.service.getApplicantsList(projectId, state);
   }
 }
