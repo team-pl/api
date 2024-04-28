@@ -230,7 +230,12 @@ export class UserService {
     await this.userRepository.update(userId, {
       numberOfApplications: data.numberOfApplications + 1,
     });
-    return true;
+
+    return {
+      profileImageUrl: data.profileImageUrl,
+      nickname: data.nickname,
+      jobType: data.jobType,
+    };
   }
 
   // NOTE: 지원 확정될 때

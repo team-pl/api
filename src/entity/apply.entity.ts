@@ -39,6 +39,28 @@ export class Apply {
   userId: string;
 
   @ApiProperty({
+    description: '지원한 사용자 프로필사진 url',
+  })
+  @Column({ comment: '지원한 사용자 프로필사진 url' })
+  profileImageUrl: string;
+
+  @ApiProperty({ description: '지원한 사용자 닉네임(별명)' })
+  @Column({ comment: '지원한 사용자 닉네임(별명)' })
+  nickname: string;
+
+  @ApiProperty({
+    description: '지원한 사용자 직업 종류',
+    nullable: true,
+    default: null,
+  })
+  @Column({
+    comment: '지원한 사용자 직업 종류',
+    nullable: true,
+    default: null,
+  })
+  jobType: string | null;
+
+  @ApiProperty({
     description: '지원한 프로필 ID',
   })
   @Column({ comment: '지원한 프로필 ID' })

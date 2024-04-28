@@ -33,8 +33,14 @@ export class ApplyService {
     }
 
     // NOTE: 지원하려는 프로젝트 정보 조회
-    const { projectUserId, name, applicantTotalNumber } =
-      await this.projectService.applyProject(projectId, userId);
+    const {
+      projectUserId,
+      name,
+      applicantTotalNumber,
+      profileImageUrl,
+      nickname,
+      jobType,
+    } = await this.projectService.applyProject(projectId, userId);
 
     // NOTE: 프로젝트 모집한 사람에게 알림 보내기
     await this.notificationService.create({
@@ -50,6 +56,9 @@ export class ApplyService {
       profileId,
       userId,
       details,
+      profileImageUrl,
+      nickname,
+      jobType,
     });
 
     await this.applyRepository.save(applyData);

@@ -495,12 +495,16 @@ export class ProjectService {
     });
 
     // NOTE: 사용자의 지원 횟수 업데이트하기
-    await this.userService.updateApply(userId);
+    const { profileImageUrl, nickname, jobType } =
+      await this.userService.updateApply(userId);
 
     return {
       projectUserId: result.userId,
       name: result.name,
       applicantTotalNumber: result.applicantTotalNumber + 1,
+      profileImageUrl,
+      nickname,
+      jobType,
     };
   }
 
