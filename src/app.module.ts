@@ -11,6 +11,7 @@ import { ProfileModule } from './profile/profile.module';
 import { CommentModule } from './comment/comment.module';
 import { EmailModule } from './email/email.module';
 import { NotificationModule } from './notification/notification.module';
+import { ApplyModule } from './apply/apply.module';
 import swaggerConfig from './config/swagger.config';
 
 @Module({
@@ -38,6 +39,7 @@ import swaggerConfig from './config/swagger.config';
     CommentModule,
     EmailModule,
     NotificationModule,
+    ApplyModule,
   ],
   controllers: [AppController],
   providers: [AppService],

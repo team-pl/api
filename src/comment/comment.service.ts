@@ -1,13 +1,12 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Comment } from 'src/entity/comment.entity';
-import { IsNull, Repository, In, Not } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { ProjectService } from 'src/project/project.service';
 import { v4 as uuid } from 'uuid';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { NotificationsService } from 'src/notification/notification.service';
-import { IsNotEmpty } from 'class-validator';
 
 @Injectable()
 export class CommentService {
@@ -32,14 +31,15 @@ export class CommentService {
     const comment = new Comment();
 
     // NOTE: 댓글을 달려고 하는 프로젝트 존재 여부 확인 및 nickname과 jobType 가져오기
-    const { nickname, jobType, profileImageUrl, projectUserId } =
+    const { nickname, jobType, profileImageUrl, projectUserId, projectName } =
       await this.projectService.getforCreateComment(projectId, userId);
 
     // NOTE: 알림 추가
     await this.notificationService.create({
       userId: projectUserId,
-      message: '프로젝트에 댓글이 달렸습니다.',
+      message: '프로젝트에 새로운 댓글이 달렸습니다.',
       projectId,
+      projectName,
     });
 
     // NOTE: 대댓글인 경우
@@ -64,6 +64,7 @@ export class CommentService {
         userId: referenceUserId,
         message: '대댓글이 달렸습니다.',
         projectId,
+        projectName,
       });
     }
 

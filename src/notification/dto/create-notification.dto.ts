@@ -22,4 +22,11 @@ export class CreateNotificationDto {
     description: '알림 관련 프로젝트 ID',
   })
   projectId?: string;
+
+  @IsOptional()
+  @IsString()
+  @ApiPropertyOptional({
+    description: '알림 관련 프로젝트 이름(제목)',
+  })
+  projectName?: string;
 }

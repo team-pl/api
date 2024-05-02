@@ -15,7 +15,7 @@ import {
 import { UserService } from 'src/user/user.service';
 import { GetProjectQueryDto } from './dto/get-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
-import { CreateTestProjectDto } from './dto/create-test-project.dto';
+import { EApplyState } from 'src/type/apply.type';
 
 @Injectable()
 export class ProjectService {
@@ -473,6 +473,112 @@ export class ProjectService {
       jobType: userData.jobType,
       profileImageUrl: userData.profileImageUrl,
       projectUserId: projectData.userId,
+      projectName: projectData.name,
+    };
+  }
+
+  // NOTE: 프로젝트 지원하기 로직
+  async applyProject(projectId, userId) {
+    // NOTE: 조회하기
+    const result = await this.projectRepository.findOneBy({ id: projectId });
+
+    if (result.state !== EProjectState.RECRUITING) {
+      throw new HttpException(
+        '프로젝트 모집이 마감되어 지원이 불가능합니다.',
+        HttpStatus.CONFLICT,
+      );
+    }
+
+    // NOTE: 지원자 수 업데이트하기
+    await this.projectRepository.update(projectId, {
+      applicantTotalNumber: result.applicantTotalNumber + 1,
+    });
+
+    // NOTE: 사용자의 지원 횟수 업데이트하기
+    const { profileImageUrl, nickname, jobType } =
+      await this.userService.updateApply(userId);
+
+    return {
+      projectUserId: result.userId,
+      name: result.name,
+      applicantTotalNumber: result.applicantTotalNumber + 1,
+      profileImageUrl,
+      nickname,
+      jobType,
+    };
+  }
+
+  // NOTE: 프로젝트 확인 로직
+  async checkApply(projectId) {
+    // NOTE: 프로젝트 이름 조회하기
+    const result = await this.projectRepository.findOneBy({ id: projectId });
+
+    return {
+      name: result.name,
+    };
+  }
+
+  // NOTE: 프로젝트 참여확정 로직
+  async confirmedProject(projectId, userId) {
+    // NOTE: 조회하기
+    const result = await this.projectRepository.findOneBy({ id: projectId });
+
+    // NOTE: 만약 현재 지원자를 참여 확정한 후 인원이 다 찼다면 프로젝트 모집 상태 변경하기
+    if (result.confirmedNumber + 1 === result.recruitTotalNumber) {
+      await this.projectRepository.update(projectId, {
+        state: EProjectState.COMPLETED,
+        confirmedNumber: result.confirmedNumber + 1,
+      });
+    } else {
+      // NOTE: 참여 확정자 수 업데이트하기
+      await this.projectRepository.update(projectId, {
+        confirmedNumber: result.confirmedNumber + 1,
+      });
+    }
+
+    // NOTE: 사용자의 참여확정 횟수 업데이트하기
+    await this.userService.confirmedApply(userId);
+
+    return {
+      name: result.name,
+    };
+  }
+
+  // NOTE: 프로젝트 확정취소 로직
+  async cancelApply(projectId: string, state: EApplyState) {
+    // NOTE: 프로젝트 이름 조회하기
+    const result = await this.projectRepository.findOneBy({ id: projectId });
+
+    // NOTE: 지원 확정 -> 지원 취소 변경이므로 확정인원 -1 해주기 + 해당 인원 포함해서 지원 완료된 프로젝트라면
+
+    if (state === EApplyState.CONFIRMED) {
+      await this.projectRepository.update(
+        { id: projectId },
+        { confirmedNumber: result.confirmedNumber - 1 },
+      );
+    }
+
+    return {
+      name: result.name,
+    };
+  }
+
+  // NOTE: 프로젝트 거절 로직
+  async rejectApply(projectId: string, state: EApplyState) {
+    // NOTE: 프로젝트 이름 조회하기
+    const result = await this.projectRepository.findOneBy({ id: projectId });
+
+    // NOTE: 지원 확정 -> 지원 취소 변경이므로 확정인원 -1 해주기 + 해당 인원 포함해서 지원 완료된 프로젝트라면
+
+    if (state === EApplyState.CONFIRMED) {
+      await this.projectRepository.update(
+        { id: projectId },
+        { confirmedNumber: result.confirmedNumber - 1 },
+      );
+    }
+
+    return {
+      name: result.name,
     };
   }
 

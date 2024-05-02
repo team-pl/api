@@ -69,6 +69,10 @@ export class Project {
   @Column({ comment: '프로젝트 기타 모집인원', default: 0 })
   recruitEtcTotalNumber: number;
 
+  @ApiProperty({ description: '프로젝트 총 지원인원', default: 0 })
+  @Column({ comment: '프로젝트 총 지원인원', default: 0 })
+  applicantTotalNumber: number;
+
   @ApiProperty({
     description: '프로젝트 모집 카테고리',
     example: 'DEVELOPER/DESIGN/ETC',

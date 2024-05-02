@@ -226,16 +226,25 @@ export class UserService {
     return user;
   }
 
-  async createTestUser(data: CreateTestUserDto) {
-    const id = uuid();
-    // NOTE: 프로필 사진을 랜덤 이미지로 설정
-    const url = randomProfile();
-    const createData = await this.userRepository.create({
-      id,
-      profileImageUrl: url,
-      ...data,
+  async updateApply(userId: string) {
+    const data = await this.userRepository.findOneBy({ id: userId });
+    await this.userRepository.update(userId, {
+      numberOfApplications: data.numberOfApplications + 1,
     });
-    await this.userRepository.save(createData);
-    return createData;
+
+    return {
+      profileImageUrl: data.profileImageUrl,
+      nickname: data.nickname,
+      jobType: data.jobType,
+    };
+  }
+
+  // NOTE: 지원 확정될 때
+  async confirmedApply(userId: string) {
+    const data = await this.userRepository.findOneBy({ id: userId });
+    await this.userRepository.update(userId, {
+      numberOfConfirmed: data.numberOfConfirmed + 1,
+    });
+    return true;
   }
 }
