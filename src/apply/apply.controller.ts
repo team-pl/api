@@ -200,7 +200,7 @@ export class ApplyController {
   }
 
   @Get()
-  @ApiOperation({ summary: '프로젝트 지원자 조회 API' })
+  @ApiOperation({ summary: '프로젝트 지원자 목록 조회 API' })
   @UseGuards(JwtAuthGuard)
   @ApiQuery({
     name: 'state',
@@ -230,5 +230,27 @@ export class ApplyController {
     }
 
     return this.service.getApplicantsList(projectId, state);
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: '프로젝트 지원자 상세 조회 API' })
+  @UseGuards(JwtAuthGuard)
+  @ApiParam({
+    name: 'id',
+    required: true,
+    description: '프로젝트 지원 ID',
+  })
+  @ApiResponse({
+    status: 200,
+    type: GetApplicantsResDto,
+  })
+  async getApplicant(@Request() req, @Param('id') applyId: string) {
+    const { id } = req.user.name;
+
+    if (!id) {
+      throw new HttpException('NotFound', HttpStatus.UNAUTHORIZED);
+    }
+
+    return this.service.getApplicant(applyId);
   }
 }

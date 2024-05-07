@@ -581,4 +581,11 @@ export class ProjectService {
       name: result.name,
     };
   }
+
+  // NOTE: 지원자 상세 조회
+  async getApplicant(profileId: string) {
+    const profile = await this.profileService.getProfileById(profileId);
+
+    return profile;
+  }
 }

@@ -280,4 +280,20 @@ export class ApplyService {
       count: list.length,
     };
   }
+
+  async getApplicant(applyId: string) {
+    const applyData = await this.applyRepository.findOneBy({
+      deletedAt: IsNull(),
+      id: applyId,
+    });
+
+    const profileData = await this.projectService.getApplicant(
+      applyData.profileId,
+    );
+
+    return {
+      details: applyData.details,
+      profile: profileData,
+    };
+  }
 }
