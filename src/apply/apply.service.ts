@@ -291,9 +291,46 @@ export class ApplyService {
       applyData.profileId,
     );
 
+    const eduArray = [];
+    const careerArray = [];
+
+    for (let i = 1; i <= 5; i++) {
+      if (!profileData[`eduCategory${i}`]) break;
+
+      eduArray.push({
+        category: profileData[`eduCategory${i}`],
+        schoolName: profileData[`eduSchoolName${i}`],
+        major: profileData[`eduMajor${i}`],
+        admissionDate: profileData[`eduAdmissionDate${i}`],
+        graduationDate: profileData[`eduGraduationDate${i}`],
+        isAttending: profileData[`eduIsAttending${i}`],
+      });
+    }
+
+    for (let i = 1; i <= 10; i++) {
+      if (!profileData[`careerCompanyName${i}`]) break;
+
+      careerArray.push({
+        companyName: profileData[`careerCompanyName${i}`],
+        role: profileData[`careerRole${i}`],
+        joinDate: profileData[`careerJoinDate${i}`],
+        quitDate: profileData[`careerQuitDate${i}`],
+        isWorking: profileData[`careerIsWorking${i}`],
+      });
+    }
+
     return {
       details: applyData.details,
-      profile: profileData,
+      profile: {
+        id: profileData.id,
+        createdAt: profileData.createdAt,
+        name: profileData.name,
+        edu: eduArray,
+        carrer: careerArray,
+        skill: profileData.skill.split('&&'),
+        portfolioUrl: profileData.portfolioUrl,
+        portfolioFile: profileData.portfolioFile,
+      },
     };
   }
 }

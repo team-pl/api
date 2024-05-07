@@ -28,10 +28,11 @@ import {
   CheckApplyResDto,
   ConfirmApplyResDto,
   GetApplicantsResDto,
+  GetDetailResDto,
   PostApplyResDto,
   RejectApplyResDto,
 } from './dto/response.dto';
-import { EApplyState, EGetApplyState } from 'src/type/apply.type';
+import { EGetApplyState } from 'src/type/apply.type';
 
 @Controller('apply')
 @ApiExtraModels(
@@ -42,6 +43,7 @@ import { EApplyState, EGetApplyState } from 'src/type/apply.type';
   CancelApplyResDto,
   RejectApplyResDto,
   GetApplicantsResDto,
+  GetDetailResDto,
 )
 @ApiTags('프로젝트 지원')
 export class ApplyController {
@@ -242,7 +244,7 @@ export class ApplyController {
   })
   @ApiResponse({
     status: 200,
-    type: GetApplicantsResDto,
+    type: GetDetailResDto,
   })
   async getApplicant(@Request() req, @Param('id') applyId: string) {
     const { id } = req.user.name;
