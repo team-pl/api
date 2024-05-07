@@ -299,3 +299,47 @@ export class PostTempProfileResDto {
   })
   isTemporaryStorage: boolean;
 }
+
+// NOTE: 지원시 조회하는 프로필 데이터 DTO
+export class GetApplyProfileResDto {
+  @ApiProperty({ description: '프로필 고유 Id' })
+  id: string;
+
+  @ApiProperty({ description: '프로필 등록일' })
+  createdAt: Date;
+
+  @ApiProperty({ description: '프로필 제목' })
+  name: string;
+
+  @ApiProperty({
+    description: '학력 정보',
+    isArray: true,
+  })
+  edu: EduResDto;
+
+  @ApiProperty({
+    description: '경력 정보',
+    isArray: true,
+  })
+  carrer: CareerResDto;
+
+  @ApiProperty({
+    description: '스킬',
+    type: [String],
+  })
+  skill: string[];
+
+  @ApiProperty({
+    description: '포트폴리오 url',
+    nullable: true,
+    default: null,
+  })
+  portfolioUrl: string | null;
+
+  @ApiProperty({
+    description: '포트폴리오 파일',
+    nullable: true,
+    default: null,
+  })
+  portfolioFile: string | null;
+}

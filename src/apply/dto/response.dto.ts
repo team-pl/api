@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { GetApplyProfileResDto } from 'src/profile/dto/response.dto';
 import { EApplyState } from 'src/type/apply.type';
 
 export class PostApplyResDto {
@@ -86,4 +87,12 @@ export class GetApplicantResDto {
 export class GetApplicantsResDto {
   @ApiProperty({ description: '지원자 목록', isArray: true })
   list: GetApplicantResDto;
+}
+
+export class GetDetailResDto {
+  @ApiProperty({ description: '사용자가 입력한 지원 내용' })
+  details: string;
+
+  @ApiProperty({ description: '사용자가 프로젝트 지원시 사용한 프로필 데이터' })
+  profile: GetApplyProfileResDto;
 }
