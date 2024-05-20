@@ -12,10 +12,23 @@ import { CommentModule } from './comment/comment.module';
 import { EmailModule } from './email/email.module';
 import { NotificationModule } from './notification/notification.module';
 import { ApplyModule } from './apply/apply.module';
+import { LikeModule } from './like/like.module';
+import { RedisCacheService } from './redis-cache/redis-cache.service';
+import { RedisCacheModule } from './redis-cache/redis-cache.module';
 import swaggerConfig from './config/swagger.config';
+import { RedisModule } from '@liaoliaots/nestjs-redis';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    RedisModule.forRoot({
+      config: {
+        host: process.env.REDIS_HOST,
+        port: Number(process.env.REDIS_PORT),
+        password: process.env.REDIS_PASSWORD,
+        connectTimeout: 10000,
+      },
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
       load: [swaggerConfig],
@@ -31,6 +44,7 @@ import swaggerConfig from './config/swagger.config';
       synchronize: false,
       logging: true,
     }),
+    ScheduleModule.forRoot(),
     UserModule,
     AuthModule,
     ProjectModule,
@@ -40,8 +54,10 @@ import swaggerConfig from './config/swagger.config';
     EmailModule,
     NotificationModule,
     ApplyModule,
+    LikeModule,
+    RedisCacheModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, RedisCacheService],
 })
 export class AppModule {}
