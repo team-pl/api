@@ -51,17 +51,16 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe());
 
-  app.enableCors();
-
-  // app.enableCors({
-  //   origin: [
-  //     process.env.NODE_ENV === 'development'
-  //       ? 'http://localhost:3000'
-  //       : 'https://teampl-plus.com',
-  //   ],
-  //   credentials: true,
-  //   exposedHeaders: ['Access-Control-Allow-Origin'],
-  // });
+  app.enableCors({
+    origin: [
+      process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3000'
+        : 'https://teampl-plus.com',
+      'http://58.29.146.179:3000',
+    ],
+    credentials: true,
+    exposedHeaders: ['Access-Control-Allow-Origin'],
+  });
 
   await app.listen(process.env.NODE_ENV === 'development' ? 3001 : 3000);
 }
