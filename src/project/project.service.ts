@@ -588,4 +588,36 @@ export class ProjectService {
 
     return profile;
   }
+
+  async getLikesCount(projectId: string) {
+    const data = await this.projectRepository.findOneBy({
+      id: projectId,
+      deletedAt: IsNull(),
+    });
+
+    return data.numberOfLikes;
+  }
+
+  async getAllProjectIdList(): Promise<{ id: string }[]> {
+    const result = await this.projectRepository.find({
+      where: {
+        deletedAt: IsNull(),
+      },
+      select: ['id'],
+    });
+
+    return result;
+  }
+
+  async updateLikes(projectId: string, likeCount: number) {
+    const data = await this.projectRepository.findOneBy({
+      id: projectId,
+      deletedAt: IsNull(),
+    });
+
+    await this.projectRepository.update(
+      { id: projectId },
+      { numberOfLikes: data.numberOfLikes + likeCount },
+    );
+  }
 }

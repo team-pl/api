@@ -145,4 +145,62 @@ export class RedisCacheService {
   async findMembers(key: string) {
     return await this.client.smembers(key);
   }
+
+  // NOTE: 좋아요한 프로젝트와 사용자 ID 가져옴
+  async getKeysByPattern(
+    pattern: string,
+  ): Promise<{ projectId: string; userId: string }[]> {
+    const keys: string[] = [];
+    let cursor = '0';
+    const results: { projectId: string; userId: string }[] = [];
+
+    do {
+      const result = await this.client.scan(
+        cursor,
+        'MATCH',
+        pattern,
+        'COUNT',
+        100,
+      );
+      cursor = result[0];
+      keys.push(...result[1]);
+    } while (cursor !== '0');
+
+    for (const key of keys) {
+      const userId = await this.client.get(key);
+      const projectId = key.split(':').pop(); // 마지막 부분 추출 (예: "likes:user:00000"에서 "00000")
+      results.push({ projectId, userId });
+    }
+
+    return results;
+  }
+
+  // NOTE: 좋아요한 프로젝트와 총 좋아요 수를 가져옴
+  async getTotalCount(
+    pattern: string,
+  ): Promise<{ projectId: string; totalCount: string }[]> {
+    const keys: string[] = [];
+    let cursor = '0';
+    const results: { projectId: string; totalCount: string }[] = [];
+
+    do {
+      const result = await this.client.scan(
+        cursor,
+        'MATCH',
+        pattern,
+        'COUNT',
+        100,
+      );
+      cursor = result[0];
+      keys.push(...result[1]);
+    } while (cursor !== '0');
+
+    for (const key of keys) {
+      const totalCount = await this.client.get(key);
+      const projectId = key.split(':').pop(); // 마지막 부분 추출 (예: "likes:project::00000"에서 "00000")
+      results.push({ projectId, totalCount });
+    }
+
+    return results;
+  }
 }
