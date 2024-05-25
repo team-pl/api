@@ -54,7 +54,7 @@ import { CreateTestProjectDto } from './dto/create-test-project.dto';
   GetOneProjectResDto,
   CreateTestProjectDto,
 )
-@ApiTags('Project')
+@ApiTags('프로젝트')
 export class ProjectController {
   constructor(
     private readonly service: ProjectService,

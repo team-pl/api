@@ -142,6 +142,7 @@ export class ProjectService {
       order: { numberOfScore: 'DESC' },
       select: [
         'id',
+        'createdAt',
         'name',
         'content',
         'state',
@@ -171,6 +172,7 @@ export class ProjectService {
       take: 8,
       select: [
         'id',
+        'createdAt',
         'name',
         'content',
         'state',
@@ -192,14 +194,8 @@ export class ProjectService {
     });
 
     return {
-      popular: {
-        list: finalPopularList,
-        count: popularList[1],
-      },
-      new: {
-        list: finalNewList,
-        count: newList[1],
-      },
+      popular: finalPopularList,
+      new: finalNewList,
     };
   }
 
@@ -246,6 +242,7 @@ export class ProjectService {
       order: { createdAt: 'DESC' },
       select: [
         'id',
+        'createdAt',
         'name',
         'content',
         'state',
@@ -265,10 +262,7 @@ export class ProjectService {
       };
     });
 
-    return {
-      list: finalList,
-      count: list[1],
-    };
+    return { list: finalList };
   }
 
   async getProjectById(id: string) {

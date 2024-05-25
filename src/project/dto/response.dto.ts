@@ -108,6 +108,9 @@ export class HomeProjectListResDto {
   @ApiProperty({ description: '프로젝트 고유 Id' })
   id: string;
 
+  @ApiProperty({ description: '프로젝트 등록일', type: Date })
+  createdAt: Date;
+
   @ApiProperty({ description: '프로젝트명' })
   name: string;
 
@@ -146,25 +149,23 @@ export class ProjectDataResDto {
   @ApiProperty({
     description: '프로젝트 데이터 형식',
     type: HomeProjectListResDto,
+    isArray: true,
   })
   list: HomeProjectListResDto[];
-
-  @ApiProperty({ description: '프로젝트 개수' })
-  count: number;
 }
 
 export class HomeProjectResDto {
   @ApiProperty({
     description: '인기 프로젝트 조회 결과',
-    type: ProjectDataResDto,
+    isArray: true,
   })
-  popular: ProjectDataResDto;
+  popular: HomeProjectListResDto;
 
   @ApiProperty({
     description: '신규 프로젝트 조회 결과',
-    type: ProjectDataResDto,
+    isArray: true,
   })
-  new: ProjectDataResDto;
+  new: HomeProjectListResDto;
 }
 
 export class UpdateProjectResDto {
