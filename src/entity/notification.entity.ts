@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { EProjectState } from 'src/type/project.type';
 import {
   Column,
   CreateDateColumn,
@@ -58,4 +59,25 @@ export class Notification {
   @ApiProperty({ description: '알림 읽음 여부', default: false })
   @Column({ comment: '알림 읽음 여부', default: false })
   isRead: boolean;
+
+  @ApiProperty({
+    description: '알림 클릭시 페이지 이동을 위한 url',
+    default: '',
+    example: 'dashboard or detail',
+  })
+  @Column({ comment: '알림 클릭시 페이지 이동을 위한 url', default: '' })
+  url: string;
+
+  // FIXME: 이거 수정해야함!!
+  @ApiProperty({
+    description: '대시보드 페이지>프로젝트 탭 이동을 위한 값',
+    // default: EProjectState.RECRUITING,
+    // enum: EProjectState,
+  })
+  @Column({
+    comment: '대시보드 페이지>프로젝트 탭 이동을 위한 값',
+    // default: EProjectState.RECRUITING,
+    // enum: EProjectState,
+  })
+  dashboardStatus: EProjectState;
 }
