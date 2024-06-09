@@ -41,6 +41,7 @@ import { GetProjectQueryDto } from './dto/get-project.dto';
 import { ECategorySelect, ESubCategorySelect } from 'src/type/project.type';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { CreateTestProjectDto } from './dto/create-test-project.dto';
+import { JwtOptionalAuthGuard } from 'src/auth/jwtOptionalAuth.guard';
 
 @Controller('project')
 @ApiExtraModels(
@@ -176,6 +177,7 @@ export class ProjectController {
 
   @Get()
   @ApiOperation({ summary: '프로젝트 찾기>목록 조회 API' })
+  @UseGuards(JwtOptionalAuthGuard)
   @ApiQuery({
     name: 'skip',
     required: true,
@@ -211,33 +213,38 @@ export class ProjectController {
     type: ProjectDataResDto,
   })
   async getProjectList(
+    @Request() req,
     @Query('skip') skip: string,
     @Query('take') take?: string,
     @Query('category') category?: ECategorySelect,
     @Query('subCategory') subCategory?: ESubCategorySelect,
     @Query('searchWord') searchWord?: string,
   ) {
+    const userId = req.user?.id;
     return this.service.getProjectList({
       skip,
       take,
       category,
       subCategory,
       searchWord,
+      userId,
     });
   }
 
   @Get('home')
   @ApiOperation({ summary: '홈>인기/신규 프로젝트 목록 조회 API' })
+  @UseGuards(JwtOptionalAuthGuard)
   @ApiResponse({
     status: 200,
     type: HomeProjectResDto,
   })
-  async getHomeProject() {
-    return this.service.getHomeProject();
+  async getHomeProject(@Request() req) {
+    return this.service.getHomeProject(req.user?.id);
   }
 
   @Get(':id')
   @ApiOperation({ summary: '프로젝트 상세 조회 API' })
+  @UseGuards(JwtOptionalAuthGuard)
   @ApiParam({
     name: 'id',
     required: true,
@@ -251,8 +258,8 @@ export class ProjectController {
     status: 200,
     type: GetOneProjectResDto,
   })
-  getOneProject(@Param('id') id: string) {
-    return this.service.getOneProject(id);
+  getOneProject(@Param('id') id: string, @Request() req) {
+    return this.service.getOneProject(id, req.user?.id);
   }
 
   @Delete(':id')

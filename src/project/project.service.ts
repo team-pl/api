@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  forwardRef,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Project } from 'src/entity/project.entity';
 import { In, IsNull, Like, Raw, Repository } from 'typeorm';
@@ -16,6 +22,7 @@ import { UserService } from 'src/user/user.service';
 import { GetProjectQueryDto } from './dto/get-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { EApplyState } from 'src/type/apply.type';
+import { LikeService } from 'src/like/like.service';
 
 @Injectable()
 export class ProjectService {
@@ -24,6 +31,8 @@ export class ProjectService {
     private projectRepository: Repository<Project>,
     private readonly profileService: ProfileService,
     private readonly userService: UserService,
+    @Inject(forwardRef(() => LikeService))
+    private readonly likeService: LikeService,
   ) {}
 
   async create(data: CreateProjectDto, userId: string, fileUrl: string | null) {
@@ -130,7 +139,7 @@ export class ProjectService {
     };
   }
 
-  async getHomeProject() {
+  async getHomeProject(userId?: string) {
     // NOTE: 인기 점수 내림차순으로 프로젝트 8개를 가져옴
     const popularList = await this.projectRepository.findAndCount({
       // NOTE: 현재 프로젝트 상태가 모집중이거나 기한이 남았지만 모집인원이 다 차서 마감된 모집 종료 상태일때 SELECT 해옴
@@ -154,11 +163,17 @@ export class ProjectService {
       ],
     });
 
-    const finalPopularList = popularList[0].map((data) => {
+    const finalPopularList = popularList[0].map(async (data) => {
+      let isLike = false;
+      if (userId) {
+        isLike = await this.likeService.getProjectUserLike(data.id, userId);
+      }
+
       return {
         ...data,
         recruitCategory: data.recruitCategory.split('/'),
         content: data.content.toString(),
+        isLike: isLike,
       };
     });
 
@@ -185,17 +200,26 @@ export class ProjectService {
       order: { createdAt: 'DESC' },
     });
 
-    const finalNewList = newList[0].map((data) => {
+    const finalNewList = newList[0].map(async (data) => {
+      let isLike = false;
+      if (userId) {
+        isLike = await this.likeService.getProjectUserLike(data.id, userId);
+      }
+
       return {
         ...data,
         recruitCategory: data.recruitCategory.split('/'),
         content: data.content.toString(),
+        isLike: isLike,
       };
     });
 
+    const resolvedFinalPopularList = await Promise.all(finalPopularList);
+    const resolvedFinalNewList = await Promise.all(finalNewList);
+
     return {
-      popular: finalPopularList,
-      new: finalNewList,
+      popular: resolvedFinalPopularList,
+      new: resolvedFinalNewList,
     };
   }
 
@@ -206,6 +230,7 @@ export class ProjectService {
       category = ECategorySelect.ALL,
       subCategory = ESubCategorySelect.ALL,
       searchWord = '',
+      userId = '',
     } = query;
 
     const transCategory = category === ECategorySelect.ALL ? '' : category;
@@ -254,15 +279,23 @@ export class ProjectService {
       ],
     });
 
-    const finalList = list[0].map((data) => {
+    const finalList = list[0].map(async (data) => {
+      let isLike = false;
+      if (userId) {
+        isLike = await this.likeService.getProjectUserLike(data.id, userId);
+      }
+
       return {
         ...data,
         recruitCategory: data.recruitCategory.split('/'),
         content: data.content.toString(),
+        isLike,
       };
     });
 
-    return { list: finalList };
+    const resolvedFinalList = await Promise.all(finalList);
+
+    return { list: resolvedFinalList };
   }
 
   async getProjectById(id: string) {
@@ -390,7 +423,9 @@ export class ProjectService {
     return true;
   }
 
-  async getOneProject(id: string) {
+  async getOneProject(id: string, userId?: string) {
+    let isLike = false;
+
     const projectData = await this.projectRepository.find({
       where: { id, deletedAt: IsNull() },
       relations: ['user'],
@@ -421,6 +456,10 @@ export class ProjectService {
       });
     }
 
+    if (userId) {
+      isLike = await this.likeService.getProjectUserLike(id, userId);
+    }
+
     return {
       id: projectData[0].id,
       createdAt: projectData[0].createdAt,
@@ -444,6 +483,7 @@ export class ProjectService {
       categoryInfo: categoryArray,
       user: projectData[0].user,
       profile,
+      isLike,
     };
   }
 
