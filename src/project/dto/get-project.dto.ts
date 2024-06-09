@@ -39,4 +39,11 @@ export class GetProjectQueryDto {
     description: '검색어',
   })
   searchWord?: string;
+
+  @IsOptional()
+  @IsString()
+  @ApiPropertyOptional({
+    description: '사용자 ID',
+  })
+  userId?: string;
 }
