@@ -203,4 +203,17 @@ export class RedisCacheService {
 
     return results;
   }
+
+  async getValue(key: string): Promise<string | null> {
+    return await this.client.get(key);
+  }
+
+  // NOTE: 특정 키에 특정 값이 포함되는지 확인하는 함수
+  async isValueIncluded(key: string, value: string): Promise<boolean> {
+    const storedValue = await this.getValue(key);
+    if (storedValue) {
+      return storedValue.includes(value);
+    }
+    return false;
+  }
 }

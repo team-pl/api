@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Like } from 'src/entity/like.entity';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { ClickLikeDto } from './dto/click-like.dto';
 import { RedisCacheService } from 'src/redis-cache/redis-cache.service';
 import { Cron, CronExpression } from '@nestjs/schedule';
@@ -14,6 +14,7 @@ export class LikeService {
     @InjectRepository(Like)
     private likeRepository: Repository<Like>,
     private readonly redisCacheService: RedisCacheService,
+    @Inject(forwardRef(() => ProjectService))
     private readonly projectService: ProjectService,
   ) {}
 
@@ -90,6 +91,27 @@ export class LikeService {
     const totalCount = addCount + savedLikeCount;
 
     return totalCount;
+  }
+
+  async getProjectUserLike(projectId: string, userId: string) {
+    let result = false;
+
+    const redisResult = await this.redisCacheService.isValueIncluded(
+      `likes:users:${projectId}`,
+      userId,
+    );
+
+    const dbResult = await this.likeRepository.findOneBy({
+      projectId,
+      userId,
+      deletedAt: IsNull(),
+    });
+
+    if (redisResult || !!dbResult) {
+      result = true;
+    }
+
+    return result;
   }
 
   // NOTE: 데이터베이스와 Redis 데이터 동기화 로직 구현
