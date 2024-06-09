@@ -143,6 +143,9 @@ export class HomeProjectListResDto {
 
   @ApiProperty({ description: '프로젝트 모집마감일', type: Date })
   recruitExpiredAt: Date;
+
+  @ApiProperty({ description: '사용자의 해당 프로젝트에 대한 좋아요(찜) 여부' })
+  isLike: boolean;
 }
 
 export class ProjectDataResDto {
@@ -346,4 +349,7 @@ export class GetOneProjectResDto {
     type: CreateProfileDto,
   })
   profile: CreateProfileDto;
+
+  @ApiProperty({ description: '사용자의 해당 프로젝트에 대한 좋아요(찜) 여부' })
+  isLike: boolean;
 }
