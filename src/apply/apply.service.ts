@@ -1,7 +1,13 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  forwardRef,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Apply } from 'src/entity/apply.entity';
-import { In, IsNull, Repository } from 'typeorm';
+import { In, IsNull, Not, Repository } from 'typeorm';
 import { CreateApplyDto } from './dto/create-apply.dto';
 import { v4 as uuid } from 'uuid';
 import { ProjectService } from 'src/project/project.service';
@@ -13,6 +19,7 @@ export class ApplyService {
   constructor(
     @InjectRepository(Apply)
     private applyRepository: Repository<Apply>,
+    @Inject(forwardRef(() => ProjectService))
     private readonly projectService: ProjectService,
     private readonly notificationService: NotificationsService,
   ) {}
@@ -332,5 +339,33 @@ export class ApplyService {
         portfolioFile: profileData.portfolioFile,
       },
     };
+  }
+
+  // NOTE: 사용자별 지원완료한 목록 조회
+  async getUserApplyList(userId: string): Promise<string[]> {
+    const dataList = await this.applyRepository.findBy({
+      deletedAt: IsNull(),
+      userId,
+      // FIXME: 지원완료 상태 관련 state 조건 추가하기
+      state: Not(EApplyState.CONFIRMED),
+    });
+
+    const result = dataList.map((data) => data.projectId);
+
+    return result;
+  }
+
+  // NOTE: 사용자별 침야확정한 목록 조회
+  async getUserConfirmedList(userId: string): Promise<string[]> {
+    const dataList = await this.applyRepository.findBy({
+      deletedAt: IsNull(),
+      userId,
+
+      state: EApplyState.CONFIRMED,
+    });
+
+    const result = dataList.map((data) => data.projectId);
+
+    return result;
   }
 }
