@@ -23,6 +23,8 @@ import { GetProjectQueryDto } from './dto/get-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { EApplyState } from 'src/type/apply.type';
 import { LikeService } from 'src/like/like.service';
+import { GetDashboardProjectsQueryDto } from './dto/get-dashboard-project';
+import { ApplyService } from 'src/apply/apply.service';
 
 @Injectable()
 export class ProjectService {
@@ -33,6 +35,8 @@ export class ProjectService {
     private readonly userService: UserService,
     @Inject(forwardRef(() => LikeService))
     private readonly likeService: LikeService,
+    @Inject(forwardRef(() => ApplyService))
+    private readonly applyService: ApplyService,
   ) {}
 
   async create(data: CreateProjectDto, userId: string, fileUrl: string | null) {
@@ -653,5 +657,213 @@ export class ProjectService {
       { id: projectId },
       { numberOfLikes: data.numberOfLikes + likeCount },
     );
+  }
+
+  async getLikedProjectList(
+    { ...query }: GetDashboardProjectsQueryDto,
+    userId: string,
+  ) {
+    const { skip, take = '6' } = query;
+
+    const likeProjectList = await this.likeService.getLikedProjects(userId);
+
+    if (!likeProjectList.length) {
+      return { list: [] };
+    }
+
+    // NOTE: 최신순으로 프로젝트 조회
+    const list = await this.projectRepository.findAndCount({
+      where: [
+        {
+          deletedAt: IsNull(),
+          id: In(likeProjectList),
+        },
+      ],
+      skip: Number(skip),
+      take: Number(take),
+      order: { createdAt: 'DESC' },
+      select: [
+        'id',
+        'createdAt',
+        'name',
+        'content',
+        'state',
+        'recruitCategory',
+        'recruitTotalNumber',
+        'confirmedNumber',
+        'userName',
+        'recruitExpiredAt',
+      ],
+    });
+
+    const finalList = list[0].map((data) => {
+      return {
+        ...data,
+        recruitCategory: data.recruitCategory.split('/'),
+        content: data.content.toString(),
+        isLike: true,
+      };
+    });
+
+    return { list: finalList };
+  }
+
+  // NOTE: 대시보드>등록 프로젝트 조회 로직
+  async getRegisteredProjectList(
+    { ...query }: GetDashboardProjectsQueryDto,
+    userId: string,
+  ) {
+    const { skip, take = '6' } = query;
+
+    // NOTE: 최신순으로 프로젝트 조회
+    const list = await this.projectRepository.findAndCount({
+      where: [
+        {
+          deletedAt: IsNull(),
+          userId,
+        },
+      ],
+      skip: Number(skip),
+      take: Number(take),
+      order: { createdAt: 'DESC' },
+      select: [
+        'id',
+        'createdAt',
+        'name',
+        'content',
+        'state',
+        'recruitCategory',
+        'recruitTotalNumber',
+        'confirmedNumber',
+        'userName',
+        'recruitExpiredAt',
+      ],
+    });
+
+    const finalList = list[0].map((data) => {
+      return {
+        ...data,
+        recruitCategory: data.recruitCategory.split('/'),
+        content: data.content.toString(),
+      };
+    });
+
+    return { list: finalList };
+  }
+
+  // NOTE: 대시보드>지원완료 프로젝트 조회 로직
+  async getApplyProjectList(
+    { ...query }: GetDashboardProjectsQueryDto,
+    userId: string,
+  ) {
+    const { skip, take = '6' } = query;
+
+    // NOTE: 해당 사용자가 지원한 프로젝트 조회
+
+    const applyProjectList = await this.applyService.getUserApplyList(userId);
+
+    if (!applyProjectList.length) {
+      return { list: [] };
+    }
+
+    // NOTE: 최신순으로 프로젝트 조회
+    const list = await this.projectRepository.findAndCount({
+      where: [
+        {
+          deletedAt: IsNull(),
+          id: In(applyProjectList),
+        },
+      ],
+      skip: Number(skip),
+      take: Number(take),
+      order: { createdAt: 'DESC' },
+      select: [
+        'id',
+        'createdAt',
+        'name',
+        'content',
+        'state',
+        'recruitCategory',
+        'recruitTotalNumber',
+        'confirmedNumber',
+        'userName',
+        'recruitExpiredAt',
+      ],
+    });
+
+    const finalList = list[0].map(async (data) => {
+      let isLike = false;
+      if (userId) {
+        isLike = await this.likeService.getProjectUserLike(data.id, userId);
+      }
+
+      return {
+        ...data,
+        recruitCategory: data.recruitCategory.split('/'),
+        content: data.content.toString(),
+        isLike: isLike,
+      };
+    });
+
+    return { list: finalList };
+  }
+
+  // NOTE: 대시보드>참여확정 프로젝트 조회 로직
+  async getConfirmProjectList(
+    { ...query }: GetDashboardProjectsQueryDto,
+    userId: string,
+  ) {
+    const { skip, take = '6' } = query;
+
+    // NOTE: 해당 사용자가 지원한 프로젝트 조회
+
+    const applyProjectList = await this.applyService.getUserConfirmedList(
+      userId,
+    );
+
+    if (!applyProjectList.length) {
+      return { list: [] };
+    }
+
+    // NOTE: 최신순으로 프로젝트 조회
+    const list = await this.projectRepository.findAndCount({
+      where: [
+        {
+          deletedAt: IsNull(),
+          id: In(applyProjectList),
+        },
+      ],
+      skip: Number(skip),
+      take: Number(take),
+      order: { createdAt: 'DESC' },
+      select: [
+        'id',
+        'createdAt',
+        'name',
+        'content',
+        'state',
+        'recruitCategory',
+        'recruitTotalNumber',
+        'confirmedNumber',
+        'userName',
+        'recruitExpiredAt',
+      ],
+    });
+
+    const finalList = list[0].map(async (data) => {
+      let isLike = false;
+      if (userId) {
+        isLike = await this.likeService.getProjectUserLike(data.id, userId);
+      }
+
+      return {
+        ...data,
+        recruitCategory: data.recruitCategory.split('/'),
+        content: data.content.toString(),
+        isLike: isLike,
+      };
+    });
+
+    return { list: finalList };
   }
 }

@@ -353,3 +353,53 @@ export class GetOneProjectResDto {
   @ApiProperty({ description: '사용자의 해당 프로젝트에 대한 좋아요(찜) 여부' })
   isLike: boolean;
 }
+
+export class GetProjectListResDto {
+  @ApiProperty({ description: '프로젝트 고유 Id' })
+  id: string;
+
+  @ApiProperty({ description: '프로젝트 등록일', type: Date })
+  createdAt: Date;
+
+  @ApiProperty({ description: '프로젝트명' })
+  name: string;
+
+  @ApiProperty({ description: '프로젝트 모집내용' })
+  content: string;
+
+  @ApiProperty({
+    description: '프로젝트 모집 상태',
+    enum: EProjectState,
+  })
+  state: EProjectState;
+
+  @ApiProperty({
+    description: '프로젝트 모집 카테고리',
+    isArray: true,
+    enum: ECategory1,
+  })
+  recruitCategory: ECategory1[];
+
+  @ApiProperty({ description: '프로젝트 모집인원' })
+  recruitTotalNumber: number;
+
+  @ApiProperty({ description: '프로젝트 확정인원' })
+  confirmedNumber: number;
+
+  @ApiProperty({
+    description: '프로젝트 모집글을 작성한 사용자 이름',
+  })
+  userName: string;
+
+  @ApiProperty({ description: '프로젝트 모집마감일', type: Date })
+  recruitExpiredAt: Date;
+}
+
+export class RegisterProjectDataResDto {
+  @ApiProperty({
+    description: '프로젝트 데이터 형식',
+    type: GetProjectListResDto,
+    isArray: true,
+  })
+  list: GetProjectListResDto[];
+}

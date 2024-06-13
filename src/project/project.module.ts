@@ -8,10 +8,12 @@ import { ProfileModule } from 'src/profile/profile.module';
 import { UserModule } from 'src/user/user.module';
 import { JwtModule } from '@nestjs/jwt';
 import { LikeModule } from 'src/like/like.module';
+import { ApplyModule } from 'src/apply/apply.module';
 
 @Module({
   imports: [
     forwardRef(() => LikeModule),
+    forwardRef(() => ApplyModule),
     JwtModule.register({
       secret: process.env.SECRET_KEY,
       signOptions: { expiresIn: '1h' },

@@ -31,6 +31,7 @@ import {
   HomeProjectResDto,
   PostProjectResDto,
   ProjectDataResDto,
+  RegisterProjectDataResDto,
   UpdateProjectResDto,
 } from './dto/response.dto';
 import { JwtAuthGuard } from 'src/auth/jwtAuth.guard';
@@ -54,6 +55,7 @@ import { JwtOptionalAuthGuard } from 'src/auth/jwtOptionalAuth.guard';
   UpdateProjectResDto,
   GetOneProjectResDto,
   CreateTestProjectDto,
+  RegisterProjectDataResDto,
 )
 @ApiTags('프로젝트')
 export class ProjectController {
@@ -240,6 +242,138 @@ export class ProjectController {
   })
   async getHomeProject(@Request() req) {
     return this.service.getHomeProject(req.user?.id);
+  }
+
+  @Get('dashboard/confirm')
+  @ApiOperation({ summary: '대시보드>참여확정 목록 조회 API' })
+  @UseGuards(JwtAuthGuard)
+  @ApiQuery({
+    name: 'skip',
+    required: true,
+    description: '현재까지 조회한 프로젝트 개수',
+    type: 'string',
+  })
+  @ApiQuery({
+    name: 'take',
+    required: false,
+    type: 'string',
+    description: '조회하려는 프로젝트 개수',
+  })
+  @ApiResponse({
+    status: 200,
+    type: ProjectDataResDto,
+  })
+  async getConfirmedProjects(
+    @Request() req,
+    @Query('skip') skip: string,
+    @Query('take') take?: string,
+  ) {
+    const { id } = req.user.name;
+
+    if (!id) {
+      throw new HttpException('NotFound', HttpStatus.UNAUTHORIZED);
+    }
+
+    return await this.service.getApplyProjectList({ skip, take }, id);
+  }
+
+  @Get('dashboard/apply')
+  @ApiOperation({ summary: '대시보드>지원완료 목록 조회 API' })
+  @UseGuards(JwtAuthGuard)
+  @ApiQuery({
+    name: 'skip',
+    required: true,
+    description: '현재까지 조회한 프로젝트 개수',
+    type: 'string',
+  })
+  @ApiQuery({
+    name: 'take',
+    required: false,
+    type: 'string',
+    description: '조회하려는 프로젝트 개수',
+  })
+  @ApiResponse({
+    status: 200,
+    type: ProjectDataResDto,
+  })
+  async getApplyProjects(
+    @Request() req,
+    @Query('skip') skip: string,
+    @Query('take') take?: string,
+  ) {
+    const { id } = req.user.name;
+
+    if (!id) {
+      throw new HttpException('NotFound', HttpStatus.UNAUTHORIZED);
+    }
+
+    return await this.service.getApplyProjectList({ skip, take }, id);
+  }
+
+  @Get('dashboard/register')
+  @ApiOperation({ summary: '대시보드>등록 프로젝트 목록 조회 API' })
+  @UseGuards(JwtAuthGuard)
+  @ApiQuery({
+    name: 'skip',
+    required: true,
+    description: '현재까지 조회한 프로젝트 개수',
+    type: 'string',
+  })
+  @ApiQuery({
+    name: 'take',
+    required: false,
+    type: 'string',
+    description: '조회하려는 프로젝트 개수',
+  })
+  @ApiResponse({
+    status: 200,
+    type: RegisterProjectDataResDto,
+  })
+  async getRegisteredProjects(
+    @Request() req,
+    @Query('skip') skip: string,
+    @Query('take') take?: string,
+  ) {
+    const { id } = req.user.name;
+
+    if (!id) {
+      throw new HttpException('NotFound', HttpStatus.UNAUTHORIZED);
+    }
+
+    return await this.service.getRegisteredProjectList({ skip, take }, id);
+  }
+
+  @Get('dashboard/liked')
+  @ApiOperation({ summary: '대시보드>내가 찜한 공고 목록 조회 API' })
+  @UseGuards(JwtAuthGuard)
+  @ApiQuery({
+    name: 'skip',
+    required: true,
+    description: '현재까지 조회한 프로젝트 개수',
+    type: 'string',
+  })
+  @ApiQuery({
+    name: 'take',
+    required: false,
+    type: 'string',
+    description: '조회하려는 프로젝트 개수',
+  })
+  @ApiResponse({
+    status: 200,
+    type: ProjectDataResDto,
+  })
+  async getLikedProjects(
+    @Request() req,
+    @Query('skip') skip: string,
+    @Query('take') take?: string,
+  ) {
+    const { id } = req.user.name;
+
+    if (!id) {
+      throw new HttpException('NotFound', HttpStatus.UNAUTHORIZED);
+    }
+
+    return await this.service.getLikedProjectList({ skip, take }, id);
   }
 
   @Get(':id')
