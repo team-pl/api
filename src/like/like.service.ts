@@ -22,57 +22,65 @@ export class LikeService {
     const { projectId } = data;
 
     // NOTE: 특정 사용자가 특정 프로젝트를 클릭한 것을 저장하기 위함
-    const usersKey = `likes:users:${projectId}`;
+    const likeProjectKey = `likes:users:${projectId}`;
 
     // NOTE: 특정 프로젝트의 총 좋아요 수를 저장하기 위함
     const countKey = `likes:project:${projectId}`;
 
     // NOTE: 좋아요 해지 -> 클릭 변환을 위함
-    const unlikeKey = `unlikes:users:${projectId}`;
+    const unlikeProjectKey = `unlikes:users:${projectId}`;
+
+    // NOTE: 사용자별로 좋아요를 클릭한 프로젝트를 저장하기 위함
+    const likeUserKey = `user:likeProject:${userId}`;
+
+    // NOTE: 사용자별로 좋아요를 해지한 프로젝트를 저장하기 위함
+    const unlikeUserKey = `user:unlikeProject:${userId}`;
 
     // NOTE: Redis에 특정 사용자가 특정 프로젝트를 클릭한 것을 저장
-    const { isMember } = await this.redisCacheService.addUserLike(
-      usersKey,
-      userId,
-      unlikeKey,
-    );
-
-    // 좋아요 추가
-    const totalResult = await this.redisCacheService.increment(
+    const result = await this.redisCacheService.addUserLike(
+      likeProjectKey,
       countKey,
-      isMember,
+      unlikeProjectKey,
+      likeUserKey,
+      unlikeUserKey,
+      userId,
+      projectId,
     );
 
     return {
-      result: totalResult,
+      result: result,
     };
   }
 
   async unlikeProject(projectId: string, userId: string) {
-    // NOTE: 특정 사용자가 특정 프로젝트를 클릭 해지한 것을 저장하기 위함
-    const usersKey = `likes:users:${projectId}`;
+    // NOTE: 특정 사용자가 특정 프로젝트를 클릭한 것을 저장하기 위함
+    const likeProjectKey = `likes:users:${projectId}`;
 
     // NOTE: 특정 프로젝트의 총 좋아요 수를 저장하기 위함
     const countKey = `likes:project:${projectId}`;
 
     // NOTE: 좋아요 해지 -> 클릭 변환을 위함
-    const unlikeKey = `unlikes:users:${projectId}`;
+    const unlikeProjectKey = `unlikes:users:${projectId}`;
+
+    // NOTE: 사용자별로 좋아요를 클릭한 프로젝트를 저장하기 위함
+    const likeUserKey = `user:likeProject:${userId}`;
+
+    // NOTE: 사용자별로 좋아요를 해지한 프로젝트를 저장하기 위함
+    const unlikeUserKey = `user:unlikeProject:${userId}`;
 
     // NOTE: Redis에 특정 사용자가 특정 프로젝트를 해지한 것을 저장
-    const { isMember } = await this.redisCacheService.deleteUserLike(
-      usersKey,
-      userId,
-      unlikeKey,
-    );
-
-    // 좋아요 추가
-    const totalResult = await this.redisCacheService.decrement(
+    const result = await this.redisCacheService.deleteUserLike(
+      likeProjectKey,
       countKey,
-      isMember,
+      unlikeProjectKey,
+      likeUserKey,
+      unlikeUserKey,
+      userId,
+      projectId,
     );
 
     return {
-      result: totalResult,
+      result: result,
     };
   }
 
@@ -112,6 +120,33 @@ export class LikeService {
     }
 
     return result;
+  }
+
+  // NOTE: 사용자별 좋아요한 프로젝트 조회
+  async getLikedProjects(userId: string) {
+    //NOTE: Redis 조회
+    const redisLikeresult = await this.redisCacheService.findMembers(
+      `user:likeProject:${userId}`,
+    );
+
+    const redisUnlikeresult = await this.redisCacheService.findMembers(
+      `user:unlikeProject:${userId}`,
+    );
+
+    const dbResult = await this.likeRepository.findBy({
+      userId,
+      deletedAt: IsNull(),
+    });
+
+    const dbProjectResult = dbResult.map((data) => data.projectId);
+
+    const resultArray = [...new Set([...redisLikeresult, ...dbProjectResult])];
+
+    const filteredArray = resultArray.filter(
+      (data) => !redisUnlikeresult.includes(data),
+    );
+
+    return filteredArray;
   }
 
   // NOTE: 데이터베이스와 Redis 데이터 동기화 로직 구현
