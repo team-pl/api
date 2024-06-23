@@ -66,10 +66,16 @@ enum ESubCategorySelect {
   ETC = 'ETC', // 기타
 }
 
+enum ESortDirection {
+  LATEST = 'LATEST',
+  POPULAR = 'POPULAR',
+}
+
 export {
   ECategory1,
   ECategory2,
   EProjectState,
   ECategorySelect,
   ESubCategorySelect,
+  ESortDirection,
 };

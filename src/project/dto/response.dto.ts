@@ -403,3 +403,15 @@ export class RegisterProjectDataResDto {
   })
   list: GetProjectListResDto[];
 }
+
+export class ProjectFindDataResDto {
+  @ApiProperty({
+    description: '프로젝트 데이터 형식',
+    type: HomeProjectListResDto,
+    isArray: true,
+  })
+  list: HomeProjectListResDto[];
+
+  @ApiProperty({ description: '프로젝트 데이터 개수' })
+  count: number;
+}

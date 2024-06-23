@@ -1,6 +1,10 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { ECategorySelect, ESubCategorySelect } from 'src/type/project.type';
+import {
+  ECategorySelect,
+  ESortDirection,
+  ESubCategorySelect,
+} from 'src/type/project.type';
 
 export class GetProjectQueryDto {
   @IsString()
@@ -46,4 +50,12 @@ export class GetProjectQueryDto {
     description: '사용자 ID',
   })
   userId?: string;
+
+  @IsOptional()
+  @IsEnum(ESortDirection)
+  @ApiPropertyOptional({
+    description: '조회 정렬 선택',
+    enum: ESortDirection,
+  })
+  sort: ESortDirection;
 }
