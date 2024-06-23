@@ -16,6 +16,7 @@ import {
   ECategory2,
   ECategorySelect,
   EProjectState,
+  ESortDirection,
   ESubCategorySelect,
 } from 'src/type/project.type';
 import { UserService } from 'src/user/user.service';
@@ -235,12 +236,26 @@ export class ProjectService {
       subCategory = ESubCategorySelect.ALL,
       searchWord = '',
       userId = '',
+      sort = '',
     } = query;
 
     const transCategory = category === ECategorySelect.ALL ? '' : category;
 
     const transSubCategory =
       subCategory === ESubCategorySelect.ALL ? '' : subCategory;
+
+    let orderBy = {};
+
+    switch (sort) {
+      case ESortDirection.POPULAR:
+        orderBy = { numberOfScore: 'DESC' };
+        break;
+      case ESortDirection.LATEST:
+        orderBy = { createdAt: 'DESC' };
+        break;
+      default:
+        orderBy = { createdAt: 'DESC' };
+    }
 
     // NOTE: 최신순으로 프로젝트 조회
     const list = await this.projectRepository.findAndCount({
@@ -268,7 +283,7 @@ export class ProjectService {
       ],
       skip: Number(skip),
       take: Number(take),
-      order: { createdAt: 'DESC' },
+      order: orderBy,
       select: [
         'id',
         'createdAt',
@@ -299,7 +314,7 @@ export class ProjectService {
 
     const resolvedFinalList = await Promise.all(finalList);
 
-    return { list: resolvedFinalList };
+    return { list: resolvedFinalList, count: list[1] };
   }
 
   async getProjectById(id: string) {

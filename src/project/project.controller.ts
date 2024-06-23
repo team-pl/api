@@ -31,6 +31,7 @@ import {
   HomeProjectResDto,
   PostProjectResDto,
   ProjectDataResDto,
+  ProjectFindDataResDto,
   RegisterProjectDataResDto,
   UpdateProjectResDto,
 } from './dto/response.dto';
@@ -39,7 +40,11 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { FileService } from 'src/file/file.service';
 import { EFileUsage } from 'src/type/file.type';
 import { GetProjectQueryDto } from './dto/get-project.dto';
-import { ECategorySelect, ESubCategorySelect } from 'src/type/project.type';
+import {
+  ECategorySelect,
+  ESortDirection,
+  ESubCategorySelect,
+} from 'src/type/project.type';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { CreateTestProjectDto } from './dto/create-test-project.dto';
 import { JwtOptionalAuthGuard } from 'src/auth/jwtOptionalAuth.guard';
@@ -56,6 +61,7 @@ import { JwtOptionalAuthGuard } from 'src/auth/jwtOptionalAuth.guard';
   GetOneProjectResDto,
   CreateTestProjectDto,
   RegisterProjectDataResDto,
+  ProjectFindDataResDto,
 )
 @ApiTags('프로젝트')
 export class ProjectController {
@@ -210,9 +216,15 @@ export class ProjectController {
     type: 'string',
     description: '검색어',
   })
+  @ApiQuery({
+    name: 'sort',
+    required: false,
+    description: '조회 정렬 선택',
+    enum: ESortDirection,
+  })
   @ApiResponse({
     status: 200,
-    type: ProjectDataResDto,
+    type: ProjectFindDataResDto,
   })
   async getProjectList(
     @Request() req,
@@ -221,6 +233,7 @@ export class ProjectController {
     @Query('category') category?: ECategorySelect,
     @Query('subCategory') subCategory?: ESubCategorySelect,
     @Query('searchWord') searchWord?: string,
+    @Query('sort') sort?: ESortDirection,
   ) {
     const userId = req.user?.id;
     return this.service.getProjectList({
@@ -230,6 +243,7 @@ export class ProjectController {
       subCategory,
       searchWord,
       userId,
+      sort,
     });
   }
 
