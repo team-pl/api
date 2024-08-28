@@ -207,6 +207,7 @@ export class ProjectController {
   @ApiQuery({
     name: 'subCategory',
     required: false,
+    isArray: true,
     description: '조회 하위카테고리',
     enum: ESubCategorySelect,
   })
@@ -231,7 +232,7 @@ export class ProjectController {
     @Query('skip') skip: string,
     @Query('take') take?: string,
     @Query('category') category?: ECategorySelect,
-    @Query('subCategory') subCategory?: ESubCategorySelect,
+    @Query('subCategory') subCategory?: ESubCategorySelect[],
     @Query('searchWord') searchWord?: string,
     @Query('sort') sort?: ESortDirection,
   ) {

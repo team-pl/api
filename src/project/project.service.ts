@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Project } from 'src/entity/project.entity';
-import { In, IsNull, Like, Raw, Repository } from 'typeorm';
+import { Brackets, In, IsNull, Like, Raw, Repository } from 'typeorm';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { v4 as uuid } from 'uuid';
 import { ProfileService } from 'src/profile/profile.service';
@@ -233,70 +233,82 @@ export class ProjectService {
       skip,
       take = '12',
       category = ECategorySelect.ALL,
-      subCategory = ESubCategorySelect.ALL,
+      subCategory = [],
       searchWord = '',
       userId = '',
       sort = '',
     } = query;
 
-    const transCategory = category === ECategorySelect.ALL ? '' : category;
+    const queryBuilder = this.projectRepository.createQueryBuilder('project');
 
-    const transSubCategory =
-      subCategory === ESubCategorySelect.ALL ? '' : subCategory;
+    // Select specific columns
+    queryBuilder.select([
+      'project.id',
+      'project.deletedAt',
+      'project.createdAt',
+      'project.name',
+      'project.content',
+      'project.state',
+      'project.recruitCategory',
+      'project.recruitSubCategory',
+      'project.userName',
+      'project.recruitExpiredAt',
+      'project.recruitTotalNumber',
+      'project.confirmedNumber',
+    ]);
 
-    let orderBy = {};
+    queryBuilder.andWhere('project.deletedAt IS NULL');
 
-    switch (sort) {
-      case ESortDirection.POPULAR:
-        orderBy = { numberOfScore: 'DESC' };
-        break;
-      case ESortDirection.LATEST:
-        orderBy = { createdAt: 'DESC' };
-        break;
-      default:
-        orderBy = { createdAt: 'DESC' };
+    if (category !== ECategorySelect.ALL) {
+      queryBuilder.andWhere('project.recruitCategory LIKE :category', {
+        category: `%${category}%`,
+      });
     }
 
-    // NOTE: 최신순으로 프로젝트 조회
-    const list = await this.projectRepository.findAndCount({
-      where: [
-        {
-          deletedAt: IsNull(),
-          recruitCategory: Like(`%${transCategory}%`),
-          recruitSubCategory: Like(`%${transSubCategory}%`),
-          name: Like(`%${searchWord}%`),
-        },
-        {
-          deletedAt: IsNull(),
-          recruitCategory: Like(`%${transCategory}%`),
-          recruitSubCategory: Like(`%${transSubCategory}%`),
-          userName: Like(`%${searchWord}%`),
-        },
-        {
-          deletedAt: IsNull(),
-          recruitCategory: Like(`%${transCategory}%`),
-          recruitSubCategory: Like(`%${transSubCategory}%`),
-          content: Raw(
-            (data) => `ENCODE(${data}, 'escape') LIKE '%${searchWord}%'`,
-          ),
-        },
-      ],
-      skip: Number(skip),
-      take: Number(take),
-      order: orderBy,
-      select: [
-        'id',
-        'createdAt',
-        'name',
-        'content',
-        'state',
-        'recruitCategory',
-        'recruitTotalNumber',
-        'confirmedNumber',
-        'userName',
-        'recruitExpiredAt',
-      ],
-    });
+    // subCategory 필터링 (배열)
+    if (subCategory && subCategory.length > 0) {
+      const subCategoryConditions = subCategory
+        .map((sub) => `project.recruitSubCategory LIKE :sub_${sub}`)
+        .join(' OR ');
+      subCategory.forEach((sub) => {
+        queryBuilder.setParameter(`sub_${sub}`, `%${sub}%`);
+      });
+      queryBuilder.andWhere(`(${subCategoryConditions})`);
+    }
+
+    // searchWord 필터링
+    if (searchWord) {
+      queryBuilder.andWhere(
+        new Brackets((qb) => {
+          qb.orWhere('project.name ILIKE :searchWord')
+            .orWhere('project.userName ILIKE :searchWord')
+            .orWhere('project.content LIKE :searchWord');
+        }),
+        { searchWord: `%${searchWord}%` },
+      );
+    }
+
+    if (sort) {
+      let order = '';
+
+      switch (sort) {
+        case ESortDirection.POPULAR:
+          order = 'numberOfScore';
+          break;
+        case ESortDirection.LATEST:
+          order = 'createdAt';
+          break;
+        default:
+          order = 'createdAt';
+      }
+
+      queryBuilder.orderBy('project.' + order, 'DESC');
+    }
+
+    // Pagination
+    queryBuilder.skip(Number(skip)).take(Number(take));
+
+    const list = await queryBuilder.getManyAndCount();
 
     const finalList = list[0].map(async (data) => {
       let isLike = false;

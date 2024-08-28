@@ -34,8 +34,9 @@ export class GetProjectQueryDto {
   @ApiPropertyOptional({
     description: '조회 하위 카테고리',
     enum: ESubCategorySelect,
+    isArray: true,
   })
-  subCategory?: ESubCategorySelect;
+  subCategory?: ESubCategorySelect[];
 
   @IsOptional()
   @IsString()
