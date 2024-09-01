@@ -18,6 +18,7 @@ import { RedisCacheModule } from './redis-cache/redis-cache.module';
 import swaggerConfig from './config/swagger.config';
 import { RedisModule } from '@liaoliaots/nestjs-redis';
 import { ScheduleModule } from '@nestjs/schedule';
+import { CronModule } from './cron/cron.module';
 
 @Module({
   imports: [
@@ -56,6 +57,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     ApplyModule,
     LikeModule,
     RedisCacheModule,
+    CronModule,
   ],
   controllers: [AppController],
   providers: [AppService, RedisCacheService],
