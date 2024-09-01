@@ -66,7 +66,7 @@ export class Notification {
     enum: ENotificationType,
     default: ENotificationType.PROJECT,
   })
-  eduCategory1: ENotificationType;
+  type: ENotificationType;
 
   @ApiProperty({
     description: '알림 클릭시 이동할 페이지(dashboard/project)',
