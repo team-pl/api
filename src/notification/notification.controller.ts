@@ -57,7 +57,7 @@ export class NotificationController {
 
     const data = await this.service.getNotifications(userId);
 
-    return { list: data };
+    return data;
   }
 
   @Delete()
