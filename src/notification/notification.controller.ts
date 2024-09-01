@@ -31,7 +31,7 @@ import { DeleteNotificationDto } from './dto/delete-notification.dto';
   DeleteNotificationResDto,
   DeleteNotificationDto,
 )
-@ApiTags('Notification')
+@ApiTags('알림')
 export class NotificationController {
   constructor(private readonly service: NotificationsService) {}
 
