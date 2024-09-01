@@ -71,8 +71,12 @@ export class Notification {
   @ApiProperty({
     description: '알림 클릭시 이동할 페이지(dashboard/project)',
     example: 'dashboard/project',
+    default: '',
   })
-  @Column({ comment: '알림 클릭시 이동할 페이지(dashboard/project)' })
+  @Column({
+    comment: '알림 클릭시 이동할 페이지(dashboard/project)',
+    default: '',
+  })
   targetPage: string;
 
   @ApiProperty({
