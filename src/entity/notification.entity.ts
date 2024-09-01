@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { EDashboardState, ENotificationType } from 'src/type/notification.type';
 import {
   Column,
   CreateDateColumn,
@@ -54,6 +55,39 @@ export class Notification {
   @ApiProperty({ description: '알림 내용' })
   @Column({ comment: '알림 내용' })
   message: string;
+
+  @ApiProperty({
+    description: '알림 종류(PROJECT/COMMENT/APPLY/DEADLINE)',
+    enum: ENotificationType,
+    default: ENotificationType.PROJECT,
+  })
+  @Column({
+    comment: '알림 종류(PROJECT/COMMENT/APPLY/DEADLINE)',
+    enum: ENotificationType,
+    default: ENotificationType.PROJECT,
+  })
+  eduCategory1: ENotificationType;
+
+  @ApiProperty({
+    description: '알림 클릭시 이동할 페이지(dashboard/project)',
+    example: 'dashboard/project',
+  })
+  @Column({ comment: '알림 클릭시 이동할 페이지(dashboard/project)' })
+  targetPage: string;
+
+  @ApiProperty({
+    description: '대시보드 이동시 프로젝트 상태',
+    default: null,
+    nullable: true,
+    enum: EDashboardState,
+  })
+  @Column({
+    comment: '대시보드 이동시 프로젝트 상태',
+    default: null,
+    nullable: true,
+    enum: EDashboardState,
+  })
+  dashboardState: EDashboardState | null;
 
   @ApiProperty({ description: '알림 읽음 여부', default: false })
   @Column({ comment: '알림 읽음 여부', default: false })
