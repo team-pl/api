@@ -89,10 +89,9 @@ export class PostProjectResDto {
   file: string | null;
 
   @ApiProperty({
-    description: '프로젝트 모집자가 선택한 프로필 정보',
-    type: CreateProfileDto,
+    description: '프로젝트 모집자가 선택한 프로필 ID (profile_entity.id)',
   })
-  profile: CreateProfileDto[];
+  profileId: string;
 
   @ApiProperty({ description: '프로젝트 모집자의 ID (user_entity.id)' })
   userId: string;
@@ -240,10 +239,9 @@ export class UpdateProjectResDto {
   file: string | null;
 
   @ApiProperty({
-    description: '프로젝트 모집자가 선택한 프로필 정보',
-    type: CreateProfileDto,
+    description: '프로젝트 모집자가 선택한 프로필 ID (profile_entity.id)',
   })
-  profile: CreateProfileDto[];
+  profileId: string;
 
   @ApiProperty({ description: '프로젝트 모집자의 ID (user_entity.id)' })
   userId: string;

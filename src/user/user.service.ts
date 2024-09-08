@@ -172,6 +172,21 @@ export class UserService {
     return user.nickname;
   }
 
+  // NOTE: 프로젝트 등록시 사용
+  async postProject(id: string) {
+    const user = await this.userRepository.findOneBy({
+      id,
+      deletedAt: IsNull(),
+    });
+
+    // NOTE: 프로젝트 등록시 유저 테이블에서 프로젝트 등록 횟수 +1
+    await this.userRepository.update(id, {
+      numberOfRegistrations: user.numberOfRegistrations + 1,
+    });
+
+    return user.nickname;
+  }
+
   async updateProfile(id: string, data: UpdateUserProfileDto) {
     const { file, nickname, jobType } = data;
 

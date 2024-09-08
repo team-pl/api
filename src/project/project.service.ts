@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Project } from 'src/entity/project.entity';
-import { Brackets, In, IsNull, Like, Raw, Repository } from 'typeorm';
+import { Brackets, In, IsNull, LessThan, Like, Raw, Repository } from 'typeorm';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { v4 as uuid } from 'uuid';
 import { ProfileService } from 'src/profile/profile.service';
@@ -68,7 +68,7 @@ export class ProjectService {
 
     const profileData = await this.profileService.getProfileById(profileId);
 
-    const userNickname = await this.userService.getUserNicknameById(userId);
+    const userNickname = await this.userService.postProject(userId);
 
     const categoryData = {};
 
@@ -106,7 +106,7 @@ export class ProjectService {
       content: bufferContent,
       userId,
       file: fileUrl,
-      profileId,
+      profileId: profileData.id,
       recruitDevTotalNumber: devCount,
       recruitDesignTotalNumber: designCount,
       recruitEtcTotalNumber: etcCount,
@@ -138,7 +138,7 @@ export class ProjectService {
       content: result.content.toString(),
       url: result.url,
       file: result.file,
-      profile: profileData,
+      profileId: profileData.id,
       userId: result.userId,
       categoryInfo,
     };
@@ -406,7 +406,7 @@ export class ProjectService {
       recruitExpiredAt: expiredAt,
       content: bufferContent,
       file: fileUrl,
-      profileId,
+      profileId: profileData.id,
       recruitDevTotalNumber: devCount,
       recruitDesignTotalNumber: designCount,
       recruitEtcTotalNumber: etcCount,
@@ -436,7 +436,7 @@ export class ProjectService {
       content: result.content.toString(),
       url: result.url,
       file: result.file,
-      profile: profileData,
+      profileId: profileData.id,
       userId: result.userId,
       categoryInfo,
     };
@@ -892,5 +892,25 @@ export class ProjectService {
     });
 
     return { list: finalList };
+  }
+
+  async getExpiredProjects() {
+    const now = new Date();
+    const list = await this.projectRepository.find({
+      where: {
+        deletedAt: IsNull(),
+        state: EProjectState.RECRUITING,
+        recruitExpiredAt: LessThan(now),
+      },
+      select: ['id'],
+    });
+
+    return list;
+  }
+
+  async updateExpiredProjects(idList: string[]) {
+    await this.projectRepository.update(idList, { state: EProjectState.END });
+
+    return true;
   }
 }
