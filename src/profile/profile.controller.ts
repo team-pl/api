@@ -30,6 +30,7 @@ import { EFileUsage } from 'src/type/file.type';
 import {
   DeleteProfileResDto,
   GetMyInfoResDto,
+  GetMyProfileListResDto,
   PostProfileResDto,
   PostTempProfileResDto,
   UpdateProfileResDto,
@@ -49,8 +50,9 @@ import { CreateTestProfileDto } from './dto/create-test-profile.dto';
   CreateProfileTempDto,
   PostTempProfileResDto,
   CreateTestProfileDto,
+  GetMyProfileListResDto,
 )
-@ApiTags('Profile')
+@ApiTags('프로필')
 export class ProfileController {
   constructor(
     private readonly service: ProfileService,
@@ -232,5 +234,28 @@ export class ProfileController {
     }
 
     return this.service.getAllProfile(id);
+  }
+
+  @Get('/my-list')
+  @ApiOperation({
+    summary: '프로젝트 등록/수정페이지>자신의 프로필 조회 API',
+  })
+  @UseGuards(JwtAuthGuard)
+  @ApiResponse({
+    status: 401,
+    description: 'user ID NotFound',
+  })
+  @ApiResponse({
+    status: 200,
+    type: GetMyProfileListResDto,
+  })
+  getMyProfileList(@Request() req) {
+    const { id } = req.user.name;
+
+    if (!id) {
+      throw new HttpException('user ID NotFound', HttpStatus.UNAUTHORIZED);
+    }
+
+    return this.service.getMyProfileList(id);
   }
 }

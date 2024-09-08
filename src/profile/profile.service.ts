@@ -428,4 +428,20 @@ export class ProfileService {
 
     return profileData;
   }
+
+  async getMyProfileList(userId: string) {
+    const list = await this.profileRepository.findAndCount({
+      where: {
+        deletedAt: IsNull(),
+        userId,
+      },
+      select: ['id', 'createdAt', 'name', 'isRepresentative'],
+      order: { createdAt: 'DESC' },
+    });
+
+    return {
+      list: list[0],
+      count: list[1],
+    };
+  }
 }

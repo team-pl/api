@@ -343,3 +343,29 @@ export class GetApplyProfileResDto {
   })
   portfolioFile: string | null;
 }
+
+export class GetMyProfileResDto {
+  @ApiProperty({ description: '프로필 고유 Id' })
+  id: string;
+
+  @ApiProperty({ description: '프로필 등록일' })
+  createdAt: Date;
+
+  @ApiProperty({ description: '프로필 제목' })
+  name: string;
+
+  @ApiProperty({ description: '대표 프로필 여부' })
+  isRepresentative: boolean;
+}
+
+export class GetMyProfileListResDto {
+  @ApiProperty({
+    description: '자신의 프로필 목록 조회',
+    type: GetMyProfileResDto,
+    isArray: true,
+  })
+  list: GetMyProfileResDto[];
+
+  @ApiProperty({ description: '자신의 프로필 개수' })
+  count: number;
+}
