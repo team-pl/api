@@ -451,7 +451,9 @@ export class ProjectService {
       throw new HttpException(e, HttpStatus.NOT_FOUND);
     }
 
-    return true;
+    return {
+      result: true,
+    };
   }
 
   async getOneProject(id: string, userId?: string) {
@@ -465,11 +467,6 @@ export class ProjectService {
     if (!projectData.length) {
       throw new HttpException('Project NotFound', HttpStatus.NOT_FOUND);
     }
-
-    // NOTE: 사용자가 프로젝트 등록시 입력한 프로필 ID로 조회
-    const profile = await this.profileService.getProfileById(
-      projectData[0].profileId,
-    );
 
     await this.projectRepository.update(id, {
       numberOfViews: projectData[0].numberOfViews + 1,
@@ -491,6 +488,9 @@ export class ProjectService {
       isLike = await this.likeService.getProjectUserLike(id, userId);
     }
 
+    // NOTE: 총 좋아요 수 조회
+    const numberOfLikes = await this.likeService.getLikes(id);
+
     return {
       id: projectData[0].id,
       createdAt: projectData[0].createdAt,
@@ -505,15 +505,14 @@ export class ProjectService {
       recruitCategory: projectData[0].recruitCategory.split('/'),
       recruitSubCategory: projectData[0].recruitSubCategory.split('/'),
       userName: projectData[0].userName,
+      jobType: projectData[0].user.jobType,
       numberOfViews: projectData[0].numberOfViews,
-      numberOfLikes: projectData[0].numberOfLikes,
+      numberOfLikes,
       content: projectData[0].content.toString(),
       url: projectData[0].url,
       file: projectData[0].file,
       userId: projectData[0].userId,
       categoryInfo: categoryArray,
-      user: projectData[0].user,
-      profile,
       isLike,
     };
   }
@@ -757,8 +756,8 @@ export class ProjectService {
         'id',
         'createdAt',
         'name',
-        'content',
         'state',
+        'content',
         'recruitCategory',
         'recruitTotalNumber',
         'confirmedNumber',
@@ -832,7 +831,9 @@ export class ProjectService {
       };
     });
 
-    return { list: finalList };
+    const resolvedFinalList = await Promise.all(finalList);
+
+    return { list: resolvedFinalList };
   }
 
   // NOTE: 대시보드>참여확정 프로젝트 조회 로직
@@ -891,7 +892,9 @@ export class ProjectService {
       };
     });
 
-    return { list: finalList };
+    const resolvedFinalList = await Promise.all(finalList);
+
+    return { list: resolvedFinalList };
   }
 
   async getExpiredProjects() {

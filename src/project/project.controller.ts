@@ -289,7 +289,7 @@ export class ProjectController {
       throw new HttpException('NotFound', HttpStatus.UNAUTHORIZED);
     }
 
-    return await this.service.getApplyProjectList({ skip, take }, id);
+    return await this.service.getConfirmProjectList({ skip, take }, id);
   }
 
   @Get('dashboard/apply')

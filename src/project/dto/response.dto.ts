@@ -313,6 +313,13 @@ export class GetOneProjectResDto {
   })
   userName: string;
 
+  @ApiProperty({
+    description: '직업 종류',
+    default: null,
+    nullable: true,
+  })
+  jobType: string | null;
+
   @ApiProperty({ description: '프로젝트 조회수' })
   numberOfViews: number;
 
@@ -336,17 +343,6 @@ export class GetOneProjectResDto {
     isArray: true,
   })
   categoryInfo: CategoryResDto;
-
-  @ApiProperty({
-    description: '프로젝트를 등록한 사용자 정보',
-  })
-  user: GetUserResDto;
-
-  @ApiProperty({
-    description: '프로젝트 모집자가 선택한 프로필 정보',
-    type: CreateProfileDto,
-  })
-  profile: CreateProfileDto;
 
   @ApiProperty({ description: '사용자의 해당 프로젝트에 대한 좋아요(찜) 여부' })
   isLike: boolean;
