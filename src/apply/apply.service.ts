@@ -346,8 +346,7 @@ export class ApplyService {
     const dataList = await this.applyRepository.findBy({
       deletedAt: IsNull(),
       userId,
-      // FIXME: 지원완료 상태 관련 state 조건 추가하기
-      state: Not(EApplyState.CONFIRMED),
+      state: In([EApplyState.UNCONFIRMED, EApplyState.CHECKED]),
     });
 
     const result = dataList.map((data) => data.projectId);
@@ -360,8 +359,7 @@ export class ApplyService {
     const dataList = await this.applyRepository.findBy({
       deletedAt: IsNull(),
       userId,
-
-      state: EApplyState.CONFIRMED,
+      state: In([EApplyState.CONFIRMED, EApplyState.CONFIRMED_CANCELED]),
     });
 
     const result = dataList.map((data) => data.projectId);
