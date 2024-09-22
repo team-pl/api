@@ -512,6 +512,7 @@ export class ProjectService {
       url: projectData[0].url,
       file: projectData[0].file,
       userId: projectData[0].userId,
+      profileImageUrl: projectData[0].user.profileImageUrl,
       categoryInfo: categoryArray,
       isLike,
     };

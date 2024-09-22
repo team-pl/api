@@ -339,6 +339,12 @@ export class GetOneProjectResDto {
   userId: string;
 
   @ApiProperty({
+    description:
+      '프로젝트 모집자의 프로필 이미지 url (user_entity.profileImageUrl)',
+  })
+  profileImageUrl: string;
+
+  @ApiProperty({
     description: '모집 카테고리 정보',
     isArray: true,
   })
