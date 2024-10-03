@@ -267,10 +267,17 @@ export class ProjectService {
 
     // subCategory 필터링 (배열)
     if (subCategory && subCategory.length > 0) {
-      const subCategoryConditions = subCategory
+      const subCategoryArray = [];
+      if (typeof subCategory === 'string') {
+        subCategoryArray.push(subCategory);
+      } else {
+        subCategoryArray.push(...subCategory);
+      }
+
+      const subCategoryConditions = subCategoryArray
         .map((sub) => `project.recruitSubCategory LIKE :sub_${sub}`)
         .join(' OR ');
-      subCategory.forEach((sub) => {
+      subCategoryArray.forEach((sub) => {
         queryBuilder.setParameter(`sub_${sub}`, `%${sub}%`);
       });
       queryBuilder.andWhere(`(${subCategoryConditions})`);
