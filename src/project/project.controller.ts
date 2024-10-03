@@ -401,7 +401,7 @@ export class ProjectController {
   })
   @ApiResponse({
     status: 404,
-    description: 'Project NotFound',
+    description: '존재하지 않는 프로젝트입니다.',
   })
   @ApiResponse({
     status: 200,
@@ -425,7 +425,11 @@ export class ProjectController {
   })
   @ApiResponse({
     status: 404,
-    description: 'Profile NotFound',
+    description: '없는 프로젝트 입니다.',
+  })
+  @ApiResponse({
+    status: 403,
+    description: '해당 프로젝트의 등록자가 아니므로 삭제 권한이 없습니다.',
   })
   @ApiResponse({
     status: 200,
@@ -438,6 +442,6 @@ export class ProjectController {
       throw new HttpException('NotFound', HttpStatus.UNAUTHORIZED);
     }
 
-    return this.service.deleteProject(projectId);
+    return this.service.deleteProject(projectId, id);
   }
 }

@@ -449,8 +449,21 @@ export class ProjectService {
     };
   }
 
-  async deleteProject(id: string) {
+  async deleteProject(id: string, userId: string) {
     const now = new Date();
+
+    const projectData = await this.projectRepository.findOneBy({ id: id });
+
+    if (!projectData) {
+      throw new HttpException('없는 프로젝트 입니다.', HttpStatus.NOT_FOUND);
+    }
+
+    if (projectData.userId !== userId) {
+      throw new HttpException(
+        '해당 프로젝트의 등록자가 아니므로 삭제 권한이 없습니다.',
+        HttpStatus.FORBIDDEN,
+      );
+    }
 
     try {
       await this.projectRepository.update(id, { deletedAt: now });
@@ -472,7 +485,10 @@ export class ProjectService {
     });
 
     if (!projectData.length) {
-      throw new HttpException('Project NotFound', HttpStatus.NOT_FOUND);
+      throw new HttpException(
+        '존재하지 않는 프로젝트입니다.',
+        HttpStatus.NOT_FOUND,
+      );
     }
 
     await this.projectRepository.update(id, {
