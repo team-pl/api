@@ -511,9 +511,6 @@ export class ProjectService {
       isLike = await this.likeService.getProjectUserLike(id, userId);
     }
 
-    // NOTE: 총 좋아요 수 조회
-    const numberOfLikes = await this.likeService.getLikes(id);
-
     return {
       id: projectData[0].id,
       createdAt: projectData[0].createdAt,
@@ -530,7 +527,7 @@ export class ProjectService {
       userName: projectData[0].userName,
       jobType: projectData[0].user.jobType,
       numberOfViews: projectData[0].numberOfViews,
-      numberOfLikes,
+      numberOfLikes: projectData[0].numberOfLikes,
       content: projectData[0].content.toString(),
       url: projectData[0].url,
       file: projectData[0].file,
@@ -702,6 +699,13 @@ export class ProjectService {
       id: projectId,
       deletedAt: IsNull(),
     });
+
+    if (!data) {
+      throw new HttpException(
+        '이미 삭제된 프로젝트입니다.',
+        HttpStatus.NOT_FOUND,
+      );
+    }
 
     await this.projectRepository.update(
       { id: projectId },
