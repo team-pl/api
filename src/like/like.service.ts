@@ -4,9 +4,9 @@ import { Like } from 'src/entity/like.entity';
 import { IsNull, Repository } from 'typeorm';
 import { ClickLikeDto } from './dto/click-like.dto';
 import { RedisCacheService } from 'src/redis-cache/redis-cache.service';
-import { Cron, CronExpression } from '@nestjs/schedule';
 import { v4 as uuid } from 'uuid';
 import { ProjectService } from 'src/project/project.service';
+import { convertTimestampToKST } from 'src/lib/date';
 
 @Injectable()
 export class LikeService {
@@ -19,6 +19,93 @@ export class LikeService {
   ) {}
 
   async likeProject(data: ClickLikeDto, userId: string) {
+    const { projectId } = data;
+
+    const likeData = await this.likeRepository.findOneBy({
+      deletedAt: IsNull(),
+      userId,
+      projectId,
+    });
+
+    if (likeData) {
+      return {
+        result: false,
+      };
+    }
+
+    const id = uuid();
+    const like = await this.likeRepository.create({
+      id,
+      userId,
+      projectId,
+    });
+
+    await this.likeRepository.save(like);
+
+    // NOTE: 프로젝트 총 좋아요 수 업데이트
+    await this.projectService.updateLikes(projectId, 1);
+
+    return {
+      result: true,
+    };
+  }
+
+  async unlikeProject(projectId: string, userId: string) {
+    const now = new Date();
+
+    const likeData = await this.likeRepository.findOneBy({
+      deletedAt: IsNull(),
+      userId,
+      projectId,
+    });
+
+    if (!likeData) {
+      return {
+        result: false,
+      };
+    }
+
+    await this.likeRepository.update(likeData.id, {
+      deletedAt: now,
+    });
+
+    // NOTE: 프로젝트 총 좋아요 수 업데이트
+    await this.projectService.updateLikes(projectId, -1);
+
+    return {
+      result: true,
+    };
+  }
+
+  async getProjectUserLike(projectId: string, userId: string) {
+    let result = false;
+
+    const dbResult = await this.likeRepository.findOneBy({
+      projectId,
+      userId,
+      deletedAt: IsNull(),
+    });
+
+    if (dbResult) {
+      result = true;
+    }
+
+    return result;
+  }
+
+  // NOTE: 사용자별 좋아요한 프로젝트 조회
+  async getLikedProjects(userId: string) {
+    const dbResult = await this.likeRepository.findBy({
+      userId,
+      deletedAt: IsNull(),
+    });
+
+    const resultArray = dbResult.map((data) => data.projectId);
+
+    return resultArray;
+  }
+
+  async likeProjectWithRedis(data: ClickLikeDto, userId: string) {
     const { projectId } = data;
 
     // NOTE: 특정 사용자가 특정 프로젝트를 클릭한 것을 저장하기 위함
@@ -36,23 +123,33 @@ export class LikeService {
     // NOTE: 사용자별로 좋아요를 해지한 프로젝트를 저장하기 위함
     const unlikeUserKey = `user:unlikeProject:${userId}`;
 
-    // NOTE: Redis에 특정 사용자가 특정 프로젝트를 클릭한 것을 저장
-    const result = await this.redisCacheService.addUserLike(
-      likeProjectKey,
-      countKey,
-      unlikeProjectKey,
-      likeUserKey,
-      unlikeUserKey,
-      userId,
-      projectId,
-    );
+    try {
+      // NOTE: 기존에 해당 프로젝트를 찜했는지 여부를 확인
+      const isLiked = await this.getProjectUserLike(projectId, userId);
 
-    return {
-      result: result,
-    };
+      if (!isLiked) {
+        // NOTE: Redis에 특정 사용자가 특정 프로젝트를 클릭한 것을 저장
+        await this.redisCacheService.addUserLike(
+          likeProjectKey,
+          countKey,
+          unlikeProjectKey,
+          likeUserKey,
+          unlikeUserKey,
+          userId,
+          projectId,
+        );
+      }
+
+      return {
+        result: true,
+      };
+    } catch (error) {
+      // NOTE: Redis 명령 실행 중 에러 발생 시 처리
+      console.error('좋아요 관련 Redis Error :', error);
+    }
   }
 
-  async unlikeProject(projectId: string, userId: string) {
+  async unlikeProjectWithRedis(projectId: string, userId: string) {
     // NOTE: 특정 사용자가 특정 프로젝트를 클릭한 것을 저장하기 위함
     const likeProjectKey = `likes:users:${projectId}`;
 
@@ -68,24 +165,33 @@ export class LikeService {
     // NOTE: 사용자별로 좋아요를 해지한 프로젝트를 저장하기 위함
     const unlikeUserKey = `user:unlikeProject:${userId}`;
 
-    // NOTE: Redis에 특정 사용자가 특정 프로젝트를 해지한 것을 저장
-    const result = await this.redisCacheService.deleteUserLike(
-      likeProjectKey,
-      countKey,
-      unlikeProjectKey,
-      likeUserKey,
-      unlikeUserKey,
-      userId,
-      projectId,
-    );
+    try {
+      // NOTE: 기존에 해당 프로젝트를 찜했는지 여부를 확인
+      const isLiked = await this.getProjectUserLike(projectId, userId);
 
-    return {
-      result: result,
-    };
+      if (isLiked) {
+        // NOTE: Redis에 특정 사용자가 특정 프로젝트를 해지한 것을 저장
+        await this.redisCacheService.deleteUserLike(
+          likeProjectKey,
+          countKey,
+          unlikeProjectKey,
+          likeUserKey,
+          unlikeUserKey,
+          userId,
+          projectId,
+        );
+      }
+
+      return {
+        result: true,
+      };
+    } catch (error) {
+      // NOTE: Redis 명령 실행 중 에러 발생 시 처리
+      console.error('좋아요 관련 Redis Error :', error);
+    }
   }
 
-  // NOTE: 총 좋아요 수 확인
-  async getLikes(projectId: string) {
+  async getLikesWithRedis(projectId: string) {
     const countKey = `likes:project:${projectId}`;
 
     // 특정 게시물의 좋아요 수 조회
@@ -101,7 +207,7 @@ export class LikeService {
     return totalCount;
   }
 
-  async getProjectUserLike(projectId: string, userId: string) {
+  async getProjectUserLikeWithRedis(projectId: string, userId: string) {
     let result = false;
 
     const redisResult = await this.redisCacheService.isValueIncluded(
@@ -123,16 +229,23 @@ export class LikeService {
   }
 
   // NOTE: 사용자별 좋아요한 프로젝트 조회
-  async getLikedProjects(userId: string) {
+  async getLikedProjectsWithRedis(userId: string) {
     //NOTE: Redis 조회
-    const redisLikeresult = await this.redisCacheService.findMembers(
+    const redisLikeResult = await this.redisCacheService.findMembers(
       `user:likeProject:${userId}`,
     );
 
-    const redisUnlikeresult = await this.redisCacheService.findMembers(
+    const transRedisLikeResult = redisLikeResult.map(
+      (data) => data.split('|')[0],
+    );
+
+    const redisUnlikeResult = await this.redisCacheService.findMembers(
       `user:unlikeProject:${userId}`,
     );
 
+    const transRedisUnLikeResult = redisUnlikeResult.map(
+      (data) => data.split('|')[0],
+    );
     const dbResult = await this.likeRepository.findBy({
       userId,
       deletedAt: IsNull(),
@@ -140,60 +253,33 @@ export class LikeService {
 
     const dbProjectResult = dbResult.map((data) => data.projectId);
 
-    const resultArray = [...new Set([...redisLikeresult, ...dbProjectResult])];
+    const resultArray = [
+      ...new Set([...transRedisLikeResult, ...dbProjectResult]),
+    ];
 
     const filteredArray = resultArray.filter(
-      (data) => !redisUnlikeresult.includes(data),
+      (data) => !transRedisUnLikeResult.includes(data),
     );
 
     return filteredArray;
   }
 
-  // NOTE: 데이터베이스와 Redis 데이터 동기화 로직 구현
-  @Cron(CronExpression.EVERY_DAY_AT_3AM)
-  async syncLikesToDatabase() {
+  async syncLikesToDB(date: string, userId: string, projectId: string) {
+    const id = uuid();
+
+    const time = convertTimestampToKST(Number(date));
+
+    const result = await this.likeRepository.create({
+      id,
+      createdAt: time,
+      userId,
+      projectId,
+    });
+    await this.likeRepository.save(result);
+  }
+
+  async syncUnlikesToDB(userId: string, projectId: string) {
     const now = new Date();
-
-    console.log('Cron 스케쥴링 시작');
-
-    const likedResult = await this.redisCacheService.getKeysByPattern(
-      'likes:users:',
-    );
-
-    const unlikedResult = await this.redisCacheService.getKeysByPattern(
-      'unlikes:users:',
-    );
-
-    const totalCountList = await this.redisCacheService.getTotalCount(
-      'likes:project:',
-    );
-
-    // NOTE: 좋아요 생성
-    likedResult.forEach(async (value) => {
-      const id = uuid();
-      const result = await this.likeRepository.create({
-        id,
-        userId: value.userId,
-        projectId: value.projectId,
-      });
-      await this.likeRepository.save(result);
-    });
-
-    // NOTE: 좋아요 해지 반영
-    unlikedResult.forEach(async (value) => {
-      await this.likeRepository.update(
-        { userId: value.userId, projectId: value.projectId },
-        { deletedAt: now },
-      );
-    });
-
-    // NOTE: 총 좋아요 수 프로젝트 테이블 동기화
-
-    totalCountList.forEach(async (value) => {
-      await this.projectService.updateLikes(
-        value.projectId,
-        Number(value.totalCount),
-      );
-    });
+    await this.likeRepository.update({ userId, projectId }, { deletedAt: now });
   }
 }
