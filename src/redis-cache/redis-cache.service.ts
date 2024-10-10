@@ -55,6 +55,8 @@ export class RedisCacheService {
 
     const ttl = 60 * 60 * 24 * 2;
 
+    const timestamp = Date.now(); // 현재 시간 (Unix 타임스탬프)
+
     // NOTE: 프로젝트별 좋아요 해지 목록에서 제거
     await this.client.srem(unlikeProjectKey, userId);
 
@@ -62,11 +64,11 @@ export class RedisCacheService {
     await this.client.srem(unlikeUserKey, projectId);
 
     // NOTE: 프로젝트별 좋아요 목록 추가
-    await this.client.sadd(likeProjectKey, userId);
+    await this.client.sadd(likeProjectKey, `${userId}|${timestamp}`);
     await this.client.expire(likeProjectKey, ttl);
 
     // NOTE: 사용자별 좋아요 목록 추가
-    await this.client.sadd(likeUserKey, projectId);
+    await this.client.sadd(likeUserKey, `${projectId}|${timestamp}`);
     await this.client.expire(likeUserKey, ttl);
 
     // NOTE: 프로젝트별 총 좋아요 수 키가 존재하는지 확인
@@ -94,6 +96,8 @@ export class RedisCacheService {
   ) {
     const ttl = 60 * 60 * 24 * 2;
 
+    const timestamp = Date.now(); // 현재 시간 (Unix 타임스탬프)
+
     // NOTE: 프로젝트별 좋아요 목록에서 제거
     await this.client.srem(likeProjectKey, userId);
 
@@ -101,11 +105,11 @@ export class RedisCacheService {
     await this.client.srem(likeUserKey, projectId);
 
     // NOTE: 프로젝트별 좋아요 해지 목록 추가
-    await this.client.sadd(unlikeProjectKey, userId);
+    await this.client.sadd(unlikeProjectKey, `${userId}|${timestamp}`);
     await this.client.expire(unlikeProjectKey, ttl);
 
     // NOTE: 사용자별 좋아요 해지 목록 추가
-    await this.client.sadd(unlikeUserKey, projectId);
+    await this.client.sadd(unlikeUserKey, `${projectId}|${timestamp}`);
     await this.client.expire(unlikeUserKey, ttl);
 
     const count = await this.client.decr(countKey);
@@ -159,9 +163,11 @@ export class RedisCacheService {
     } while (cursor !== '0');
 
     for (const key of keys) {
-      const userId = await this.client.get(key);
+      const userId = await this.client.smembers(key);
       const projectId = key.split(':').pop(); // 마지막 부분 추출 (예: "likes:user:00000"에서 "00000")
-      results.push({ projectId, userId });
+      if (userId.length > 0) {
+        results.push({ projectId, userId: userId[0] });
+      }
     }
 
     return results;
@@ -197,15 +203,40 @@ export class RedisCacheService {
   }
 
   async getValue(key: string): Promise<string | null> {
-    return await this.client.get(key);
+    try {
+      const value = await this.client.get(key);
+      return value;
+    } catch (error) {
+      console.log('ERROR: ', error);
+    }
+  }
+
+  async getSetValue(key: string): Promise<string[] | null> {
+    try {
+      const values = await this.client.smembers(key); // Set의 모든 값 가져오기
+      return values;
+    } catch (error) {
+      console.error('Redis smembers error:', error);
+      return null;
+    }
   }
 
   // NOTE: 특정 키에 특정 값이 포함되는지 확인하는 함수
   async isValueIncluded(key: string, value: string): Promise<boolean> {
-    const storedValue = await this.getValue(key);
+    const storedValue = await this.getSetValue(key);
+
     if (storedValue) {
-      return storedValue.includes(value);
+      const filteredData = storedValue.filter((data) => data.includes(value));
+      return filteredData.length > 0 ? true : false;
     }
     return false;
+  }
+
+  // NOTE: 여러 키를 한 번에 삭제하는 함수(동기화 이후에 사용)
+  async removeKeys(keys: string[]) {
+    if (keys.length > 0) {
+      await this.client.del(...keys);
+      console.log(`Deleted keys: ${keys.join(', ')}`);
+    }
   }
 }
