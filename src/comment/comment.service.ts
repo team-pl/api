@@ -30,17 +30,18 @@ export class CommentService {
 
     const comment = new Comment();
 
-    // NOTE: 댓글을 달려고 하는 프로젝트 존재 여부 확인 및 nickname과 jobType 가져오기
+    // NOTE: 댓글을 달려고 하는 프로젝트 존재 여부 확인 및 댓글 다는 사람의 nickname과 jobType 가져오기
     const { nickname, jobType, profileImageUrl, projectUserId, projectName } =
       await this.projectService.getforCreateComment(projectId, userId);
 
     // NOTE: 알림 추가
-    await this.notificationService.create({
-      userId: projectUserId,
-      message: '프로젝트에 새로운 댓글이 달렸습니다.',
+    await this.notificationService.createForComment(
+      projectUserId,
+      '프로젝트에 새로운 댓글이 달렸습니다.',
       projectId,
       projectName,
-    });
+      'project',
+    );
 
     // NOTE: 대댓글인 경우
     if (parentCommentId) {
@@ -60,12 +61,13 @@ export class CommentService {
       comment.referenceName = referenceName;
 
       // NOTE: 알림 추가
-      await this.notificationService.create({
-        userId: referenceUserId,
-        message: '대댓글이 달렸습니다.',
+      await this.notificationService.createForComment(
+        referenceUserId,
+        '대댓글이 달렸습니다.',
         projectId,
         projectName,
-      });
+        'project',
+      );
     }
 
     comment.id = id;
@@ -128,8 +130,6 @@ export class CommentService {
   }
 
   async delete(deleteUserId: string, commentId: string) {
-    const now = new Date();
-
     // NOTE: 자신이 단 댓글인지 확인
     const data = await this.commentRepository.findOne({
       where: {
@@ -163,7 +163,6 @@ export class CommentService {
   }
 
   async getComments(projectId: string) {
-    // 모든 댓글을 단일 쿼리로 가져옵니다.
     const comments = await this.commentRepository.find({
       where: {
         projectId,
@@ -198,6 +197,6 @@ export class CommentService {
         };
     });
 
-    return result;
+    return { list: result };
   }
 }
