@@ -19,7 +19,7 @@ export class CreateCommentDto {
   @IsOptional()
   @IsString()
   @ApiPropertyOptional({
-    description: '대댓글 남길때>댓글 ID(부모 댓글 ID)',
+    description: '대댓글 남길때 필수>댓글 ID(부모 댓글 ID)',
     nullable: true,
   })
   parentCommentId: string | null;
@@ -27,7 +27,7 @@ export class CreateCommentDto {
   @IsOptional()
   @IsString()
   @ApiPropertyOptional({
-    description: '대댓글 남길때>태그한 사용자 ID',
+    description: '대댓글 남길때 필수>태그한 사용자 ID',
     nullable: true,
   })
   referenceUserId: string | null;
@@ -35,7 +35,7 @@ export class CreateCommentDto {
   @IsOptional()
   @IsString()
   @ApiPropertyOptional({
-    description: '대댓글 남길때>태그한 사용자 이름',
+    description: '대댓글 남길때 필수>태그한 사용자 이름',
     nullable: true,
   })
   referenceName: string | null;
