@@ -538,6 +538,7 @@ export class ProjectService {
     };
   }
 
+  // NOTE: 댓글 생성 관련 함수
   async getforCreateComment(id: string, userId: string) {
     // NOTE: 프로젝트 존재 여부 확인
     const projectData = await this.projectRepository.findOne({
@@ -548,7 +549,10 @@ export class ProjectService {
     });
 
     if (!projectData)
-      throw new HttpException('Project NotFound', HttpStatus.NOT_FOUND);
+      throw new HttpException(
+        '존재하지 않는 프로젝트입니다.',
+        HttpStatus.NOT_FOUND,
+      );
 
     // NOTE: 댓글을 등록한 사용자 데이터 조회
     const userData = await this.userService.getUserById(userId);
@@ -702,7 +706,7 @@ export class ProjectService {
 
     if (!data) {
       throw new HttpException(
-        '이미 삭제된 프로젝트입니다.',
+        '존재하지 않는 프로젝트입니다.',
         HttpStatus.NOT_FOUND,
       );
     }
