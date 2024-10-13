@@ -40,7 +40,7 @@ import { UpdateCommentDto } from './dto/update-comment.dto';
   DeleteCommentResDto,
   GetCommentsResDto,
 )
-@ApiTags('Comment')
+@ApiTags('댓글')
 export class CommentController {
   constructor(private readonly service: CommentService) {}
 
@@ -57,9 +57,7 @@ export class CommentController {
     type: GetCommentsResDto,
   })
   async getComment(@Query('projectId') projectId: string) {
-    const data = await this.service.getComments(projectId);
-
-    return { list: data };
+    return await this.service.getComments(projectId);
   }
 
   @Post()
@@ -80,7 +78,7 @@ export class CommentController {
     const { id } = req.user.name;
 
     if (!id) {
-      throw new HttpException('NotFound', HttpStatus.UNAUTHORIZED);
+      throw new HttpException('user ID NotFound', HttpStatus.UNAUTHORIZED);
     }
 
     return this.service.create(data, id);
