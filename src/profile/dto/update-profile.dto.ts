@@ -2,6 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsArray,
   IsBoolean,
+  IsEnum,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -10,6 +11,8 @@ import {
 import { EEduCategory } from 'src/type/profile.type';
 
 export class EduUpdateDto {
+  @IsOptional()
+  @IsEnum(EEduCategory)
   @ApiProperty({
     description: '학력>분류',
     nullable: true,
@@ -17,31 +20,73 @@ export class EduUpdateDto {
   })
   category: EEduCategory | null;
 
+  @IsOptional()
+  @IsString()
   @ApiProperty({ description: '학력>학교이름', nullable: true })
   schoolName: string | null;
 
+  @IsOptional()
+  @IsString()
   @ApiProperty({ description: '학력>전공', nullable: true })
   major: string | null;
 
-  @ApiProperty({ description: '학력>입학일자', nullable: true })
+  @IsOptional()
+  @IsString()
+  @ApiProperty({
+    description: '학력>입학일자(YYYY/MM)',
+    example: '2024/10',
+    nullable: true,
+  })
   admissionDate: string | null;
 
-  @ApiProperty({ description: '학력>졸업일자', nullable: true })
+  @IsOptional()
+  @IsString()
+  @ApiProperty({
+    description: '학력>졸업일자(YYYY/MM)',
+    example: '2024/10',
+    nullable: true,
+  })
   graduationDate: string | null;
+
+  @IsOptional()
+  @IsBoolean()
+  @ApiProperty({ description: '학력>재학중 여부', nullable: true })
+  isAttending: boolean | null;
 }
 
 export class CareerUpdateDto {
+  @IsOptional()
+  @IsString()
   @ApiProperty({ description: '경력>회사이름', nullable: true })
   companyName: string | null;
 
+  @IsOptional()
+  @IsString()
   @ApiProperty({ description: '경력>역할', nullable: true })
   role: string | null;
 
-  @ApiProperty({ description: '경력>입사일자', nullable: true })
+  @IsOptional()
+  @IsString()
+  @ApiProperty({
+    description: '경력>입사일자(YYYY/MM)',
+    example: '2024/10',
+    nullable: true,
+  })
   joinDate: string | null;
 
-  @ApiProperty({ description: '경력>퇴사일자', nullable: true })
+  @IsOptional()
+  @IsString()
+  @ApiProperty({
+    description: '경력>퇴사일자(YYYY/MM)',
+    example: '2024/10',
+    nullable: true,
+  })
   quitDate: string | null;
+
+  @IsOptional()
+  @IsBoolean()
+  @ApiProperty({ description: '경력>재직중 여부', nullable: true })
+  isWorking: boolean | null;
 }
 
 export class UpdateProfileDto {
@@ -64,7 +109,8 @@ export class UpdateProfileDto {
   @IsNotEmpty()
   @ApiProperty({
     description: '스킬',
-    type: [String],
+    type: () => String,
+    isArray: true,
   })
   skill: string[];
 
@@ -72,16 +118,18 @@ export class UpdateProfileDto {
 
   @IsOptional()
   @ApiPropertyOptional({
-    description: '학력 정보',
-    type: [EduUpdateDto],
+    description: '학력 정보(최대 5개까지 등록가능)',
+    type: () => EduUpdateDto,
+    isArray: true,
     nullable: true,
   })
   edu: EduUpdateDto[] | null;
 
   @IsOptional()
   @ApiPropertyOptional({
-    description: '경력 정보',
-    type: [CareerUpdateDto],
+    description: '경력 정보(최대 10개까지 등록가능)',
+    type: CareerUpdateDto,
+    isArray: true,
     nullable: true,
   })
   career: CareerUpdateDto[] | null;

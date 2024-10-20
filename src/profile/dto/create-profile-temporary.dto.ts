@@ -3,7 +3,6 @@ import {
   IsArray,
   IsBoolean,
   IsEnum,
-  IsNotEmpty,
   IsOptional,
   IsString,
   IsUrl,
@@ -32,13 +31,26 @@ export class EduTempPostDto {
 
   @IsOptional()
   @IsString()
-  @ApiProperty({ description: '학력>입학일자', nullable: true })
+  @ApiProperty({
+    description: '학력>입학일자(YYYY/MM)',
+    example: '2024/10',
+    nullable: true,
+  })
   admissionDate: string | null;
 
   @IsOptional()
   @IsString()
-  @ApiProperty({ description: '학력>졸업일자', nullable: true })
+  @ApiProperty({
+    description: '학력>졸업일자(YYYY/MM)',
+    example: '2024/10',
+    nullable: true,
+  })
   graduationDate: string | null;
+
+  @IsOptional()
+  @IsBoolean()
+  @ApiProperty({ description: '학력>재학중 여부', nullable: true })
+  isAttending: boolean | null;
 }
 
 export class CareerTempPostDto {
@@ -54,20 +66,34 @@ export class CareerTempPostDto {
 
   @IsOptional()
   @IsString()
-  @ApiProperty({ description: '경력>입사일자', nullable: true })
+  @ApiProperty({
+    description: '경력>입사일자(YYYY/MM)',
+    example: '2024/10',
+    nullable: true,
+  })
   joinDate: string | null;
 
   @IsOptional()
   @IsString()
-  @ApiProperty({ description: '경력>퇴사일자', nullable: true })
+  @ApiProperty({
+    description: '경력>퇴사일자(YYYY/MM)',
+    example: '2024/10',
+    nullable: true,
+  })
   quitDate: string | null;
+
+  @IsOptional()
+  @IsBoolean()
+  @ApiProperty({ description: '경력>재직중 여부', nullable: true })
+  isWorking: boolean | null;
 }
 
 export class CreateProfileTempDto {
   @IsOptional()
   @IsString()
   @ApiPropertyOptional({
-    description: '임시저장된 프로핑 ID',
+    description:
+      '이전에 임시저장된 프로필 ID(처음 임시 저장할 때는 없어도 되지만, 임시저장을 여러 번 하는 경우 필요)',
   })
   id: string | null;
 
@@ -90,7 +116,8 @@ export class CreateProfileTempDto {
   @IsArray()
   @ApiPropertyOptional({
     description: '스킬',
-    type: [String],
+    type: () => String,
+    isArray: true,
   })
   skill: string[] | null;
 
@@ -98,7 +125,7 @@ export class CreateProfileTempDto {
 
   @IsOptional()
   @ApiPropertyOptional({
-    description: '학력 정보',
+    description: '학력 정보(최대 5개까지 등록가능)',
     type: [EduTempPostDto],
     nullable: true,
   })
@@ -106,7 +133,7 @@ export class CreateProfileTempDto {
 
   @IsOptional()
   @ApiPropertyOptional({
-    description: '경력 정보',
+    description: '경력 정보(최대 10개까지 등록가능)',
     type: [CareerTempPostDto],
     nullable: true,
   })

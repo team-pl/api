@@ -32,13 +32,26 @@ export class EduPostDto {
 
   @IsOptional()
   @IsString()
-  @ApiProperty({ description: '학력>입학일자', nullable: true })
+  @ApiProperty({
+    description: '학력>입학일자(YYYY/MM)',
+    example: '2024/10',
+    nullable: true,
+  })
   admissionDate: string | null;
 
   @IsOptional()
   @IsString()
-  @ApiProperty({ description: '학력>졸업일자', nullable: true })
+  @ApiProperty({
+    description: '학력>졸업일자(YYYY/MM)',
+    example: '2024/10',
+    nullable: true,
+  })
   graduationDate: string | null;
+
+  @IsOptional()
+  @IsBoolean()
+  @ApiProperty({ description: '학력>재학중 여부', nullable: true })
+  isAttending: boolean | null;
 }
 
 export class CareerPostDto {
@@ -54,13 +67,26 @@ export class CareerPostDto {
 
   @IsOptional()
   @IsString()
-  @ApiProperty({ description: '경력>입사일자', nullable: true })
+  @ApiProperty({
+    description: '경력>입사일자(YYYY/MM)',
+    example: '2024/10',
+    nullable: true,
+  })
   joinDate: string | null;
 
   @IsOptional()
   @IsString()
-  @ApiProperty({ description: '경력>퇴사일자', nullable: true })
+  @ApiProperty({
+    description: '경력>퇴사일자(YYYY/MM)',
+    example: '2024/10',
+    nullable: true,
+  })
   quitDate: string | null;
+
+  @IsOptional()
+  @IsBoolean()
+  @ApiProperty({ description: '경력>재직중 여부', nullable: true })
+  isWorking: boolean | null;
 }
 
 export class CreateProfileDto {
@@ -83,7 +109,8 @@ export class CreateProfileDto {
   @IsNotEmpty()
   @ApiProperty({
     description: '스킬',
-    type: [String],
+    type: () => String,
+    isArray: true,
   })
   skill: string[];
 
@@ -91,16 +118,18 @@ export class CreateProfileDto {
 
   @IsOptional()
   @ApiPropertyOptional({
-    description: '학력 정보',
-    type: [EduPostDto],
+    description: '학력 정보(최대 5개까지 등록가능)',
+    type: () => EduPostDto,
+    isArray: true,
     nullable: true,
   })
   edu: EduPostDto[] | null;
 
   @IsOptional()
   @ApiPropertyOptional({
-    description: '경력 정보',
-    type: [CareerPostDto],
+    description: '경력 정보(최대 10개까지 등록가능)',
+    type: CareerPostDto,
+    isArray: true,
     nullable: true,
   })
   career: CareerPostDto[] | null;
