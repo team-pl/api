@@ -53,6 +53,17 @@ export class CommentService {
 
       comment.parentComment = parentComment;
       comment.parentCommentId = parentCommentId;
+
+      // NOTE: 대댓글을 다는 경우 원댓글 작성자에게도 알림이 가도록 설정 & 그러나 참조 댓글이 원댓글인 경우는 제외
+      if (referenceUserId !== parentComment.userId) {
+        await this.notificationService.createForComment(
+          parentComment.userId,
+          '대댓글이 달렸습니다.',
+          projectId,
+          projectName,
+          'project',
+        );
+      }
     }
 
     // NOTE: 태그 댓글인 경우
