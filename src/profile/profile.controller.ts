@@ -70,7 +70,7 @@ export class ProfileController {
   })
   @ApiResponse({
     status: 403,
-    description: 'Number of profile registrations exceeded',
+    description: '등록 가능한 프로필 개수를 초과했습니다.',
   })
   @ApiResponse({
     status: 200,
@@ -113,7 +113,7 @@ export class ProfileController {
   })
   @ApiResponse({
     status: 403,
-    description: 'Number of profile registrations exceeded',
+    description: '등록 가능한 프로필 개수를 초과했습니다.',
   })
   @ApiResponse({
     status: 200,
