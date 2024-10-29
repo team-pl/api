@@ -446,6 +446,13 @@ export class Profile {
   @Column({ comment: '임시저장 여부', default: false })
   isTemporaryStorage: boolean;
 
+  @ApiProperty({
+    description: '삭제 여부',
+    default: false,
+  })
+  @Column({ comment: '삭제 여부', default: false })
+  isDeleted: boolean;
+
   // --------------------------
 
   @ApiProperty({ description: '프로필을 등록한 사용자 정보' })
