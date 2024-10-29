@@ -479,31 +479,35 @@ export class ProjectService {
   async getOneProject(id: string, userId?: string) {
     let isLike = false;
 
-    const projectData = await this.projectRepository.find({
+    const projectData = await this.projectRepository.findOne({
       where: { id, deletedAt: IsNull() },
       relations: ['user'],
     });
 
-    if (!projectData.length) {
+    if (!projectData) {
       throw new HttpException(
         '존재하지 않는 프로젝트입니다.',
         HttpStatus.NOT_FOUND,
       );
     }
 
+    const profileData = await this.profileService.getProjectOwnerProfile(
+      projectData.profileId,
+    );
+
     await this.projectRepository.update(id, {
-      numberOfViews: projectData[0].numberOfViews + 1,
+      numberOfViews: projectData.numberOfViews + 1,
     });
 
     const categoryArray = [];
 
     for (let i = 1; i <= 10; i++) {
-      if (!projectData[0][`category${i}_1`]) break;
+      if (!projectData[`category${i}_1`]) break;
 
       categoryArray.push({
-        category: projectData[0][`category${i}_1`],
-        subCategory: projectData[0][`category${i}_2`],
-        count: projectData[0][`category${i}Number`],
+        category: projectData[`category${i}_1`],
+        subCategory: projectData[`category${i}_2`],
+        count: projectData[`category${i}Number`],
       });
     }
 
@@ -512,29 +516,30 @@ export class ProjectService {
     }
 
     return {
-      id: projectData[0].id,
-      createdAt: projectData[0].createdAt,
-      name: projectData[0].name,
-      state: projectData[0].state,
-      recruitExpiredAt: projectData[0].recruitExpiredAt,
-      recruitTotalNumber: projectData[0].recruitTotalNumber,
-      confirmedNumber: projectData[0].confirmedNumber,
-      recruitDevTotalNumber: projectData[0].recruitDevTotalNumber,
-      recruitDesignTotalNumber: projectData[0].recruitDesignTotalNumber,
-      recruitEtcTotalNumber: projectData[0].recruitEtcTotalNumber,
-      recruitCategory: projectData[0].recruitCategory.split('/'),
-      recruitSubCategory: projectData[0].recruitSubCategory.split('/'),
-      userName: projectData[0].userName,
-      jobType: projectData[0].user.jobType,
-      numberOfViews: projectData[0].numberOfViews,
-      numberOfLikes: projectData[0].numberOfLikes,
-      content: projectData[0].content.toString(),
-      url: projectData[0].url,
-      file: projectData[0].file,
-      userId: projectData[0].userId,
-      profileImageUrl: projectData[0].user.profileImageUrl,
+      id: projectData.id,
+      createdAt: projectData.createdAt,
+      name: projectData.name,
+      state: projectData.state,
+      recruitExpiredAt: projectData.recruitExpiredAt,
+      recruitTotalNumber: projectData.recruitTotalNumber,
+      confirmedNumber: projectData.confirmedNumber,
+      recruitDevTotalNumber: projectData.recruitDevTotalNumber,
+      recruitDesignTotalNumber: projectData.recruitDesignTotalNumber,
+      recruitEtcTotalNumber: projectData.recruitEtcTotalNumber,
+      recruitCategory: projectData.recruitCategory.split('/'),
+      recruitSubCategory: projectData.recruitSubCategory.split('/'),
+      userName: projectData.userName,
+      jobType: projectData.user.jobType,
+      numberOfViews: projectData.numberOfViews,
+      numberOfLikes: projectData.numberOfLikes,
+      content: projectData.content.toString(),
+      url: projectData.url,
+      file: projectData.file,
+      userId: projectData.userId,
+      profileImageUrl: projectData.user.profileImageUrl,
       categoryInfo: categoryArray,
       isLike,
+      profile: profileData,
     };
   }
 

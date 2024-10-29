@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { CreateProfileDto } from 'src/profile/dto/create-profile.dto';
+import { GetProfileForProjectResDto } from 'src/profile/dto/response.dto';
 import { ECategory1, ECategory2, EProjectState } from 'src/type/project.type';
-import { GetUserResDto } from 'src/user/dto/response.dto';
 
 export class CategoryResDto {
   @ApiProperty({
@@ -352,6 +351,9 @@ export class GetOneProjectResDto {
 
   @ApiProperty({ description: '사용자의 해당 프로젝트에 대한 좋아요(찜) 여부' })
   isLike: boolean;
+
+  @ApiProperty({ description: '프로젝트 등록자의 프로필 정보' })
+  profile: GetProfileForProjectResDto;
 }
 
 export class GetProjectListResDto {
