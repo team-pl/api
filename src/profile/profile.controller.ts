@@ -306,16 +306,16 @@ export class ProfileController {
     status: 200,
     type: GetOneProfileResDto,
   })
-  getOneProject(@Param('id') id: string, @Request() req) {
-    const { userId } = req.user.name;
+  getOneProject(@Param('id') projectId: string, @Request() req) {
+    const { id } = req.user.name;
 
-    if (!userId) {
+    if (!id) {
       throw new HttpException(
         '존재하지 않는 사용자입니다.',
         HttpStatus.UNAUTHORIZED,
       );
     }
 
-    return this.service.getOneProfile(id);
+    return this.service.getOneProfile(projectId);
   }
 }
