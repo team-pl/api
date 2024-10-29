@@ -344,7 +344,7 @@ export class GetApplyProfileResDto {
   portfolioFile: string | null;
 }
 
-export class GetMyProfileResDto {
+export class GetProfileResDto {
   @ApiProperty({ description: '프로필 고유 Id' })
   id: string;
 
@@ -356,16 +356,113 @@ export class GetMyProfileResDto {
 
   @ApiProperty({ description: '대표 프로필 여부' })
   isRepresentative: boolean;
+
+  @ApiProperty({
+    description: '임시저장 여부',
+  })
+  isTemporaryStorage: boolean;
 }
 
-export class GetMyProfileListResDto {
+export class GetProfileListResDto {
   @ApiProperty({
-    description: '자신의 프로필 목록 조회',
-    type: GetMyProfileResDto,
+    description: '프로필 데이터 형식',
+    type: GetProfileResDto,
     isArray: true,
   })
-  list: GetMyProfileResDto[];
+  list: GetProfileResDto[];
+}
 
-  @ApiProperty({ description: '자신의 프로필 개수' })
-  count: number;
+export class GetOneProfileResDto {
+  @ApiProperty({ description: '프로필 고유 Id' })
+  id: string;
+
+  @ApiProperty({ description: '프로필 등록일' })
+  createdAt: Date;
+
+  @ApiProperty({ description: '프로필 제목' })
+  name: string;
+
+  @ApiProperty({ description: '대표 프로필 여부' })
+  isRepresentative: boolean;
+
+  @ApiProperty({
+    description: '학력 정보',
+    isArray: true,
+  })
+  edu: EduResDto;
+
+  @ApiProperty({
+    description: '경력 정보',
+    isArray: true,
+  })
+  carrer: CareerResDto;
+
+  @ApiProperty({
+    description: '스킬',
+    type: [String],
+  })
+  skill: string[];
+
+  @ApiProperty({
+    description: '포트폴리오 url',
+    nullable: true,
+    default: null,
+  })
+  portfolioUrl: string | null;
+
+  @ApiProperty({
+    description: '포트폴리오 파일',
+    nullable: true,
+    default: null,
+  })
+  portfolioFile: string | null;
+
+  @ApiProperty({
+    description: '임시저장 여부',
+  })
+  isTemporaryStorage: boolean;
+}
+
+export class GetProfileExistsResDto {
+  @ApiProperty({
+    description: '프로필 등록 여부 결과',
+  })
+  result: boolean;
+}
+
+export class GetProfileForProjectResDto {
+  @ApiProperty({ description: '프로필 제목' })
+  name: string;
+
+  @ApiProperty({
+    description: '학력 정보',
+    isArray: true,
+  })
+  edu: EduResDto;
+
+  @ApiProperty({
+    description: '경력 정보',
+    isArray: true,
+  })
+  carrer: CareerResDto;
+
+  @ApiProperty({
+    description: '스킬',
+    type: [String],
+  })
+  skill: string[];
+
+  @ApiProperty({
+    description: '포트폴리오 url',
+    nullable: true,
+    default: null,
+  })
+  portfolioUrl: string | null;
+
+  @ApiProperty({
+    description: '포트폴리오 파일',
+    nullable: true,
+    default: null,
+  })
+  portfolioFile: string | null;
 }

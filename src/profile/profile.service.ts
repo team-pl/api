@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Profile } from 'src/entity/profile.entity';
-import { IsNull, Repository } from 'typeorm';
+import { IsNull, Not, Repository } from 'typeorm';
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { v4 as uuid } from 'uuid';
 import { UserService } from 'src/user/user.service';
@@ -89,7 +89,7 @@ export class ProfileService {
       id,
       userId,
       portfolioFile: fileUrl,
-      skill: skill.join('/'),
+      skill: skill.join('&&'),
       ...eduData,
       ...careerData,
       ...rest,
@@ -176,7 +176,7 @@ export class ProfileService {
       id: newProfileId,
       userId,
       portfolioFile: fileUrl,
-      skill: skill && skill.length ? skill.join('/') : '',
+      skill: skill && skill.length ? skill.join('&&') : '',
       ...eduData,
       ...careerData,
       ...rest,
@@ -225,8 +225,7 @@ export class ProfileService {
   }
 
   async deleteProfile(id: string) {
-    const now = new Date();
-    await this.profileRepository.update(id, { deletedAt: now });
+    await this.profileRepository.update(id, { isDeleted: true });
     return {
       result: true,
     };
@@ -315,14 +314,14 @@ export class ProfileService {
     if (fileUrl) {
       await this.profileRepository.update(profileId, {
         portfolioFile: fileUrl,
-        skill: skill && skill.length ? skill.join('/') : '',
+        skill: skill && skill.length ? skill.join('&&') : '',
         ...eduData,
         ...careerData,
         ...rest,
       });
     } else {
       await this.profileRepository.update(profileId, {
-        skill: skill && skill.length ? skill.join('/') : '',
+        skill: skill && skill.length ? skill.join('&&') : '',
         ...eduData,
         ...careerData,
         ...rest,
@@ -346,75 +345,148 @@ export class ProfileService {
     };
   }
 
+  // NOTE: 마이페이지에서 임시저장한 프로필까지 조회하는 API 로직
   async getAllProfile(userId: string) {
     // NOTE: 대표 프로필 먼저 SELECT
-    const representativeProfile = await this.profileRepository.findOneBy({
-      userId,
-      deletedAt: IsNull(),
-      isRepresentative: true,
+    const representativeProfile = await this.profileRepository.findOne({
+      where: {
+        userId,
+        deletedAt: IsNull(),
+        isDeleted: false,
+        isRepresentative: true,
+        isTemporaryStorage: false,
+      },
+      select: [
+        'id',
+        'createdAt',
+        'name',
+        'isRepresentative',
+        'isTemporaryStorage',
+      ],
     });
 
-    // NOTE: 기본 프로필을 최신순으로 SELECT
+    // NOTE: 프로필을 최신순으로 SELECT
     const profileArray = await this.profileRepository.find({
       where: {
         userId,
         deletedAt: IsNull(),
-        isRepresentative: false,
+        isDeleted: false,
+        id: representativeProfile && Not(representativeProfile.id),
       },
+      select: [
+        'id',
+        'createdAt',
+        'name',
+        'isRepresentative',
+        'isTemporaryStorage',
+      ],
       order: { createdAt: 'DESC' },
     });
 
     // NOTE: 프로필 데이터 합치기
     const totalProfile = [representativeProfile, ...profileArray];
 
-    // NOTE: 웹사이트에 보내기 위해서 데이터 가공
-    const result = totalProfile.map((data) => {
-      const eduArray = [];
-      const careerArray = [];
+    return {
+      result: totalProfile,
+    };
+  }
 
-      for (let i = 1; i <= 5; i++) {
-        if (!data[`eduCategory${i}`]) break;
-
-        eduArray.push({
-          category: data[`eduCategory${i}`],
-          schoolName: data[`eduSchoolName${i}`],
-          major: data[`eduMajor${i}`],
-          admissionDate: data[`eduAdmissionDate${i}`],
-          graduationDate: data[`eduGraduationDate${i}`],
-          isAttending: data[`eduIsAttending${i}`],
-        });
-      }
-
-      for (let i = 1; i <= 10; i++) {
-        if (!data[`careerCompanyName${i}`]) break;
-
-        careerArray.push({
-          companyName: data[`careerCompanyName${i}`],
-          role: data[`careerRole${i}`],
-          joinDate: data[`careerJoinDate${i}`],
-          quitDate: data[`careerQuitDate${i}`],
-          isWorking: data[`careerIsWorking${i}`],
-        });
-      }
-      return {
-        id: data.id,
-        createdAt: data.createdAt,
-        name: data.name,
-        isRepresentative: data.isRepresentative,
-        edu: eduArray,
-        career: careerArray,
-        skill: data.skill.split('&&'),
-        portfolioUrl: data.portfolioUrl,
-        portfolioFile: data.portfolioFile,
-        isTemporaryStorage: data.isTemporaryStorage,
-      };
+  // NOTE: 프로젝트 등록/수정페이지에서 임시저장 프로필 제외하고 조회하는 API 로직
+  async getAllProfileForProject(userId: string) {
+    // NOTE: 대표 프로필 먼저 SELECT
+    const representativeProfile = await this.profileRepository.findOne({
+      where: {
+        userId,
+        deletedAt: IsNull(),
+        isDeleted: false,
+        isRepresentative: true,
+        isTemporaryStorage: false,
+      },
+      select: [
+        'id',
+        'createdAt',
+        'name',
+        'isRepresentative',
+        'isTemporaryStorage',
+      ],
     });
 
-    const user = await this.userService.getMyInfo(userId);
+    // NOTE: 프로필을 최신순으로 SELECT
+    const profileArray = await this.profileRepository.find({
+      where: {
+        userId,
+        deletedAt: IsNull(),
+        isDeleted: false,
+        id: representativeProfile && Not(representativeProfile.id),
+        isTemporaryStorage: false,
+      },
+      select: [
+        'id',
+        'createdAt',
+        'name',
+        'isRepresentative',
+        'isTemporaryStorage',
+      ],
+      order: { createdAt: 'DESC' },
+    });
+
+    // NOTE: 프로필 데이터 합치기
+    const totalProfile = [representativeProfile, ...profileArray];
 
     return {
-      user,
-      profile: result,
+      result: totalProfile,
+    };
+  }
+
+  async getOneProfile(id: string) {
+    const data = await this.profileRepository.findOneBy({ id });
+
+    if (!data) {
+      throw new HttpException(
+        '존재하지 않는 프로필입니다.',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const eduArray = [];
+    const careerArray = [];
+
+    for (let i = 1; i <= 5; i++) {
+      if (!data[`eduCategory${i}`]) break;
+
+      eduArray.push({
+        category: data[`eduCategory${i}`],
+        schoolName: data[`eduSchoolName${i}`],
+        major: data[`eduMajor${i}`],
+        admissionDate: data[`eduAdmissionDate${i}`],
+        graduationDate: data[`eduGraduationDate${i}`],
+        isAttending: data[`eduIsAttending${i}`],
+      });
+    }
+
+    for (let i = 1; i <= 10; i++) {
+      if (!data[`careerCompanyName${i}`]) break;
+
+      careerArray.push({
+        companyName: data[`careerCompanyName${i}`],
+        role: data[`careerRole${i}`],
+        joinDate: data[`careerJoinDate${i}`],
+        quitDate: data[`careerQuitDate${i}`],
+        isWorking: data[`careerIsWorking${i}`],
+      });
+    }
+
+    return {
+      id: data.id,
+      createdAt: data.createdAt,
+      name: data.name,
+      isRepresentative: data.isRepresentative,
+      edu: eduArray,
+      career: careerArray,
+      skill: data.skill.split('&&'),
+      portfolioUrl: data.portfolioUrl,
+      portfolioFile: data.portfolioFile,
+      isTemporaryStorage: data.isTemporaryStorage,
     };
   }
 
@@ -430,19 +502,58 @@ export class ProfileService {
     return profileData;
   }
 
-  async getMyProfileList(userId: string) {
-    const list = await this.profileRepository.findAndCount({
-      where: {
-        deletedAt: IsNull(),
-        userId,
-      },
-      select: ['id', 'createdAt', 'name', 'isRepresentative'],
-      order: { createdAt: 'DESC' },
+  // NOTE: 프로젝트 등록자의 프로필 조회를 위함
+  async getProjectOwnerProfile(profileId: string) {
+    const data = await this.profileRepository.findOneBy({ id: profileId });
+
+    const eduArray = [];
+    const careerArray = [];
+
+    for (let i = 1; i <= 5; i++) {
+      if (!data[`eduCategory${i}`]) break;
+
+      eduArray.push({
+        category: data[`eduCategory${i}`],
+        schoolName: data[`eduSchoolName${i}`],
+        major: data[`eduMajor${i}`],
+        admissionDate: data[`eduAdmissionDate${i}`],
+        graduationDate: data[`eduGraduationDate${i}`],
+        isAttending: data[`eduIsAttending${i}`],
+      });
+    }
+
+    for (let i = 1; i <= 10; i++) {
+      if (!data[`careerCompanyName${i}`]) break;
+
+      careerArray.push({
+        companyName: data[`careerCompanyName${i}`],
+        role: data[`careerRole${i}`],
+        joinDate: data[`careerJoinDate${i}`],
+        quitDate: data[`careerQuitDate${i}`],
+        isWorking: data[`careerIsWorking${i}`],
+      });
+    }
+
+    return {
+      name: data.name,
+      edu: eduArray,
+      career: careerArray,
+      skill: data.skill.split('&&'),
+      portfolioUrl: data.portfolioUrl,
+      portfolioFile: data.portfolioFile,
+    };
+  }
+
+  async isProfileExists(userId: string) {
+    const profileData = await this.profileRepository.findBy({
+      userId,
+      deletedAt: IsNull(),
+      isDeleted: false,
+      isTemporaryStorage: false,
     });
 
     return {
-      list: list[0],
-      count: list[1],
+      result: profileData.length > 0,
     };
   }
 }
