@@ -57,6 +57,10 @@ export class ApplyController {
     description: 'user ID NotFound',
   })
   @ApiResponse({
+    status: 404,
+    description: '존재하지 않는 프로젝트입니다.',
+  })
+  @ApiResponse({
     status: 409,
     description: '프로젝트 모집이 마감되어 지원이 불가능합니다.',
   })
@@ -75,7 +79,7 @@ export class ApplyController {
     const { id } = req.user.name;
 
     if (!id) {
-      throw new HttpException('NotFound', HttpStatus.UNAUTHORIZED);
+      throw new HttpException('user ID NotFound', HttpStatus.UNAUTHORIZED);
     }
 
     return this.service.create(data, id);
@@ -169,36 +173,6 @@ export class ApplyController {
     }
 
     return this.service.cancel(applyId);
-  }
-
-  @Patch('reject/:id')
-  @ApiOperation({ summary: '프로젝트 거절 API' })
-  @UseGuards(JwtAuthGuard)
-  @ApiParam({
-    name: 'id',
-    required: true,
-    description: '프로젝트 지원 ID',
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'user ID NotFound',
-  })
-  @ApiResponse({
-    status: 422,
-    description: '해당 인원은 프로젝트에 이미 거절되었습니다.',
-  })
-  @ApiResponse({
-    status: 200,
-    type: RejectApplyResDto,
-  })
-  async reject(@Request() req, @Param('id') applyId: string) {
-    const { id } = req.user.name;
-
-    if (!id) {
-      throw new HttpException('NotFound', HttpStatus.UNAUTHORIZED);
-    }
-
-    return this.service.reject(applyId);
   }
 
   @Get()
