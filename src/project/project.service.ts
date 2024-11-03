@@ -617,11 +617,12 @@ export class ProjectService {
 
   // NOTE: 프로젝트 확인 로직
   async checkApply(projectId) {
-    // NOTE: 프로젝트 이름 조회하기
+    // NOTE: 프로젝트 조회하기
     const result = await this.projectRepository.findOneBy({ id: projectId });
 
     return {
       name: result.name,
+      projectUserId: result.userId,
     };
   }
 

@@ -93,8 +93,8 @@ export class ApplyService {
     };
   }
 
-  // NOTE: 확인 API 로직
-  async check(applyId: string) {
+  // NOTE: 지원확인 API 로직
+  async check(applyId: string, userId: string) {
     const applyData = await this.applyRepository.findOneBy({ id: applyId });
 
     // NOTE: 프로젝트 지원한 내역이 없을때
@@ -105,20 +105,33 @@ export class ApplyService {
       );
     }
 
+    // NOTE: 프로젝트 조회
+    const { name, projectUserId } = await this.projectService.checkApply(
+      applyData.projectId,
+    );
+
+    // NOTE: 프로젝트 지원 상태 변경을 요청한 사용자와 프로젝트 등록한 사용자가 다른 경우
+    if (projectUserId !== userId) {
+      throw new HttpException(
+        '프로젝트 등록한 사람만 지원상태를 변경할 수 있습니다.',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
     // NOTE: 지원 상태 업데이트
     await this.applyRepository.update(
       { id: applyId },
       { state: EApplyState.CHECKED },
     );
 
-    const { name } = await this.projectService.checkApply(applyData.projectId);
-
-    // NOTE: 프로젝트 지원한 사람에게 알림 보내기
-    await this.notificationService.create({
+    // NOTE: 지원한 사람에게 알림 보내기
+    await this.notificationService.createForApply({
       userId: applyData.userId,
+      message: '프로젝트의 지원서가 열람되었습니다.',
       projectId: applyData.projectId,
-      message: `프로젝트 지원결과가 업데이트 되었습니다.`,
       projectName: name,
+      targetPage: 'dashboard',
+      dashboardState: EDashboardState.APPLY,
     });
 
     return { result: true };

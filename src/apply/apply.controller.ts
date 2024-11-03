@@ -86,7 +86,7 @@ export class ApplyController {
   }
 
   @Patch('check/:id')
-  @ApiOperation({ summary: '프로젝트 확인완료 API' })
+  @ApiOperation({ summary: '프로젝트 지원상태 변경>확인완료 API' })
   @UseGuards(JwtAuthGuard)
   @ApiParam({
     name: 'id',
@@ -96,6 +96,10 @@ export class ApplyController {
   @ApiResponse({
     status: 401,
     description: 'user ID NotFound',
+  })
+  @ApiResponse({
+    status: 403,
+    description: '프로젝트 등록한 사람만 지원상태를 변경할 수 있습니다.',
   })
   @ApiResponse({
     status: 404,
@@ -109,10 +113,10 @@ export class ApplyController {
     const { id } = req.user.name;
 
     if (!id) {
-      throw new HttpException('NotFound', HttpStatus.UNAUTHORIZED);
+      throw new HttpException('user ID NotFound', HttpStatus.UNAUTHORIZED);
     }
 
-    return this.service.check(applyId);
+    return this.service.check(applyId, id);
   }
 
   @Patch('confirm/:id')
