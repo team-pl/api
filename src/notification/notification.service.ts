@@ -4,7 +4,7 @@ import { Notification } from 'src/entity/notification.entity';
 import { IsNull, Repository } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 import { CreateNotificationDto } from './dto/create-notification.dto';
-import { ENotificationType } from 'src/type/notification.type';
+import { EDashboardState, ENotificationType } from 'src/type/notification.type';
 
 @Injectable()
 export class NotificationsService {
@@ -50,6 +50,41 @@ export class NotificationsService {
       projectName,
       targetPage,
       type: ENotificationType.COMMENT,
+      isRead: false,
+    });
+
+    await this.notificationRepository.save(notiData);
+
+    return true;
+  }
+
+  // NOTE: 프로젝트 지원시 사용할 알림 등록 함수
+  async createForApply({
+    userId,
+    message,
+    projectId,
+    projectName,
+    targetPage,
+    dashboardState,
+  }: {
+    userId: string;
+    message: string;
+    projectId: string;
+    projectName: string;
+    targetPage: string;
+    dashboardState: EDashboardState;
+  }) {
+    const id = uuid();
+
+    const notiData = await this.notificationRepository.create({
+      id,
+      userId,
+      message,
+      projectId,
+      projectName,
+      targetPage,
+      dashboardState,
+      type: ENotificationType.APPLY,
       isRead: false,
     });
 
