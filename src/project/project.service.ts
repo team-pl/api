@@ -478,6 +478,7 @@ export class ProjectService {
 
   async getOneProject(id: string, userId?: string) {
     let isLike = false;
+    let isApplied = false;
 
     const projectData = await this.projectRepository.findOne({
       where: { id, deletedAt: IsNull() },
@@ -513,6 +514,10 @@ export class ProjectService {
 
     if (userId) {
       isLike = await this.likeService.getProjectUserLike(id, userId);
+      isApplied = await this.applyService.getIsApplied({
+        userId,
+        projectId: id,
+      });
     }
 
     return {
@@ -540,6 +545,7 @@ export class ProjectService {
       categoryInfo: categoryArray,
       isLike,
       profile: profileData,
+      isApplied,
     };
   }
 
@@ -575,6 +581,13 @@ export class ProjectService {
   async applyProject(projectId, userId) {
     // NOTE: 조회하기
     const result = await this.projectRepository.findOneBy({ id: projectId });
+
+    if (!result) {
+      throw new HttpException(
+        '존재하지 않는 프로젝트입니다.',
+        HttpStatus.NOT_FOUND,
+      );
+    }
 
     if (result.state !== EProjectState.RECRUITING) {
       throw new HttpException(
