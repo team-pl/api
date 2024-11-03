@@ -106,6 +106,10 @@ export class ApplyController {
     description: '프로젝트에 지원한 내역이 없습니다.',
   })
   @ApiResponse({
+    status: 409,
+    description: '이미 확인완료로 변경된 지원서입니다.',
+  })
+  @ApiResponse({
     status: 200,
     type: CheckApplyResDto,
   })

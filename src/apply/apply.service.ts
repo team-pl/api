@@ -105,6 +105,13 @@ export class ApplyService {
       );
     }
 
+    if (applyData.state === EApplyState.CHECKED) {
+      throw new HttpException(
+        '이미 확인완료로 변경된 지원서입니다.',
+        HttpStatus.CONFLICT,
+      );
+    }
+
     // NOTE: 프로젝트 조회
     const { name, projectUserId } = await this.projectService.checkApply(
       applyData.projectId,
