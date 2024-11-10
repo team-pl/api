@@ -675,22 +675,51 @@ export class ProjectService {
   }
 
   // NOTE: 프로젝트 확정취소 로직
-  async cancelApply(projectId: string, state: EApplyState) {
+  async cancelApply({
+    projectId,
+    projectUserId,
+    applyUserId,
+  }: {
+    projectId: string;
+    projectUserId: string;
+    applyUserId: string;
+  }) {
     // NOTE: 프로젝트 이름 조회하기
     const result = await this.projectRepository.findOneBy({ id: projectId });
 
-    // NOTE: 지원 확정 -> 지원 취소 변경이므로 확정인원 -1 해주기 + 해당 인원 포함해서 지원 완료된 프로젝트라면
-
-    if (state === EApplyState.CONFIRMED) {
-      await this.projectRepository.update(
-        { id: projectId },
-        { confirmedNumber: result.confirmedNumber - 1 },
+    if (result.userId !== projectUserId) {
+      throw new HttpException(
+        '프로젝트 등록한 사람만 지원상태를 변경할 수 있습니다.',
+        HttpStatus.FORBIDDEN,
       );
     }
 
-    return {
-      name: result.name,
-    };
+    // NOTE: 참여 확정자 수 = 모집인원인 경우(인원이 꽉 찬 경우), 프로젝트 상태 변경하기
+    if (result.confirmedNumber === result.recruitTotalNumber) {
+      const now = new Date();
+      // NOTE: 모집 종료까지 기한이 남음
+      if (result.recruitExpiredAt.getTime() >= now.getTime()) {
+        await this.projectRepository.update(
+          { id: projectId },
+          {
+            confirmedNumber: result.confirmedNumber - 1,
+            state: EProjectState.RECRUITING,
+          },
+        );
+      } else {
+        // NOTE: 모집 종료까지 기한이 지남
+        await this.projectRepository.update(
+          { id: projectId },
+          {
+            confirmedNumber: result.confirmedNumber - 1,
+            state: EProjectState.END,
+          },
+        );
+      }
+    }
+
+    // NOTE: 사용자의 참여확정 횟수 업데이트하기
+    await this.userService.canceledApply(applyUserId);
   }
 
   // NOTE: 프로젝트 거절 로직

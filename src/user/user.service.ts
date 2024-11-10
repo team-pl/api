@@ -262,4 +262,13 @@ export class UserService {
     });
     return true;
   }
+
+  // NOTE: 지원>확정 취소될 때
+  async canceledApply(userId: string) {
+    const data = await this.userRepository.findOneBy({ id: userId });
+    await this.userRepository.update(userId, {
+      numberOfConfirmed: data.numberOfConfirmed - 1,
+    });
+    return true;
+  }
 }

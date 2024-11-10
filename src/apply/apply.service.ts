@@ -191,7 +191,7 @@ export class ApplyService {
   }
 
   // NOTE: 확정취소 API 로직
-  async cancel(applyId: string) {
+  async cancel(applyId: string, userId: string) {
     const applyData = await this.applyRepository.findOneBy({ id: applyId });
 
     // NOTE: 프로젝트 지원한 내역이 없을때
@@ -205,29 +205,29 @@ export class ApplyService {
     // NOTE: 이미 프로젝트 확정취소 상태인 경우
     if (applyData.state === EApplyState.CONFIRMED_CANCELED) {
       throw new HttpException(
-        '해당 인원은 프로젝트에 이미 확정취소되었습니다.',
-        HttpStatus.UNPROCESSABLE_ENTITY,
+        '이미 확정취소로 변경된 지원서입니다.',
+        HttpStatus.CONFLICT,
       );
     }
 
-    const { name } = await this.projectService.cancelApply(
-      applyData.projectId,
-      applyData.state,
-    );
+    if (applyData.state !== EApplyState.CONFIRMED) {
+      throw new HttpException(
+        '해당 지원자는 참여확정이 아니므로 취소를 할 수 없습니다.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    await this.projectService.cancelApply({
+      projectId: applyData.projectId,
+      applyUserId: applyData.userId,
+      projectUserId: userId,
+    });
 
     // NOTE: 지원 상태 업데이트
     await this.applyRepository.update(
       { id: applyId },
       { state: EApplyState.CONFIRMED_CANCELED },
     );
-
-    // NOTE: 프로젝트 지원한 사람에게 알림 보내기
-    await this.notificationService.create({
-      userId: applyData.userId,
-      projectId: applyData.projectId,
-      message: `프로젝트 지원결과가 업데이트 되었습니다.`,
-      projectName: name,
-    });
 
     return { result: true };
   }
