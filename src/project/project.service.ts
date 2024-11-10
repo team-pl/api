@@ -627,9 +627,25 @@ export class ProjectService {
   }
 
   // NOTE: 프로젝트 참여확정 로직
-  async confirmedProject(projectId, userId) {
+  async confirmedProject({
+    projectId,
+    applyUserId,
+    projectUserId,
+  }: {
+    projectId: string;
+    applyUserId: string;
+    projectUserId: string;
+  }) {
     // NOTE: 조회하기
     const result = await this.projectRepository.findOneBy({ id: projectId });
+
+    // NOTE: 프로젝트 지원 상태 변경을 요청한 사용자와 프로젝트 등록한 사용자가 다른 경우
+    if (result.userId !== projectUserId) {
+      throw new HttpException(
+        '프로젝트 등록한 사람만 지원상태를 변경할 수 있습니다.',
+        HttpStatus.FORBIDDEN,
+      );
+    }
 
     // NOTE: 만약 현재 지원자를 참여 확정한 후 인원이 다 찼다면 프로젝트 모집 상태 변경하기
     if (result.confirmedNumber + 1 === result.recruitTotalNumber) {
@@ -637,15 +653,21 @@ export class ProjectService {
         state: EProjectState.COMPLETED,
         confirmedNumber: result.confirmedNumber + 1,
       });
-    } else {
+    } else if (result.confirmedNumber + 1 < result.recruitTotalNumber) {
       // NOTE: 참여 확정자 수 업데이트하기
       await this.projectRepository.update(projectId, {
         confirmedNumber: result.confirmedNumber + 1,
       });
+    } else {
+      // NOTE: 만약 참여 확정 인원이 다 찬 경우
+      throw new HttpException(
+        '모집 인원이 꽉 차서 참여확정이 불가능합니다.',
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
     }
 
     // NOTE: 사용자의 참여확정 횟수 업데이트하기
-    await this.userService.confirmedApply(userId);
+    await this.userService.confirmedApply(applyUserId);
 
     return {
       name: result.name,

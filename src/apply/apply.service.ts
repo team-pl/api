@@ -145,7 +145,7 @@ export class ApplyService {
   }
 
   // NOTE: 참여확정 API 로직
-  async confirm(applyId: string) {
+  async confirm(applyId: string, userId: string) {
     const applyData = await this.applyRepository.findOneBy({ id: applyId });
 
     // NOTE: 프로젝트 지원한 내역이 없을때
@@ -159,15 +159,17 @@ export class ApplyService {
     // NOTE: 이미 프로젝트 참여 확정 상태인 경우
     if (applyData.state === EApplyState.CONFIRMED) {
       throw new HttpException(
-        '해당 인원은 프로젝트에 이미 참여확정되었습니다.',
-        HttpStatus.UNPROCESSABLE_ENTITY,
+        '이미 참여확정으로 변경된 지원서입니다.',
+        HttpStatus.CONFLICT,
       );
     }
 
-    const { name } = await this.projectService.confirmedProject(
-      applyData.projectId,
-      applyData.userId,
-    );
+    // NOTE: 프로젝트 테이블 및 사용자 테이블 업데이트
+    const { name } = await this.projectService.confirmedProject({
+      projectId: applyData.projectId,
+      applyUserId: applyData.userId,
+      projectUserId: userId,
+    });
 
     // NOTE: 지원 상태 업데이트
     await this.applyRepository.update(
@@ -175,14 +177,14 @@ export class ApplyService {
       { state: EApplyState.CONFIRMED },
     );
 
-    console.log('name: ', name);
-
     // NOTE: 프로젝트 지원한 사람에게 알림 보내기
-    await this.notificationService.create({
+    await this.notificationService.createForApply({
       userId: applyData.userId,
+      message: '프로젝트 참여확정 되었습니다.',
       projectId: applyData.projectId,
-      message: `프로젝트 지원결과가 업데이트 되었습니다.`,
       projectName: name,
+      targetPage: 'dashboard',
+      dashboardState: EDashboardState.CONFIRMED,
     });
 
     return { result: true };

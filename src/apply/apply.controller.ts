@@ -136,8 +136,20 @@ export class ApplyController {
     description: 'user ID NotFound',
   })
   @ApiResponse({
+    status: 403,
+    description: '프로젝트 등록한 사람만 지원상태를 변경할 수 있습니다.',
+  })
+  @ApiResponse({
+    status: 404,
+    description: '프로젝트에 지원한 내역이 없습니다.',
+  })
+  @ApiResponse({
+    status: 409,
+    description: '이미 참여확정으로 변경된 지원서입니다.',
+  })
+  @ApiResponse({
     status: 422,
-    description: '해당 인원은 프로젝트에 이미 참여확정되었습니다.',
+    description: '모집 인원이 꽉 차서 참여확정이 불가능합니다.',
   })
   @ApiResponse({
     status: 200,
@@ -150,7 +162,7 @@ export class ApplyController {
       throw new HttpException('NotFound', HttpStatus.UNAUTHORIZED);
     }
 
-    return this.service.confirm(applyId);
+    return this.service.confirm(applyId, id);
   }
 
   @Patch('cancel/:id')
