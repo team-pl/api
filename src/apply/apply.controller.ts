@@ -265,6 +265,14 @@ export class ApplyController {
     description: '프로젝트 지원 ID',
   })
   @ApiResponse({
+    status: 401,
+    description: 'user ID NotFound',
+  })
+  @ApiResponse({
+    status: 404,
+    description: '프로젝트에 지원한 내역이 없습니다.',
+  })
+  @ApiResponse({
     status: 200,
     type: GetDetailResDto,
   })
@@ -272,7 +280,7 @@ export class ApplyController {
     const { id } = req.user.name;
 
     if (!id) {
-      throw new HttpException('NotFound', HttpStatus.UNAUTHORIZED);
+      throw new HttpException('user ID NotFound', HttpStatus.UNAUTHORIZED);
     }
 
     return this.service.getApplicant(applyId);

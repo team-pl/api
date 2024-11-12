@@ -303,6 +303,13 @@ export class ApplyService {
       id: applyId,
     });
 
+    if (!applyData) {
+      throw new HttpException(
+        '프로젝트에 지원한 내역이 없습니다.',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
     const profileData = await this.projectService.getApplicant(
       applyData.profileId,
     );
@@ -336,7 +343,10 @@ export class ApplyService {
     }
 
     return {
+      id: applyData.id,
       details: applyData.details,
+      state: applyData.state,
+      userId: applyData.userId,
       profile: {
         id: profileData.id,
         createdAt: profileData.createdAt,

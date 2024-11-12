@@ -77,8 +77,21 @@ export class GetApplicantsResDto {
 }
 
 export class GetDetailResDto {
+  @ApiProperty({ description: '프로젝트 지원 ID' })
+  id: string;
+
   @ApiProperty({ description: '사용자가 입력한 지원 내용' })
   details: string;
+
+  @ApiProperty({
+    description: '지원 상태',
+  })
+  state: EApplyState;
+
+  @ApiProperty({
+    description: '지원한 사용자 ID',
+  })
+  userId: string;
 
   @ApiProperty({ description: '사용자가 프로젝트 지원시 사용한 프로필 데이터' })
   profile: GetApplyProfileResDto;
