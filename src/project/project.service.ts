@@ -1018,4 +1018,31 @@ export class ProjectService {
 
     return true;
   }
+
+  // NOTE: 지원서 목록 조회시 해당 프로젝트의 지원서 조회 여부가 만료인지 아닌지 확인
+  async isExpirationPeriodOver(projectId: string) {
+    const now = new Date();
+
+    const result = await this.projectRepository.findOneBy({
+      id: projectId,
+      deletedAt: IsNull(),
+    });
+
+    if (!result) {
+      throw new HttpException(
+        '존재하지 않는 프로젝트입니다.',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    if (
+      now.getTime() - result.recruitExpiredAt.getTime() >=
+      1000 * 60 * 60 * 24 * 30
+    ) {
+      throw new HttpException(
+        '기간이 만료되어 확인할 수 없습니다.',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+  }
 }

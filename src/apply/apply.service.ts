@@ -283,9 +283,17 @@ export class ApplyService {
       list.push(...data);
     }
 
+    await this.projectService.isExpirationPeriodOver(projectId);
+
+    if (!list.length) {
+      throw new HttpException(
+        '해당 프로젝트에 지원자가 없습니다.',
+        HttpStatus.NO_CONTENT,
+      );
+    }
+
     return {
       list,
-      count: list.length,
     };
   }
 

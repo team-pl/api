@@ -35,6 +35,23 @@ export class GetApplicantResDto {
   createdAt: Date;
 
   @ApiProperty({
+    description: '지원한 사용자 닉네임',
+  })
+  nickname: string;
+
+  @ApiProperty({
+    description: '지원한 사용자 프로필사진 url',
+  })
+  profileImageUrl: string;
+
+  @ApiProperty({
+    description: '지원한 사용자 직업 종류',
+    nullable: true,
+    default: null,
+  })
+  jobType: string | null;
+
+  @ApiProperty({
     description: '지원한 사용자 ID',
   })
   userId: string;
@@ -51,8 +68,12 @@ export class GetApplicantResDto {
 }
 
 export class GetApplicantsResDto {
-  @ApiProperty({ description: '지원자 목록', isArray: true })
-  list: GetApplicantResDto;
+  @ApiProperty({
+    description: '지원자 목록',
+    isArray: true,
+    type: GetApplicantResDto,
+  })
+  list: GetApplicantResDto[];
 }
 
 export class GetDetailResDto {

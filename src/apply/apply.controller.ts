@@ -159,7 +159,7 @@ export class ApplyController {
     const { id } = req.user.name;
 
     if (!id) {
-      throw new HttpException('NotFound', HttpStatus.UNAUTHORIZED);
+      throw new HttpException('user ID NotFound', HttpStatus.UNAUTHORIZED);
     }
 
     return this.service.confirm(applyId, id);
@@ -201,7 +201,7 @@ export class ApplyController {
     const { id } = req.user.name;
 
     if (!id) {
-      throw new HttpException('NotFound', HttpStatus.UNAUTHORIZED);
+      throw new HttpException('user ID NotFound', HttpStatus.UNAUTHORIZED);
     }
 
     return this.service.cancel(applyId, id);
@@ -223,6 +223,22 @@ export class ApplyController {
     type: 'string',
   })
   @ApiResponse({
+    status: 204,
+    description: '해당 프로젝트에 지원자가 없습니다.',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'user ID NotFound',
+  })
+  @ApiResponse({
+    status: 403,
+    description: '기간이 만료되어 확인할 수 없습니다.',
+  })
+  @ApiResponse({
+    status: 404,
+    description: '존재하지 않는 프로젝트입니다.',
+  })
+  @ApiResponse({
     status: 200,
     type: GetApplicantsResDto,
   })
@@ -234,7 +250,7 @@ export class ApplyController {
     const { id } = req.user.name;
 
     if (!id) {
-      throw new HttpException('NotFound', HttpStatus.UNAUTHORIZED);
+      throw new HttpException('user ID NotFound', HttpStatus.UNAUTHORIZED);
     }
 
     return this.service.getApplicantsList(projectId, state);
