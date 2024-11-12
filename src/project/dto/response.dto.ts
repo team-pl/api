@@ -352,6 +352,9 @@ export class GetOneProjectResDto {
   @ApiProperty({ description: '사용자의 해당 프로젝트에 대한 좋아요(찜) 여부' })
   isLike: boolean;
 
+  @ApiProperty({ description: '사용자의 해당 프로젝트에 대한 지원 여부' })
+  isApplied: boolean;
+
   @ApiProperty({ description: '프로젝트 등록자의 프로필 정보' })
   profile: GetProfileForProjectResDto;
 }

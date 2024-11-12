@@ -13,6 +13,7 @@ import { v4 as uuid } from 'uuid';
 import { ProjectService } from 'src/project/project.service';
 import { NotificationsService } from 'src/notification/notification.service';
 import { EApplyState, EGetApplyState } from 'src/type/apply.type';
+import { EDashboardState } from 'src/type/notification.type';
 
 @Injectable()
 export class ApplyService {
@@ -30,9 +31,13 @@ export class ApplyService {
     const { projectId, profileId, details } = data;
 
     // NOTE: 중복 지원 방지를 위해서 기존에 해당 프로젝트에 지원했는지 확인
-    const applyArr = await this.applyRepository.findBy({ userId, projectId });
+    const prevApplyData = await this.applyRepository.findOneBy({
+      deletedAt: IsNull(),
+      userId,
+      projectId,
+    });
 
-    if (applyArr.length) {
+    if (prevApplyData) {
       throw new HttpException(
         '프로젝트에 이미 지원하여 중복지원이 불가능합니다.',
         HttpStatus.UNPROCESSABLE_ENTITY,
@@ -49,19 +54,12 @@ export class ApplyService {
       jobType,
     } = await this.projectService.applyProject(projectId, userId);
 
-    // NOTE: 프로젝트 모집한 사람에게 알림 보내기
-    await this.notificationService.create({
-      userId: projectUserId,
-      projectId,
-      message: `프로젝트에 새로운 지원자가 ${applicantTotalNumber}명 있습니다.`,
-      projectName: name,
-    });
-
+    // NOTE: 지원 데이터 생성
     const applyData = await this.applyRepository.create({
       id,
       projectId,
-      profileId,
       userId,
+      profileId,
       details,
       profileImageUrl,
       nickname,
@@ -70,11 +68,33 @@ export class ApplyService {
 
     await this.applyRepository.save(applyData);
 
-    return applyData;
+    // NOTE: 프로젝트 모집한 사람에게 알림 보내기
+    await this.notificationService.createForApply({
+      userId: projectUserId,
+      message: `프로젝트에 새로운 지원자가 ${applicantTotalNumber}명 있습니다.`,
+      projectId,
+      projectName: name,
+      targetPage: 'dashboard',
+      dashboardState: EDashboardState.REGISTER,
+    });
+
+    // NOTE: 프로젝트 지원한 사람에게 알림 보내기
+    await this.notificationService.createForApply({
+      userId,
+      message: '프로젝트 지원완료가 되었습니다.',
+      projectId,
+      projectName: name,
+      targetPage: 'dashboard',
+      dashboardState: EDashboardState.APPLY,
+    });
+
+    return {
+      id: applyData.id,
+    };
   }
 
-  // NOTE: 확인 API 로직
-  async check(applyId: string) {
+  // NOTE: 지원확인 API 로직
+  async check(applyId: string, userId: string) {
     const applyData = await this.applyRepository.findOneBy({ id: applyId });
 
     // NOTE: 프로젝트 지원한 내역이 없을때
@@ -85,27 +105,47 @@ export class ApplyService {
       );
     }
 
+    if (applyData.state === EApplyState.CHECKED) {
+      throw new HttpException(
+        '이미 확인완료로 변경된 지원서입니다.',
+        HttpStatus.CONFLICT,
+      );
+    }
+
+    // NOTE: 프로젝트 조회
+    const { name, projectUserId } = await this.projectService.checkApply(
+      applyData.projectId,
+    );
+
+    // NOTE: 프로젝트 지원 상태 변경을 요청한 사용자와 프로젝트 등록한 사용자가 다른 경우
+    if (projectUserId !== userId) {
+      throw new HttpException(
+        '프로젝트 등록한 사람만 지원상태를 변경할 수 있습니다.',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
     // NOTE: 지원 상태 업데이트
     await this.applyRepository.update(
       { id: applyId },
       { state: EApplyState.CHECKED },
     );
 
-    const { name } = await this.projectService.checkApply(applyData.projectId);
-
-    // NOTE: 프로젝트 지원한 사람에게 알림 보내기
-    await this.notificationService.create({
+    // NOTE: 지원한 사람에게 알림 보내기
+    await this.notificationService.createForApply({
       userId: applyData.userId,
+      message: '프로젝트의 지원서가 열람되었습니다.',
       projectId: applyData.projectId,
-      message: `프로젝트 지원결과가 업데이트 되었습니다.`,
       projectName: name,
+      targetPage: 'dashboard',
+      dashboardState: EDashboardState.APPLY,
     });
 
     return { result: true };
   }
 
   // NOTE: 참여확정 API 로직
-  async confirm(applyId: string) {
+  async confirm(applyId: string, userId: string) {
     const applyData = await this.applyRepository.findOneBy({ id: applyId });
 
     // NOTE: 프로젝트 지원한 내역이 없을때
@@ -119,15 +159,17 @@ export class ApplyService {
     // NOTE: 이미 프로젝트 참여 확정 상태인 경우
     if (applyData.state === EApplyState.CONFIRMED) {
       throw new HttpException(
-        '해당 인원은 프로젝트에 이미 참여확정되었습니다.',
-        HttpStatus.UNPROCESSABLE_ENTITY,
+        '이미 참여확정으로 변경된 지원서입니다.',
+        HttpStatus.CONFLICT,
       );
     }
 
-    const { name } = await this.projectService.confirmedProject(
-      applyData.projectId,
-      applyData.userId,
-    );
+    // NOTE: 프로젝트 테이블 및 사용자 테이블 업데이트
+    const { name } = await this.projectService.confirmedProject({
+      projectId: applyData.projectId,
+      applyUserId: applyData.userId,
+      projectUserId: userId,
+    });
 
     // NOTE: 지원 상태 업데이트
     await this.applyRepository.update(
@@ -135,21 +177,21 @@ export class ApplyService {
       { state: EApplyState.CONFIRMED },
     );
 
-    console.log('name: ', name);
-
     // NOTE: 프로젝트 지원한 사람에게 알림 보내기
-    await this.notificationService.create({
+    await this.notificationService.createForApply({
       userId: applyData.userId,
+      message: '프로젝트 참여확정 되었습니다.',
       projectId: applyData.projectId,
-      message: `프로젝트 지원결과가 업데이트 되었습니다.`,
       projectName: name,
+      targetPage: 'dashboard',
+      dashboardState: EDashboardState.CONFIRMED,
     });
 
     return { result: true };
   }
 
   // NOTE: 확정취소 API 로직
-  async cancel(applyId: string) {
+  async cancel(applyId: string, userId: string) {
     const applyData = await this.applyRepository.findOneBy({ id: applyId });
 
     // NOTE: 프로젝트 지원한 내역이 없을때
@@ -163,70 +205,29 @@ export class ApplyService {
     // NOTE: 이미 프로젝트 확정취소 상태인 경우
     if (applyData.state === EApplyState.CONFIRMED_CANCELED) {
       throw new HttpException(
-        '해당 인원은 프로젝트에 이미 확정취소되었습니다.',
-        HttpStatus.UNPROCESSABLE_ENTITY,
+        '이미 확정취소로 변경된 지원서입니다.',
+        HttpStatus.CONFLICT,
       );
     }
 
-    const { name } = await this.projectService.cancelApply(
-      applyData.projectId,
-      applyData.state,
-    );
+    if (applyData.state !== EApplyState.CONFIRMED) {
+      throw new HttpException(
+        '해당 지원자는 참여확정이 아니므로 취소를 할 수 없습니다.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    await this.projectService.cancelApply({
+      projectId: applyData.projectId,
+      applyUserId: applyData.userId,
+      projectUserId: userId,
+    });
 
     // NOTE: 지원 상태 업데이트
     await this.applyRepository.update(
       { id: applyId },
       { state: EApplyState.CONFIRMED_CANCELED },
     );
-
-    // NOTE: 프로젝트 지원한 사람에게 알림 보내기
-    await this.notificationService.create({
-      userId: applyData.userId,
-      projectId: applyData.projectId,
-      message: `프로젝트 지원결과가 업데이트 되었습니다.`,
-      projectName: name,
-    });
-
-    return { result: true };
-  }
-
-  async reject(applyId: string) {
-    const applyData = await this.applyRepository.findOneBy({ id: applyId });
-
-    // NOTE: 프로젝트 지원한 내역이 없을때
-    if (!applyData) {
-      throw new HttpException(
-        '프로젝트에 지원한 내역이 없습니다.',
-        HttpStatus.NOT_FOUND,
-      );
-    }
-
-    // NOTE: 이미 프로젝트 거절 상태인 경우
-    if (applyData.state === EApplyState.REJECT_CONFIRMED) {
-      throw new HttpException(
-        '해당 인원은 프로젝트에 이미 거절되었습니다.',
-        HttpStatus.UNPROCESSABLE_ENTITY,
-      );
-    }
-
-    const { name } = await this.projectService.rejectApply(
-      applyData.projectId,
-      applyData.state,
-    );
-
-    // NOTE: 지원 상태 업데이트
-    await this.applyRepository.update(
-      { id: applyId },
-      { state: EApplyState.REJECT_CONFIRMED },
-    );
-
-    // NOTE: 프로젝트 지원한 사람에게 알림 보내기
-    await this.notificationService.create({
-      userId: applyData.userId,
-      projectId: applyData.projectId,
-      message: `프로젝트 지원결과가 업데이트 되었습니다.`,
-      projectName: name,
-    });
 
     return { result: true };
   }
@@ -282,9 +283,17 @@ export class ApplyService {
       list.push(...data);
     }
 
+    await this.projectService.isExpirationPeriodOver(projectId);
+
+    if (!list.length) {
+      throw new HttpException(
+        '해당 프로젝트에 지원자가 없습니다.',
+        HttpStatus.NO_CONTENT,
+      );
+    }
+
     return {
       list,
-      count: list.length,
     };
   }
 
@@ -293,6 +302,13 @@ export class ApplyService {
       deletedAt: IsNull(),
       id: applyId,
     });
+
+    if (!applyData) {
+      throw new HttpException(
+        '프로젝트에 지원한 내역이 없습니다.',
+        HttpStatus.NOT_FOUND,
+      );
+    }
 
     const profileData = await this.projectService.getApplicant(
       applyData.profileId,
@@ -327,7 +343,10 @@ export class ApplyService {
     }
 
     return {
+      id: applyData.id,
       details: applyData.details,
+      state: applyData.state,
+      userId: applyData.userId,
       profile: {
         id: profileData.id,
         createdAt: profileData.createdAt,
@@ -365,5 +384,21 @@ export class ApplyService {
     const result = dataList.map((data) => data.projectId);
 
     return result;
+  }
+
+  async getIsApplied({
+    userId,
+    projectId,
+  }: {
+    userId: string;
+    projectId: string;
+  }) {
+    const applyData = await this.applyRepository.findOneBy({
+      deletedAt: IsNull(),
+      userId,
+      projectId,
+    });
+
+    return applyData ? true : false;
   }
 }

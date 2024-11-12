@@ -209,7 +209,10 @@ export class ProfileService {
     });
 
     if (!profileData)
-      throw new HttpException('Profile NotFound', HttpStatus.NOT_FOUND);
+      throw new HttpException(
+        '존재하지 않는 프로필입니다.',
+        HttpStatus.NOT_FOUND,
+      );
 
     return profileData;
   }

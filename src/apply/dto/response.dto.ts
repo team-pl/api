@@ -5,40 +5,6 @@ import { EApplyState } from 'src/type/apply.type';
 export class PostApplyResDto {
   @ApiProperty({ description: '프로젝트 지원 ID' })
   id: string;
-
-  @ApiProperty({ description: '프로젝트 지원일' })
-  createdAt: Date;
-
-  @ApiProperty({ description: '지원 수정일' })
-  updatedAt: Date;
-
-  @ApiProperty({ description: '지원 삭제일' })
-  deletedAt: Date;
-
-  @ApiProperty({
-    description: '지원한 프로젝트 ID',
-  })
-  projectId: string;
-
-  @ApiProperty({
-    description: '지원한 사용자 ID',
-  })
-  userId: string;
-
-  @ApiProperty({
-    description: '지원한 프로필 ID',
-  })
-  profileId: string;
-
-  @ApiProperty({
-    description: '지원 상태',
-  })
-  state: EApplyState;
-
-  @ApiProperty({
-    description: '지원 내용',
-  })
-  details: string;
 }
 
 export class CheckApplyResDto {
@@ -69,6 +35,23 @@ export class GetApplicantResDto {
   createdAt: Date;
 
   @ApiProperty({
+    description: '지원한 사용자 닉네임',
+  })
+  nickname: string;
+
+  @ApiProperty({
+    description: '지원한 사용자 프로필사진 url',
+  })
+  profileImageUrl: string;
+
+  @ApiProperty({
+    description: '지원한 사용자 직업 종류',
+    nullable: true,
+    default: null,
+  })
+  jobType: string | null;
+
+  @ApiProperty({
     description: '지원한 사용자 ID',
   })
   userId: string;
@@ -85,13 +68,30 @@ export class GetApplicantResDto {
 }
 
 export class GetApplicantsResDto {
-  @ApiProperty({ description: '지원자 목록', isArray: true })
-  list: GetApplicantResDto;
+  @ApiProperty({
+    description: '지원자 목록',
+    isArray: true,
+    type: GetApplicantResDto,
+  })
+  list: GetApplicantResDto[];
 }
 
 export class GetDetailResDto {
+  @ApiProperty({ description: '프로젝트 지원 ID' })
+  id: string;
+
   @ApiProperty({ description: '사용자가 입력한 지원 내용' })
   details: string;
+
+  @ApiProperty({
+    description: '지원 상태',
+  })
+  state: EApplyState;
+
+  @ApiProperty({
+    description: '지원한 사용자 ID',
+  })
+  userId: string;
 
   @ApiProperty({ description: '사용자가 프로젝트 지원시 사용한 프로필 데이터' })
   profile: GetApplyProfileResDto;
