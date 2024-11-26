@@ -16,7 +16,7 @@ import { ApplyModule } from 'src/apply/apply.module';
     forwardRef(() => ApplyModule),
     JwtModule.register({
       secret: process.env.SECRET_KEY,
-      signOptions: { expiresIn: '1h' },
+      signOptions: { expiresIn: '1d' },
     }),
     TypeOrmModule.forFeature([Project]),
     FileModule,

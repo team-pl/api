@@ -63,6 +63,7 @@ export class GetApplicantResDto {
 
   @ApiProperty({
     description: '지원 상태',
+    type: EApplyState,
   })
   state: EApplyState;
 }
@@ -85,6 +86,7 @@ export class GetDetailResDto {
 
   @ApiProperty({
     description: '지원 상태',
+    type: EApplyState,
   })
   state: EApplyState;
 
