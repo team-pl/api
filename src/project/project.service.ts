@@ -110,6 +110,7 @@ export class ProjectService {
       recruitDevTotalNumber: devCount,
       recruitDesignTotalNumber: designCount,
       recruitEtcTotalNumber: etcCount,
+      recruitTotalNumber: devCount + designCount + etcCount,
       recruitCategory: category.join('/'),
       recruitSubCategory: subCategory.join('/'),
       userName: userNickname,
@@ -419,6 +420,7 @@ export class ProjectService {
       recruitEtcTotalNumber: etcCount,
       recruitCategory: category.join('/'),
       recruitSubCategory: subCategory.join('/'),
+      recruitTotalNumber: devCount + designCount + etcCount,
       ...rest,
     });
 
