@@ -77,13 +77,6 @@ export class CreateTestProjectDto {
   })
   url: string;
 
-  @IsNumber()
-  @IsNotEmpty()
-  @ApiProperty({
-    description: '프로젝트 총 모집인원',
-  })
-  recruitTotalNumber: number;
-
   @IsString()
   @ApiProperty({
     description: '프로젝트 모집자가 선택한 프로필 ID',
