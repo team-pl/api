@@ -192,7 +192,7 @@ export class UserService {
 
     let fileUrl: string | null = null;
 
-    if (file) {
+    if (file && Object.keys(file).length !== 0) {
       const uploadedFile = await this.fileService.uploadFile(
         file,
         id,

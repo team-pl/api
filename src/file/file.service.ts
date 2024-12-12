@@ -57,14 +57,5 @@ export class FileService {
     } catch (e) {
       console.log('FILE UPLOAD ERROR : ', e);
     }
-    // try {
-    //   const upload = await new AWS.S3()
-    //     .createBucket({ Bucket: process.env.BUCKET })
-    //     .promise();
-    //   console.log(file);
-    //   console.log(upload);
-    // } catch (e) {
-    //   console.log('ERROR : ', e);
-    // }
   }
 }

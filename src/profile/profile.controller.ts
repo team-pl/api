@@ -92,7 +92,7 @@ export class ProfileController {
 
     let fileUrl: string | null = null;
 
-    if (portfolioFile) {
+    if (portfolioFile && Object.keys(portfolioFile).length !== 0) {
       const uploadedFile = await this.fileService.uploadFile(
         portfolioFile,
         id,
@@ -135,7 +135,7 @@ export class ProfileController {
 
     let fileUrl: string | null = null;
 
-    if (portfolioFile) {
+    if (portfolioFile && Object.keys(portfolioFile).length !== 0) {
       const uploadedFile = await this.fileService.uploadFile(
         portfolioFile,
         id,
@@ -188,7 +188,7 @@ export class ProfileController {
 
     let fileUrl: string | null = null;
 
-    if (portfolioFile) {
+    if (portfolioFile && Object.keys(portfolioFile).length !== 0) {
       const uploadedFile = await this.fileService.uploadFile(
         portfolioFile,
         id,
